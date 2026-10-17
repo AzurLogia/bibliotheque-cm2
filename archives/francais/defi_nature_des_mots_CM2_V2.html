@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Défi Nature des mots — CM2 — V2</title>
+<style>
+:root{
+  --bg:#f5f7fb; --card:#fff; --ink:#172033; --muted:#68738a;
+  --accent:#3157d5; --accent2:#eef2ff; --good:#16834a; --goodbg:#e8f7ef;
+  --bad:#c43b3b; --badbg:#fdecec; --border:#dce2ee;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.app{max-width:1050px;margin:auto;padding:28px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}
+.brand h1{margin:0;font-size:clamp(26px,4vw,42px);letter-spacing:-.03em}
+.brand p{margin:6px 0 0;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:clamp(20px,4vw,38px);box-shadow:0 12px 35px rgba(26,40,78,.07)}
+h2{margin-top:0}
+.natures{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0 28px}
+.check{position:relative}
+.check input{position:absolute;opacity:0;pointer-events:none}
+.check label{display:flex;align-items:center;gap:11px;border:2px solid var(--border);border-radius:15px;padding:14px 16px;font-weight:700;cursor:pointer;min-height:58px;transition:.15s}
+.check label:before{content:"";width:20px;height:20px;border:2px solid #aeb8cc;border-radius:6px;flex:none}
+.check input:checked+label{border-color:var(--accent);background:var(--accent2);color:#243f9c}
+.check input:checked+label:before{background:var(--accent);border-color:var(--accent);box-shadow:inset 0 0 0 4px white}
+.settings{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:end}
+label.small{font-weight:750;display:block;margin-bottom:8px}
+select,input[type=number]{width:100%;font:inherit;border:2px solid var(--border);border-radius:12px;padding:12px;background:#fff}
+button{font:inherit;font-weight:800;border:0;border-radius:14px;padding:13px 19px;cursor:pointer}
+.primary{background:var(--accent);color:white}
+.secondary{background:#edf0f6;color:var(--ink)}
+.start{width:100%;font-size:19px;margin-top:25px;padding:16px}
+#error{min-height:24px;color:var(--bad);font-weight:700;margin-top:10px}
+.hidden{display:none!important}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:18px}
+.progressWrap{height:12px;background:#e8ebf2;border-radius:99px;overflow:hidden;flex:1}
+.progress{height:100%;background:var(--accent);width:0;transition:.25s}
+.counter{font-weight:800;color:var(--muted);white-space:nowrap}
+.wordBox{text-align:center;padding:28px 10px 20px}
+.prompt{color:var(--muted);font-weight:700}
+.word{font-size:clamp(50px,10vw,92px);font-weight:900;letter-spacing:-.04em;margin:10px 0 8px;line-height:1.05}
+.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:22px 0}
+.answer{background:#fff;border:2px solid var(--border);min-height:66px;color:var(--ink);font-size:clamp(15px,2vw,19px);transition:.12s}
+.answer:hover{border-color:#aab7dc;background:#fafbff}
+.answer.good{background:var(--goodbg);border-color:var(--good);color:var(--good)}
+.answer.bad{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.answer:disabled{cursor:default}
+.feedback{text-align:center;min-height:36px;font-size:21px;font-weight:850}
+.feedback.good{color:var(--good)} .feedback.bad{color:var(--bad)}
+.actions{display:flex;justify-content:center;gap:10px;margin-top:10px}
+.scoreBig{text-align:center;font-size:clamp(45px,9vw,80px);font-weight:900;margin:25px 0 4px}
+.center{text-align:center}.muted{color:var(--muted)}
+.stats{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:22px 0}
+.pill{background:#f0f3f9;border-radius:999px;padding:10px 15px;font-weight:750}
+.studentBox{text-align:center;background:#f7f8fc;border:2px solid var(--border);border-radius:18px;padding:14px 18px;margin:0 auto 10px;max-width:520px}
+.studentLabel{font-size:14px;color:var(--muted);font-weight:750;text-transform:uppercase;letter-spacing:.05em}
+.studentName{font-size:clamp(26px,5vw,42px);font-weight:900;color:var(--accent);margin-top:2px}
+.classGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:20px 0}
+.studentStat{border:1px solid var(--border);border-radius:13px;padding:10px 7px;background:#fafbfe}
+.studentStat strong{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis}
+.studentStat span{font-size:13px;color:var(--muted)}
+.footer{color:var(--muted);font-size:13px;text-align:center;margin-top:16px}
+@media(max-width:650px){.natures,.answers,.settings{grid-template-columns:1fr}.classGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.app{padding:14px}.card{border-radius:18px}.wordBox{padding-top:18px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><h1>Défi Nature des mots</h1><p>Entraînement collectif — CM2</p></div>
+  <button id="fullscreen" class="secondary" title="Plein écran">⛶ Plein écran</button>
+</header>
+
+<section id="setup" class="card">
+  <h2>Préparer la manche</h2>
+  <p class="muted">Choisis au moins deux natures. Les mots sont mélangés à chaque partie et ne se répètent pas pendant une manche.</p>
+  <div class="natures" id="natureChecks"></div>
+  <div class="settings">
+    <div>
+      <label class="small" for="rounds">Nombre de mots</label>
+      <select id="rounds">
+        <option>5</option><option selected>10</option><option>15</option><option>20</option><option>30</option>
+        <option value="custom">Personnalisé…</option>
+      </select>
+    </div>
+    <div id="customWrap" class="hidden">
+      <label class="small" for="customRounds">Nombre personnalisé</label>
+      <input id="customRounds" type="number" min="1" max="100" value="12">
+    </div>
+  </div>
+  <div style="margin-top:22px">
+      <div class="check">
+        <input type="checkbox" id="studentMode" checked>
+        <label for="studentMode">🎓 Piocher un élève au hasard pour chaque mot</label>
+      </div>
+      <p class="muted" style="margin:8px 4px 0">Chaque élève est appelé une fois avant qu’un nouveau cycle aléatoire commence. Le score individuel et le score de la classe sont conservés pendant la manche.</p>
+    </div>
+    <div id="error"></div>
+  <button id="start" class="primary start">▶ Lancer la manche</button>
+</section>
+
+<section id="game" class="card hidden">
+  <div class="topline">
+    <div class="progressWrap"><div id="progress" class="progress"></div></div>
+    <div id="counter" class="counter"></div>
+  </div>
+  <div id="studentBox" class="studentBox hidden">
+      <div class="studentLabel">C’est à toi !</div>
+      <div id="studentName" class="studentName"></div>
+    </div>
+    <div class="wordBox">
+    <div class="prompt">Quelle est la nature de ce mot ?</div>
+    <div id="word" class="word"></div>
+  </div>
+  <div id="answers" class="answers"></div>
+  <div id="feedback" class="feedback"></div>
+  <div class="actions">
+    <button id="next" class="primary hidden">Mot suivant →</button>
+    <button id="quit" class="secondary">⚙ Paramètres</button>
+  </div>
+</section>
+
+<section id="result" class="card hidden center">
+  <h2>Manche terminée !</h2>
+  <div id="scoreBig" class="scoreBig"></div>
+  <div id="scoreText" class="muted"></div>
+  <div id="stats" class="stats"></div>
+  <div id="classResults" class="hidden">
+    <h3>Résultats de la classe</h3>
+    <div id="classGrid" class="classGrid"></div>
+  </div>
+  <div class="actions">
+    <button id="replay" class="primary">↻ Rejouer avec ces réglages</button>
+    <button id="settingsBtn" class="secondary">⚙ Modifier les réglages</button>
+  </div>
+</section>
+<div class="footer">V2 — tirage aléatoire des élèves et score de classe — fonctionne hors connexion.</div>
+</div>
+
+<script>
+const CATEGORIES = {
+ common:{label:"Nom commun", words:["chat","école","forêt","courage","montagne","ordinateur","rivière","enfant","histoire","ballon","village","tempête","silence","cheval","fenêtre","jardin","musique","voyage","planète","sourire","bibliothèque","cahier","château","océan","aventure","crayon","maison","abeille","vélo","secret"]},
+ proper:{label:"Nom propre", words:["Paris","Londres","France","Europe","Sahara","Molière","Mozart","Jupiter","Seine","Alpes","Marseille","Léa","Yanis","Amazonie","Versailles","Napoléon","Afrique","Italie","Loire","Picasso","Tokyo","Canada","Martin","Athènes","Voltaire","Normandie","Camille","Madrid","Nina","Himalaya"]},
+ def:{label:"Article défini", words:["le","la","les","l’"]},
+ indef:{label:"Article indéfini", words:["un","une","des"]},
+ poss:{label:"Déterminant possessif", words:["mon","ma","mes","ton","ta","tes","son","sa","ses","notre","nos","votre","vos","leur","leurs"]},
+ demo:{label:"Déterminant démonstratif", words:["ce","cet","cette","ces"]}
+};
+const DEFAULTS=["common","proper","def","indef","poss","demo"];
+const STUDENTS=["Pauline","Louane","Clémence","Meloe","Maëlie","Kaly","Sean","Theo","Ewen","Angel","Alexei","Julia","Serigne","Camille","Manon","Mattheo","Romane","Laya","Salomé","Elona","Louis","Timeo","Gabriel","Rafael"];
+let selected=[], deck=[], index=0, firstTryCorrect=0, mistakes=0, answered=false, lastSettings=null;
+let studentMode=true, studentDeck=[], studentIndex=0, currentStudent=null, studentStats={};
+
+const $=id=>document.getElementById(id);
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function show(which){["setup","game","result"].forEach(x=>$(x).classList.toggle("hidden",x!==which))}
+function buildChecks(){
+ $("natureChecks").innerHTML=Object.entries(CATEGORIES).map(([k,v])=>`<div class="check"><input type="checkbox" id="c_${k}" value="${k}" checked><label for="c_${k}">${v.label}</label></div>`).join("");
+}
+function getCount(){
+ return $("rounds").value==="custom" ? Math.max(1,Math.min(100,parseInt($("customRounds").value)||10)) : parseInt($("rounds").value);
+}
+function makeDeck(cats,count){
+ // Balanced selection: cycles through shuffled categories, taking shuffled unused words where possible.
+ const pools={}; cats.forEach(c=>pools[c]=shuffle(CATEGORIES[c].words));
+ const out=[]; let order=shuffle(cats), pos=0;
+ while(out.length<count){
+   if(pos>=order.length){order=shuffle(cats);pos=0}
+   const c=order[pos++];
+   if(!pools[c].length) pools[c]=shuffle(CATEGORIES[c].words);
+   let w=pools[c].pop();
+   // Avoid identical word immediately following itself.
+   if(out.length && out[out.length-1].word===w && CATEGORIES[c].words.length>1){pools[c].unshift(w);w=pools[c].pop()}
+   out.push({word:w,cat:c});
+ }
+ return out;
+}
+function buildStudentDeck(count){
+ const out=[]; let pool=[];
+ for(let i=0;i<count;i++){
+   if(!pool.length) pool=shuffle(STUDENTS);
+   out.push(pool.pop());
+ }
+ return out;
+}
+function resetStudentStats(){
+ studentStats={}; STUDENTS.forEach(s=>studentStats[s]={questions:0,first:0,errors:0});
+}
+function startGame(reuse=false){
+ selected=DEFAULTS.filter(k=>$("c_"+k).checked);
+ const count=getCount();
+ if(selected.length<2){$("error").textContent="Sélectionne au moins deux natures grammaticales.";return}
+ $("error").textContent="";
+ studentMode=$("studentMode").checked;
+ lastSettings={selected:[...selected],count,studentMode};
+ deck=makeDeck(selected,count); index=0; firstTryCorrect=0; mistakes=0;
+ resetStudentStats(); studentDeck=studentMode?buildStudentDeck(count):[];
+ show("game"); renderQuestion();
+}
+function renderQuestion(){
+ answered=false; $("next").classList.add("hidden"); $("feedback").textContent=""; $("feedback").className="feedback";
+ const q=deck[index]; $("word").textContent=q.word;
+ currentStudent=studentMode?studentDeck[index]:null;
+ $("studentBox").classList.toggle("hidden",!studentMode);
+ if(studentMode){$("studentName").textContent=currentStudent; studentStats[currentStudent].questions++;}
+ $("counter").textContent=`${index+1} / ${deck.length}`;
+ $("progress").style.width=`${index/deck.length*100}%`;
+ $("answers").innerHTML=shuffle(selected).map(c=>`<button class="answer" data-cat="${c}">${CATEGORIES[c].label}</button>`).join("");
+ [...$("answers").children].forEach(b=>b.onclick=()=>choose(b,q));
+}
+function choose(btn,q){
+ if(answered)return;
+ const cat=btn.dataset.cat;
+ if(cat===q.cat){
+   answered=true; btn.classList.add("good");
+   [...$("answers").children].forEach(b=>b.disabled=true);
+   if(!document.querySelector(".answer.bad")){ firstTryCorrect++; if(studentMode) studentStats[currentStudent].first++; }
+   $("feedback").textContent="✓ Bonne réponse !"; $("feedback").className="feedback good";
+   $("next").textContent=index===deck.length-1?"Voir le résultat →":"Mot suivant →";
+   $("next").classList.remove("hidden");
+ } else {
+   mistakes++; if(studentMode) studentStats[currentStudent].errors++; btn.classList.add("bad"); btn.disabled=true;
+   $("feedback").textContent="✗ Ce n’est pas cette nature. Essaie encore !"; $("feedback").className="feedback bad";
+ }
+}
+function next(){
+ index++;
+ if(index>=deck.length){finish();return}
+ renderQuestion();
+}
+function finish(){
+ $("progress").style.width="100%"; show("result");
+ const pct=Math.round(firstTryCorrect/deck.length*100);
+ $("scoreBig").textContent=`${firstTryCorrect} / ${deck.length}`;
+ $("scoreText").textContent=`${pct} % trouvés du premier coup`;
+ $("stats").innerHTML=`<div class="pill">✓ ${firstTryCorrect} du premier coup</div><div class="pill">↻ ${mistakes} erreur${mistakes>1?"s":""} avant correction</div>`;
+ $("classResults").classList.toggle("hidden",!studentMode);
+ if(studentMode){
+   $("classGrid").innerHTML=STUDENTS.map(s=>{
+     const st=studentStats[s];
+     const detail=st.questions?`${st.first}/${st.questions} du 1er coup${st.errors?` · ${st.errors} erreur${st.errors>1?"s":""}`:""}`:"Non interrogé";
+     return `<div class="studentStat"><strong>${s}</strong><span>${detail}</span></div>`;
+   }).join("");
+ }
+}
+buildChecks();
+$("rounds").onchange=()=> $("customWrap").classList.toggle("hidden",$("rounds").value!=="custom");
+$("start").onclick=()=>startGame();
+$("next").onclick=next;
+$("quit").onclick=()=>show("setup");
+$("settingsBtn").onclick=()=>show("setup");
+$("replay").onclick=()=>{
+ DEFAULTS.forEach(k=>$("c_"+k).checked=lastSettings.selected.includes(k)); $("studentMode").checked=lastSettings.studentMode;
+ if([5,10,15,20,30].includes(lastSettings.count)){$("rounds").value=String(lastSettings.count);$("customWrap").classList.add("hidden")}
+ else {$("rounds").value="custom";$("customRounds").value=lastSettings.count;$("customWrap").classList.remove("hidden")}
+ startGame(true);
+};
+$("fullscreen").onclick=async()=>{
+ try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}catch(e){}
+};
+document.addEventListener("keydown",e=>{
+ if(!$("game").classList.contains("hidden") && answered && (e.key==="Enter"||e.key===" ")){e.preventDefault();next()}
+});
+</script>
+</body>
+</html>
