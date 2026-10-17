@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entraînement conjugaison V4</title>
+<style>
+:root{
+  --bg:#f3f6fb;--card:#fff;--ink:#1f2937;--muted:#64748b;--line:#dbe3ef;
+  --accent:#2563eb;--accent2:#7c3aed;--good:#15803d;--bad:#b91c1c;--warn:#b45309;
+  --shadow:0 10px 28px rgba(15,23,42,.10)
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:linear-gradient(180deg,#eef4ff 0%,var(--bg) 42%);color:var(--ink)
+}
+.wrap{max-width:1240px;margin:0 auto;padding:24px}
+h1{margin:0 0 8px;font-size:clamp(28px,4vw,44px);line-height:1.05}
+.subtitle{color:var(--muted);font-size:17px;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:360px 1fr;gap:20px}
+body.projection .grid{display:block}
+body.projection aside.card{display:none}
+body.projection main.card{max-width:1100px;margin:0 auto;min-height:80vh}
+body.projection .wrap{max-width:1180px}
+.projection-bar{display:none;justify-content:flex-end;margin-bottom:10px}
+body.projection .projection-bar{display:flex}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:18px}
+.panel-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.panel-title h2{font-size:19px;margin:0}
+.small{font-size:13px;color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+button,input{font:inherit}
+button{border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;transition:.15s ease}
+button:hover:not(:disabled){transform:translateY(-1px)}
+button:disabled{opacity:.42;cursor:not-allowed}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-secondary{background:#e8eefb;color:#1e3a8a}
+.btn-purple{background:var(--accent2);color:#fff}
+.btn-ghost{background:#f8fafc;color:#334155;border:1px solid var(--line)}
+
+.selector-box{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fafcff;margin-bottom:14px}
+.selector-grid{display:grid;grid-template-columns:1fr;gap:7px}
+.checkline{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:9px}
+.checkline:hover{background:#f1f5f9}
+.checkline input{transform:scale(1.15)}
+.selection-summary{font-size:12px;color:var(--muted);line-height:1.35;margin-top:8px}
+
+.students{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:350px;overflow:auto;padding-right:4px}
+.student{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:8px 9px;background:#fafcff}
+.student input{transform:scale(1.15)}
+
+.mode-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.mode{border:2px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;background:#fff}
+.mode.active{border-color:var(--accent);background:#eff6ff}
+.mode strong{display:block}.mode span{font-size:12px;color:var(--muted)}
+.remed-settings{display:none;border:1px dashed #c4b5fd;background:#faf5ff;padding:12px;border-radius:12px;margin-bottom:14px}
+.remed-settings.show{display:block}
+.remed-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.remed-line input{width:76px;padding:8px;border:1px solid var(--line);border-radius:9px}
+.note{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.4}
+
+.stage{min-height:720px;display:flex;flex-direction:column}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.pill{display:inline-flex;align-items:center;gap:8px;background:#eef2ff;color:#3730a3;border-radius:999px;padding:7px 11px;font-weight:800;font-size:14px}
+.progress{height:11px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-bottom:18px}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.3s}
+
+.student-draw{text-align:center;background:linear-gradient(135deg,#eff6ff,#f5f3ff);border:1px solid #c7d2fe;border-radius:18px;padding:18px;margin-bottom:18px}
+.student-draw .label{font-size:14px;color:var(--muted);font-weight:700}
+.student-draw .name{font-size:34px;font-weight:900;margin-top:2px}
+
+.context-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.context-chip{font-size:12px;font-weight:800;background:#f8fafc;border:1px solid var(--line);border-radius:999px;padding:6px 9px;color:#475569}
+.exercise-tag{align-self:flex-start;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:#475569;background:#f1f5f9;border-radius:999px;padding:7px 10px;margin-bottom:12px}
+.question{font-size:clamp(24px,3vw,36px);font-weight:850;line-height:1.35;text-align:center;padding:24px 12px 18px}
+.blank{display:inline-block;min-width:58px;padding:0 3px 2px}
+
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.choice{font-size:22px;padding:16px;border:2px solid var(--line);background:#fff;color:var(--ink)}
+.choice:hover:not(:disabled){border-color:#93c5fd;background:#f8fbff}
+.choice.correct{border-color:#86efac;background:#f0fdf4;color:#166534}
+.choice.wrong{border-color:#fca5a5;background:#fef2f2;color:#991b1b}
+.answerbox{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:18px 0}
+.answerbox input{min-width:300px;padding:15px 16px;font-size:22px;text-align:center;border:2px solid var(--line);border-radius:12px}
+.attempts{text-align:center;color:var(--muted);font-weight:700;margin-top:6px}
+.feedback{min-height:72px;margin-top:12px;padding:14px;border-radius:14px;font-size:18px;text-align:center;display:flex;align-items:center;justify-content:center}
+.feedback.good{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.feedback.bad{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.feedback.warn{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}
+.bottom-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:16px}
+
+.scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.score-item{border:1px solid var(--line);border-radius:11px;padding:8px;text-align:center;background:#fff}
+.score-item.saved{background:#f0fdf4;border-color:#86efac}
+.score-item .n{font-weight:800}.score-item .s{font-size:18px;font-weight:900;color:var(--accent2)}
+
+.remed-players{display:none;margin:12px 0 8px}
+.remed-players.show{display:block}
+.remed-help{text-align:center;color:var(--muted);font-weight:700;margin-bottom:10px}
+.player-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.player-btn{border:2px solid var(--line);background:#fff;color:var(--ink);padding:12px}
+.player-btn.selected{border-color:var(--accent);background:#eff6ff}
+.player-btn.blocked{opacity:.35;text-decoration:line-through}
+.player-btn.saved{border-color:#86efac;background:#f0fdf4;color:#166534}
+.player-btn .pts{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+
+.summary{display:none;text-align:center;padding:20px}.summary.show{display:block}
+.summary h2{font-size:34px;margin:8px 0}.summary .big{font-size:52px;font-weight:900;color:var(--accent)}
+
+@media(max-width:940px){
+  .grid{grid-template-columns:1fr}.students{max-height:260px}.choices{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .wrap{padding:12px}.choices{grid-template-columns:1fr}.students{grid-template-columns:1fr 1fr}.player-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Entraînement conjugaison</h1>
+  <div class="subtitle">Un outil évolutif pour réviser les temps et les groupes travaillés en classe.</div>
+
+  <div class="grid">
+    <aside class="card">
+      <div class="panel-title"><h2>Temps à travailler</h2></div>
+      <div class="selector-box">
+        <div class="selector-grid" id="tenseSelectors">
+          <label class="checkline"><input type="checkbox" value="present" checked> Présent de l’indicatif</label>
+          <label class="checkline"><input type="checkbox" value="imparfait"> Imparfait</label>
+          <label class="checkline"><input type="checkbox" value="passeCompose"> Passé composé</label>
+          <label class="checkline"><input type="checkbox" value="passeSimple"> Passé simple</label>
+          <label class="checkline"><input type="checkbox" value="futur"> Futur simple</label>
+        </div>
+        <div class="toolbar" style="margin-top:10px;margin-bottom:0">
+          <button class="btn-secondary mini" id="allTenses">Tout cocher</button>
+          <button class="btn-ghost mini" id="clearTenses">Tout décocher</button>
+        </div>
+      </div>
+
+      <div class="panel-title"><h2>Groupes de verbes</h2></div>
+      <div class="selector-box">
+        <div class="selector-grid" id="groupSelectors">
+          <label class="checkline"><input type="checkbox" value="1" checked> 1er groupe</label>
+          <label class="checkline"><input type="checkbox" value="2"> 2e groupe</label>
+          <label class="checkline"><input type="checkbox" value="3"> 3e groupe</label>
+        </div>
+        <div class="toolbar" style="margin-top:10px;margin-bottom:0">
+          <button class="btn-secondary mini" id="allGroups">Tout cocher</button>
+          <button class="btn-ghost mini" id="clearGroups">Tout décocher</button>
+        </div>
+        <div class="selection-summary" id="selectionSummary">Présent de l’indicatif · 1er groupe</div>
+      </div>
+
+      <div class="panel-title">
+        <h2>Élèves</h2><span class="small" id="selectedCount">24 sélectionnés</span>
+      </div>
+      <div class="toolbar">
+        <button class="btn-secondary" id="selectAll">Tout cocher</button>
+        <button class="btn-ghost" id="clearAll">Tout décocher</button>
+      </div>
+      <div class="students" id="students"></div>
+
+      <div style="height:16px"></div>
+      <div class="panel-title"><h2>Mode de jeu</h2></div>
+      <div class="mode-row">
+        <div class="mode active" data-mode="class"><strong>Classe</strong><span>24 questions</span></div>
+        <div class="mode" data-mode="remed"><strong>Remédiation</strong><span>Petit groupe + sauvetage</span></div>
+      </div>
+
+      <div class="remed-settings" id="remedSettings">
+        <div class="remed-line">
+          <label for="targetPoints"><strong>Pour être sauvé :</strong></label>
+          <input id="targetPoints" type="number" min="1" max="10" value="3"><span>points</span>
+        </div>
+        <div class="note">Tous réfléchissent à la même question. Clique sur l’élève qui répond. Une erreur l’empêche de répondre à nouveau à cette question.</div>
+      </div>
+
+      <button class="btn-primary" id="startBtn" style="width:100%;font-size:18px;padding:14px">Commencer</button>
+      <div class="scoreboard" id="scoreboard"></div>
+    </aside>
+
+    <main class="card stage">
+      <div class="projection-bar">
+        <button class="btn-ghost" id="settingsBtn">← Revenir aux réglages</button>
+      </div>
+      <div id="gameArea">
+        <div class="topline">
+          <div class="pill" id="qCounter">Prêt</div>
+          <div class="pill" id="scoreCounter">0 bonne réponse</div>
+        </div>
+        <div class="progress"><div id="progressBar"></div></div>
+
+        <div class="student-draw" id="studentDraw">
+          <div class="label">Élève tiré au sort</div>
+          <div class="name" id="currentStudent">—</div>
+        </div>
+
+        <div class="remed-players" id="remedPlayers">
+          <div class="remed-help">Clique sur l’élève qui propose une réponse.</div>
+          <div class="player-grid" id="playerGrid"></div>
+        </div>
+
+        <div class="context-row">
+          <div class="context-chip" id="tenseChip">Présent</div>
+          <div class="context-chip" id="groupChip">1er groupe</div>
+          <div class="context-chip" id="verbChip">verbe : —</div>
+        </div>
+
+        <div class="exercise-tag" id="exerciseTag">Choisis les paramètres puis commence</div>
+        <div class="question" id="questionText">La première question apparaîtra ici.</div>
+        <div id="interaction"></div>
+        <div class="feedback" id="feedback"></div>
+
+        <div class="bottom-actions">
+          <button class="btn-ghost" id="skipBtn" disabled>Passer</button>
+          <button class="btn-purple" id="nextBtn" disabled>Question suivante</button>
+        </div>
+      </div>
+
+      <div class="summary" id="summary">
+        <div style="font-size:48px">🎉</div>
+        <h2 id="summaryTitle">Défi terminé !</h2>
+        <div class="big" id="finalScore">0 / 24</div>
+        <p id="finalText"></p>
+        <button class="btn-primary" id="restartBtn">Rejouer</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const studentNames=[
+  "Pauline","Louane","Clémence","Meloe","Maëlie","Kaly","Sean","Theo",
+  "Ewen","Angel","Alexei","Julia","Serigne","Camille","Manon","Mattheo",
+  "Romane","Laya","Salomé","Elona","Louis","Timeo","Gabriel","Rafael"
+];
+
+const subjects=["Je","Tu","Il","Nous","Vous","Ils"];
+const tenseLabels={
+  present:"Présent de l’indicatif",
+  imparfait:"Imparfait",
+  passeCompose:"Passé composé",
+  passeSimple:"Passé simple",
+  futur:"Futur simple"
+};
+const groupLabels={"1":"1er groupe","2":"2e groupe","3":"3e groupe"};
+
+/*
+  Base de conjugaison.
+  Chaque tableau respecte l’ordre : je, tu, il, nous, vous, ils.
+  Pour les verbes commençant par une voyelle, l’affichage remplace "Je" par "J’".
+*/
+const verbs=[
+  // 1er groupe
+  {
+    infinitive:"chanter",group:"1",
+    forms:{
+      present:["chante","chantes","chante","chantons","chantez","chantent"],
+      imparfait:["chantais","chantais","chantait","chantions","chantiez","chantaient"],
+      futur:["chanterai","chanteras","chantera","chanterons","chanterez","chanteront"],
+      passeSimple:["chantai","chantas","chanta","chantâmes","chantâtes","chantèrent"],
+      passeCompose:["ai chanté","as chanté","a chanté","avons chanté","avez chanté","ont chanté"]
+    }
+  },
+  {
+    infinitive:"jouer",group:"1",
+    forms:{
+      present:["joue","joues","joue","jouons","jouez","jouent"],
+      imparfait:["jouais","jouais","jouait","jouions","jouiez","jouaient"],
+      futur:["jouerai","joueras","jouera","jouerons","jouerez","joueront"],
+      passeSimple:["jouai","jouas","joua","jouâmes","jouâtes","jouèrent"],
+      passeCompose:["ai joué","as joué","a joué","avons joué","avez joué","ont joué"]
+    }
+  },
+  {
+    infinitive:"regarder",group:"1",
+    forms:{
+      present:["regarde","regardes","regarde","regardons","regardez","regardent"],
+      imparfait:["regardais","regardais","regardait","regardions","regardiez","regardaient"],
+      futur:["regarderai","regarderas","regardera","regarderons","regarderez","regarderont"],
+      passeSimple:["regardai","regardas","regarda","regardâmes","regardâtes","regardèrent"],
+      passeCompose:["ai regardé","as regardé","a regardé","avons regardé","avez regardé","ont regardé"]
+    }
+  },
+  {
+    infinitive:"préparer",group:"1",
+    forms:{
+      present:["prépare","prépares","prépare","préparons","préparez","préparent"],
+      imparfait:["préparais","préparais","préparait","préparions","prépariez","préparaient"],
+      futur:["préparerai","prépareras","préparera","préparerons","préparerez","prépareront"],
+      passeSimple:["préparai","préparas","prépara","préparâmes","préparâtes","préparèrent"],
+      passeCompose:["ai préparé","as préparé","a préparé","avons préparé","avez préparé","ont préparé"]
+    }
+  },
+  {
+    infinitive:"aimer",group:"1",
+    forms:{
+      present:["aime","aimes","aime","aimons","aimez","aiment"],
+      imparfait:["aimais","aimais","aimait","aimions","aimiez","aimaient"],
+      futur:["aimerai","aimeras","aimera","aimerons","aimerez","aimeront"],
+      passeSimple:["aimai","aimas","aima","aimâmes","aimâtes","aimèrent"],
+      passeCompose:["ai aimé","as aimé","a aimé","avons aimé","avez aimé","ont aimé"]
+    }
+  },
+  {
+    infinitive:"dessiner",group:"1",
+    forms:{
+      present:["dessine","dessines","dessine","dessinons","dessinez","dessinent"],
+      imparfait:["dessinais","dessinais","dessinait","dessinions","dessiniez","dessinaient"],
+      futur:["dessinerai","dessineras","dessinera","dessinerons","dessinerez","dessineront"],
+      passeSimple:["dessinai","dessinas","dessina","dessinâmes","dessinâtes","dessinèrent"],
+      passeCompose:["ai dessiné","as dessiné","a dessiné","avons dessiné","avez dessiné","ont dessiné"]
+    }
+  },
+
+  // 2e groupe
+  {
+    infinitive:"finir",group:"2",
+    forms:{
+      present:["finis","finis","finit","finissons","finissez","finissent"],
+      imparfait:["finissais","finissais","finissait","finissions","finissiez","finissaient"],
+      futur:["finirai","finiras","finira","finirons","finirez","finiront"],
+      passeSimple:["finis","finis","finit","finîmes","finîtes","finirent"],
+      passeCompose:["ai fini","as fini","a fini","avons fini","avez fini","ont fini"]
+    }
+  },
+  {
+    infinitive:"choisir",group:"2",
+    forms:{
+      present:["choisis","choisis","choisit","choisissons","choisissez","choisissent"],
+      imparfait:["choisissais","choisissais","choisissait","choisissions","choisissiez","choisissaient"],
+      futur:["choisirai","choisiras","choisira","choisirons","choisirez","choisiront"],
+      passeSimple:["choisis","choisis","choisit","choisîmes","choisîtes","choisirent"],
+      passeCompose:["ai choisi","as choisi","a choisi","avons choisi","avez choisi","ont choisi"]
+    }
+  },
+  {
+    infinitive:"grandir",group:"2",
+    forms:{
+      present:["grandis","grandis","grandit","grandissons","grandissez","grandissent"],
+      imparfait:["grandissais","grandissais","grandissait","grandissions","grandissiez","grandissaient"],
+      futur:["grandirai","grandiras","grandira","grandirons","grandirez","grandiront"],
+      passeSimple:["grandis","grandis","grandit","grandîmes","grandîtes","grandirent"],
+      passeCompose:["ai grandi","as grandi","a grandi","avons grandi","avez grandi","ont grandi"]
+    }
+  },
+  {
+    infinitive:"réussir",group:"2",
+    forms:{
+      present:["réussis","réussis","réussit","réussissons","réussissez","réussissent"],
+      imparfait:["réussissais","réussissais","réussissait","réussissions","réussissiez","réussissaient"],
+      futur:["réussirai","réussiras","réussira","réussirons","réussirez","réussiront"],
+      passeSimple:["réussis","réussis","réussit","réussîmes","réussîtes","réussirent"],
+      passeCompose:["ai réussi","as réussi","a réussi","avons réussi","avez réussi","ont réussi"]
+    }
+  },
+  {
+    infinitive:"réfléchir",group:"2",
+    forms:{
+      present:["réfléchis","réfléchis","réfléchit","réfléchissons","réfléchissez","réfléchissent"],
+      imparfait:["réfléchissais","réfléchissais","réfléchissait","réfléchissions","réfléchissiez","réfléchissaient"],
+      futur:["réfléchirai","réfléchiras","réfléchira","réfléchirons","réfléchirez","réfléchiront"],
+      passeSimple:["réfléchis","réfléchis","réfléchit","réfléchîmes","réfléchîtes","réfléchirent"],
+      passeCompose:["ai réfléchi","as réfléchi","a réfléchi","avons réfléchi","avez réfléchi","ont réfléchi"]
+    }
+  },
+
+  // 3e groupe : verbes usuels de cycle 3
+  {
+    infinitive:"être",group:"3",
+    forms:{
+      present:["suis","es","est","sommes","êtes","sont"],
+      imparfait:["étais","étais","était","étions","étiez","étaient"],
+      futur:["serai","seras","sera","serons","serez","seront"],
+      passeSimple:["fus","fus","fut","fûmes","fûtes","furent"],
+      passeCompose:["ai été","as été","a été","avons été","avez été","ont été"]
+    }
+  },
+  {
+    infinitive:"avoir",group:"3",
+    forms:{
+      present:["ai","as","a","avons","avez","ont"],
+      imparfait:["avais","avais","avait","avions","aviez","avaient"],
+      futur:["aurai","auras","aura","aurons","aurez","auront"],
+      passeSimple:["eus","eus","eut","eûmes","eûtes","eurent"],
+      passeCompose:["ai eu","as eu","a eu","avons eu","avez eu","ont eu"]
+    }
+  },
+  {
+    infinitive:"faire",group:"3",
+    forms:{
+      present:["fais","fais","fait","faisons","faites","font"],
+      imparfait:["faisais","faisais","faisait","faisions","faisiez","faisaient"],
+      futur:["ferai","feras","fera","ferons","ferez","feront"],
+      passeSimple:["fis","fis","fit","fîmes","fîtes","firent"],
+      passeCompose:["ai fait","as fait","a fait","avons fait","avez fait","ont fait"]
+    }
+  },
+  {
+    infinitive:"dire",group:"3",
+    forms:{
+      present:["dis","dis","dit","disons","dites","disent"],
+      imparfait:["disais","disais","disait","disions","disiez","disaient"],
+      futur:["dirai","diras","dira","dirons","direz","diront"],
+      passeSimple:["dis","dis","dit","dîmes","dîtes","dirent"],
+      passeCompose:["ai dit","as dit","a dit","avons dit","avez dit","ont dit"]
+    }
+  },
+  {
+    infinitive:"prendre",group:"3",
+    forms:{
+      present:["prends","prends","prend","prenons","prenez","prennent"],
+      imparfait:["prenais","prenais","prenait","prenions","preniez","prenaient"],
+      futur:["prendrai","prendras","prendra","prendrons","prendrez","prendront"],
+      passeSimple:["pris","pris","prit","prîmes","prîtes","prirent"],
+      passeCompose:["ai pris","as pris","a pris","avons pris","avez pris","ont pris"]
+    }
+  },
+  {
+    infinitive:"voir",group:"3",
+    forms:{
+      present:["vois","vois","voit","voyons","voyez","voient"],
+      imparfait:["voyais","voyais","voyait","voyions","voyiez","voyaient"],
+      futur:["verrai","verras","verra","verrons","verrez","verront"],
+      passeSimple:["vis","vis","vit","vîmes","vîtes","virent"],
+      passeCompose:["ai vu","as vu","a vu","avons vu","avez vu","ont vu"]
+    }
+  },
+  {
+    infinitive:"pouvoir",group:"3",
+    forms:{
+      present:["peux","peux","peut","pouvons","pouvez","peuvent"],
+      imparfait:["pouvais","pouvais","pouvait","pouvions","pouviez","pouvaient"],
+      futur:["pourrai","pourras","pourra","pourrons","pourrez","pourront"],
+      passeSimple:["pus","pus","put","pûmes","pûtes","purent"],
+      passeCompose:["ai pu","as pu","a pu","avons pu","avez pu","ont pu"]
+    }
+  },
+  {
+    infinitive:"vouloir",group:"3",
+    forms:{
+      present:["veux","veux","veut","voulons","voulez","veulent"],
+      imparfait:["voulais","voulais","voulait","voulions","vouliez","voulaient"],
+      futur:["voudrai","voudras","voudra","voudrons","voudrez","voudront"],
+      passeSimple:["voulus","voulus","voulut","voulûmes","voulûtes","voulurent"],
+      passeCompose:["ai voulu","as voulu","a voulu","avons voulu","avez voulu","ont voulu"]
+    }
+  }
+];
+
+let mode="class";
+let activeStudents=[];
+let selectedTenses=["present"];
+let selectedGroups=["1"];
+let questionDeck=[];
+let qIndex=0,totalCorrect=0,lastStudent=null,currentStudent=null,currentQ=null;
+let answered=false,textAttempts=0;
+let targetPoints=3,remedScores={},remedBlocked=new Set(),selectedResponder=null,remedQuestionCount=0;
+
+const $=id=>document.getElementById(id);
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function normalize(s){
+  return (s||"").toLowerCase().trim()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[’']/g,"'")
+    .replace(/\s+/g," ");
+}
+function subjectDisplay(index,verb){
+  if(index===0 && /^[aeiouyéèêàâîïôöùûüh]/i.test(verb.infinitive)) return "J’";
+  return subjects[index];
+}
+function fullPhrase(index,form,verb){
+  const s=subjectDisplay(index,verb);
+  return s==="J’" ? `${s}${form}` : `${s} ${form}`;
+}
+
+function renderStudents(){
+  const box=$("students");box.innerHTML="";
+  studentNames.forEach(name=>{
+    const label=document.createElement("label");label.className="student";
+    label.innerHTML=`<input type="checkbox" checked data-name="${name}"><span>${name}</span>`;
+    box.appendChild(label);
+  });
+  box.addEventListener("change",updateSelectedCount);updateSelectedCount();
+}
+function getSelectedStudents(){
+  return [...document.querySelectorAll('#students input[type="checkbox"]:checked')].map(x=>x.dataset.name);
+}
+function updateSelectedCount(){
+  const n=getSelectedStudents().length;$("selectedCount").textContent=`${n} sélectionné${n>1?"s":""}`;
+}
+$("selectAll").onclick=()=>{document.querySelectorAll('#students input').forEach(x=>x.checked=true);updateSelectedCount()};
+$("clearAll").onclick=()=>{document.querySelectorAll('#students input').forEach(x=>x.checked=false);updateSelectedCount()};
+
+function readSelections(){
+  selectedTenses=[...document.querySelectorAll('#tenseSelectors input:checked')].map(x=>x.value);
+  selectedGroups=[...document.querySelectorAll('#groupSelectors input:checked')].map(x=>x.value);
+  updateSelectionSummary();
+}
+function updateSelectionSummary(){
+  const t=selectedTenses.map(x=>tenseLabels[x]);
+  const g=selectedGroups.map(x=>groupLabels[x]);
+  $("selectionSummary").textContent=
+    (t.length?t.join(" + "):"Aucun temps") + " · " + (g.length?g.join(" + "):"Aucun groupe");
+}
+document.querySelectorAll('#tenseSelectors input,#groupSelectors input').forEach(x=>x.addEventListener("change",readSelections));
+$("allTenses").onclick=()=>{document.querySelectorAll('#tenseSelectors input').forEach(x=>x.checked=true);readSelections()};
+$("clearTenses").onclick=()=>{document.querySelectorAll('#tenseSelectors input').forEach(x=>x.checked=false);readSelections()};
+$("allGroups").onclick=()=>{document.querySelectorAll('#groupSelectors input').forEach(x=>x.checked=true);readSelections()};
+$("clearGroups").onclick=()=>{document.querySelectorAll('#groupSelectors input').forEach(x=>x.checked=false);readSelections()};
+
+document.querySelectorAll(".mode").forEach(el=>{
+  el.onclick=()=>{
+    document.querySelectorAll(".mode").forEach(x=>x.classList.remove("active"));
+    el.classList.add("active");mode=el.dataset.mode;
+    $("remedSettings").classList.toggle("show",mode==="remed");
+  };
+});
+
+function setFeedback(msg,type=""){
+  const f=$("feedback");f.className="feedback"+(type?" "+type:"");f.innerHTML=msg;
+}
+
+function allowedVerbs(){
+  return verbs.filter(v=>selectedGroups.includes(v.group));
+}
+function availableCombos(){
+  const combos=[];
+  allowedVerbs().forEach(v=>{
+    selectedTenses.forEach(t=>{
+      if(v.forms[t]) combos.push({verb:v,tense:t});
+    });
+  });
+  return combos;
+}
+
+function makeCompletionQuestion(combo){
+  const {verb,tense}=combo;
+  const idx=Math.floor(Math.random()*6);
+  const form=verb.forms[tense][idx];
+
+  if(tense==="passeCompose"){
+    const parts=form.split(" ");
+    const aux=parts.shift();
+    const participle=parts.join(" ");
+    const distractors=shuffle(
+      verbs.filter(v=>v.group===verb.group && v.infinitive!==verb.infinitive && v.forms[tense])
+        .map(v=>v.forms[tense][idx].split(" ").slice(1).join(" "))
+        .filter((x,i,a)=>x && x!==participle && a.indexOf(x)===i)
+    ).slice(0,2);
+    while(distractors.length<2){
+      const fallback=["fait","pris","fini","chanté","vu","voulu"].find(x=>x!==participle&&!distractors.includes(x));
+      if(fallback) distractors.push(fallback); else break;
+    }
+    return {
+      type:"completion",verb,tense,index:idx,
+      text:`${subjectDisplay(idx,verb)}${subjectDisplay(idx,verb)==="J’"?"":" "}${aux} <span class="blank">___</span>`,
+      answer:participle,
+      options:shuffle([participle,...distractors.slice(0,2)])
+    };
+  }
+
+  // On masque la fin de la forme verbale. La longueur varie pour que l'exercice reste naturel.
+  let cut=1;
+  if(["imparfait","futur"].includes(tense)) cut=2;
+  if(tense==="passeSimple") cut=(verb.group==="1"?2:2);
+  if(tense==="present"){
+    cut = idx>=3 ? 3 : Math.min(2,form.length-1);
+  }
+  cut=Math.max(1,Math.min(cut,form.length-1));
+  const stem=form.slice(0,-cut),ending=form.slice(-cut);
+
+  const distractorForms=verb.forms[tense]
+    .map(f=>f.slice(-cut))
+    .filter((x,i,a)=>x!==ending && a.indexOf(x)===i);
+  let distractors=shuffle(distractorForms).slice(0,2);
+  while(distractors.length<2){
+    const generic=["e","es","ent","ons","ez","ais","ait","aient","ai","as","a","ont","rai","ras","ront"];
+    const x=generic.find(x=>x!==ending&&!distractors.includes(x));
+    if(!x) break;distractors.push(x);
+  }
+
+  const subj=subjectDisplay(idx,verb);
+  return {
+    type:"completion",verb,tense,index:idx,
+    text:`${subj}${subj==="J’"?"":" "}${stem}<span class="blank">___</span>`,
+    answer:ending,
+    options:shuffle([ending,...distractors.slice(0,2)])
+  };
+}
+
+function makeSubjectQuestion(combo){
+  const {verb,tense}=combo;
+  const forms=verb.forms[tense];
+
+  // Choisit une personne dont la forme n'est pas identique à trop d'autres,
+  // puis ne propose comme distracteurs que des sujets avec une forme différente.
+  const candidates=shuffle([0,1,2,3,4,5]).filter(i=>{
+    return forms.filter(f=>f===forms[i]).length<=2;
+  });
+  const idx=candidates[0] ?? 3;
+  const correctForm=forms[idx];
+
+  const distractorIdx=shuffle([0,1,2,3,4,5].filter(i=>i!==idx && forms[i]!==correctForm)).slice(0,2);
+  while(distractorIdx.length<2){
+    const extra=[0,1,2,3,4,5].find(i=>i!==idx&&!distractorIdx.includes(i));
+    if(extra===undefined)break;distractorIdx.push(extra);
+  }
+
+  const subjectOptions=[idx,...distractorIdx].map(i=>subjectDisplay(i,verb));
+  return {
+    type:"subject",verb,tense,index:idx,
+    text:`<span class="blank">___</span> ${correctForm}`,
+    answer:subjectDisplay(idx,verb),
+    options:shuffle(subjectOptions)
+  };
+}
+
+function makeErrorQuestion(combo){
+  const {verb,tense}=combo;
+  const forms=verb.forms[tense];
+  const idx=Math.floor(Math.random()*6);
+  const correct=forms[idx];
+
+  let wrongCandidates=forms.filter((f,i)=>i!==idx && f!==correct);
+  let wrong=wrongCandidates[Math.floor(Math.random()*wrongCandidates.length)];
+  if(!wrong) wrong=correct+"s";
+
+  const subj=subjectDisplay(idx,verb);
+  return {
+    type:"error",verb,tense,index:idx,
+    text:`${subj}${subj==="J’"?"":" "}${wrong}`,
+    answer:correct,
+    prompt:"Écris uniquement la forme correcte du verbe."
+  };
+}
+
+function makeQuestion(type,combo){
+  if(type==="completion")return makeCompletionQuestion(combo);
+  if(type==="subject")return makeSubjectQuestion(combo);
+  return makeErrorQuestion(combo);
+}
+
+function buildClassDeck(){
+  const combos=shuffle(availableCombos());
+  const types=["completion","subject","error"];
+  const deck=[];
+  for(let i=0;i<24;i++){
+    const combo=combos[i%combos.length];
+    const type=types[i%3];
+    deck.push(makeQuestion(type,combo));
+  }
+  return shuffleInTriplets(deck);
+}
+function shuffleInTriplets(deck){
+  // Préserve un bon équilibre des trois exercices tout en variant leur ordre local.
+  const out=[];
+  for(let i=0;i<deck.length;i+=3) out.push(...shuffle(deck.slice(i,i+3)));
+  return out;
+}
+function randomRemedQuestion(){
+  const combos=availableCombos();
+  const combo=combos[Math.floor(Math.random()*combos.length)];
+  const type=["completion","subject","error"][Math.floor(Math.random()*3)];
+  return makeQuestion(type,combo);
+}
+
+function drawStudent(){
+  if(activeStudents.length===1)return activeStudents[0];
+  let pool=activeStudents.filter(n=>n!==lastStudent);
+  if(!pool.length)pool=[...activeStudents];
+  const name=pool[Math.floor(Math.random()*pool.length)];lastStudent=name;return name;
+}
+
+function buildScoreboard(){
+  const board=$("scoreboard");board.innerHTML="";
+  if(mode!=="remed")return;
+  activeStudents.forEach(name=>{
+    const div=document.createElement("div");div.className="score-item";div.id="score-"+name;
+    div.innerHTML=`<div class="n">${name}</div><div class="s">0 / ${targetPoints}</div>`;
+    board.appendChild(div);
+  });
+}
+function updateScoreboard(){
+  if(mode!=="remed")return;
+  activeStudents.forEach(name=>{
+    const el=$("score-"+name);if(!el)return;
+    const pts=remedScores[name]||0;
+    el.querySelector(".s").textContent=pts>=targetPoints?"Sauvé !":`${pts} / ${targetPoints}`;
+    el.classList.toggle("saved",pts>=targetPoints);
+  });
+}
+function activeRemedStudents(){return activeStudents.filter(n=>(remedScores[n]||0)<targetPoints)}
+
+function renderRemedPlayers(){
+  const grid=$("playerGrid");grid.innerHTML="";
+  activeStudents.forEach(name=>{
+    const pts=remedScores[name]||0;
+    const b=document.createElement("button");b.className="player-btn";
+    if(pts>=targetPoints)b.classList.add("saved");
+    if(remedBlocked.has(name))b.classList.add("blocked");
+    if(selectedResponder===name)b.classList.add("selected");
+    b.disabled=pts>=targetPoints||remedBlocked.has(name);
+    b.innerHTML=`${name}<span class="pts">${pts>=targetPoints?"Sauvé":pts+" / "+targetPoints}</span>`;
+    b.onclick=()=>{
+      selectedResponder=name;renderRemedPlayers();
+      setFeedback(`<strong>${name}</strong>&nbsp;répond à cette question.`,"");
+      enableInteractionForResponder();
+    };
+    grid.appendChild(b);
+  });
+}
+function enableInteractionForResponder(){
+  if(mode!=="remed")return;
+  const enabled=!!selectedResponder;
+  document.querySelectorAll(".choice").forEach(b=>b.disabled=!enabled);
+  const input=$("textAnswer"),val=$("validateText");
+  if(input)input.disabled=!enabled;if(val)val.disabled=!enabled;
+  if(enabled&&input)input.focus();
+}
+
+function updateContext(){
+  $("tenseChip").textContent=tenseLabels[currentQ.tense];
+  $("groupChip").textContent=groupLabels[currentQ.verb.group];
+  $("verbChip").textContent=`verbe : ${currentQ.verb.infinitive}`;
+}
+
+function renderQuestion(){
+  answered=false;textAttempts=0;$("nextBtn").disabled=true;$("skipBtn").disabled=false;setFeedback("");
+
+  if(mode==="class"){
+    if(qIndex>=questionDeck.length){finishGame();return}
+    currentQ=questionDeck[qIndex];currentStudent=drawStudent();
+    $("studentDraw").style.display="block";$("remedPlayers").classList.remove("show");
+    $("currentStudent").textContent=currentStudent;
+  }else{
+    if(activeRemedStudents().length<=1){finishGame();return}
+    currentQ=randomRemedQuestion();remedQuestionCount++;remedBlocked=new Set();selectedResponder=null;
+    $("studentDraw").style.display="none";$("remedPlayers").classList.add("show");renderRemedPlayers();
+  }
+
+  updateContext();
+  const labels={
+    completion:"1. Complète le verbe",
+    subject:"2. Quel sujet convient ?",
+    error:"3. Repère et corrige l’erreur"
+  };
+  $("exerciseTag").textContent=labels[currentQ.type];
+  $("questionText").innerHTML=currentQ.text;
+
+  const interaction=$("interaction");interaction.innerHTML="";
+  if(currentQ.type==="completion"||currentQ.type==="subject"){
+    const choices=document.createElement("div");choices.className="choices";
+    currentQ.options.forEach(opt=>{
+      const b=document.createElement("button");b.className="choice";b.textContent=opt;
+      if(mode==="remed")b.disabled=true;
+      b.onclick=()=>checkChoice(b,opt);choices.appendChild(b);
+    });
+    interaction.appendChild(choices);
+  }else{
+    const p=document.createElement("div");p.style.textAlign="center";p.style.color="#64748b";p.style.fontWeight="700";p.textContent=currentQ.prompt;interaction.appendChild(p);
+    const box=document.createElement("div");box.className="answerbox";
+    box.innerHTML='<input id="textAnswer" autocomplete="off" placeholder="Réponse"><button class="btn-primary" id="validateText">Valider</button>';
+    interaction.appendChild(box);
+    const attempts=document.createElement("div");attempts.className="attempts";attempts.id="attemptsInfo";
+    attempts.textContent=mode==="remed"?"1 seul essai en remédiation":"3 essais possibles";interaction.appendChild(attempts);
+
+    if(mode==="remed"){$("textAnswer").disabled=true;$("validateText").disabled=true}
+    else setTimeout(()=>$("textAnswer").focus(),0);
+
+    $("validateText").onclick=checkText;
+    $("textAnswer").addEventListener("keydown",e=>{if(e.key==="Enter")checkText()});
+  }
+  updateTopline();
+}
+
+function showCorrectChoice(expected){
+  document.querySelectorAll(".choice").forEach(b=>{
+    if(normalize(b.textContent)===normalize(expected))b.classList.add("correct");
+  });
+}
+function handleClassResult(ok,expected){
+  if(answered)return;answered=true;$("skipBtn").disabled=true;$("nextBtn").disabled=false;
+  if(ok){totalCorrect++;setFeedback(`✅ Bravo&nbsp;<strong>${currentStudent}</strong> !`,"good")}
+  else setFeedback(`❌ La bonne réponse était <strong>${expected}</strong>.`,"bad");
+  updateTopline();
+}
+function handleRemedResult(ok,expected){
+  if(!selectedResponder)return;
+  if(ok){
+    remedScores[selectedResponder]=(remedScores[selectedResponder]||0)+1;updateScoreboard();renderRemedPlayers();
+    document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+    const input=$("textAnswer"),val=$("validateText");if(input)input.disabled=true;if(val)val.disabled=true;
+    const saved=(remedScores[selectedResponder]||0)>=targetPoints;
+    setFeedback(saved
+      ?`✅ <strong>${selectedResponder}</strong>&nbsp;marque un point et est <strong>sauvé</strong> !`
+      :`✅ <strong>${selectedResponder}</strong>&nbsp;marque un point.`,"good");
+    answered=true;$("skipBtn").disabled=true;$("nextBtn").disabled=false;
+  }else{
+    const failed=selectedResponder;remedBlocked.add(failed);selectedResponder=null;renderRemedPlayers();
+    const left=activeRemedStudents().filter(n=>!remedBlocked.has(n));
+    if(left.length===0){
+      if(currentQ.type!=="error")showCorrectChoice(expected);
+      setFeedback(`Personne ne peut plus répondre. La bonne réponse était <strong>${expected}</strong>.`,"bad");
+      answered=true;$("skipBtn").disabled=true;$("nextBtn").disabled=false;
+    }else{
+      setFeedback(`❌ <strong>${failed}</strong>&nbsp;ne peut plus répondre à cette question. La parole passe à un autre élève.`,"warn");
+      enableInteractionForResponder();
+    }
+  }
+  updateTopline();
+}
+
+function checkChoice(btn,opt){
+  if(answered)return;if(mode==="remed"&&!selectedResponder)return;
+  const ok=normalize(opt)===normalize(currentQ.answer);
+  if(ok)btn.classList.add("correct");else{btn.classList.add("wrong");setTimeout(()=>btn.classList.remove("wrong"),450)}
+  if(mode==="class"){if(!ok)showCorrectChoice(currentQ.answer);handleClassResult(ok,currentQ.answer)}
+  else handleRemedResult(ok,currentQ.answer);
+}
+function checkText(){
+  if(answered)return;if(mode==="remed"&&!selectedResponder)return;
+  const inp=$("textAnswer"),value=inp.value,ok=normalize(value)===normalize(currentQ.answer);
+
+  if(mode==="class"){
+    if(ok){inp.style.borderColor="#86efac";handleClassResult(true,currentQ.answer)}
+    else{
+      textAttempts++;const left=3-textAttempts;
+      if(left>0){
+        inp.style.borderColor="#fca5a5";$("attemptsInfo").textContent=`Encore ${left} essai${left>1?"s":""}`;
+        setFeedback(`Ce n’est pas encore ça. Il reste <strong>${left} essai${left>1?"s":""}</strong>.`,"warn");inp.select();
+      }else{
+        $("attemptsInfo").textContent="3 essais utilisés";inp.style.borderColor="#fca5a5";handleClassResult(false,currentQ.answer);
+      }
+    }
+  }else{
+    if(ok){inp.style.borderColor="#86efac";handleRemedResult(true,currentQ.answer)}
+    else{inp.value="";inp.style.borderColor="#fca5a5";handleRemedResult(false,currentQ.answer)}
+  }
+}
+
+function updateTopline(){
+  if(mode==="class"){
+    $("qCounter").textContent=`Question ${Math.min(qIndex+1,24)} / 24`;
+    $("scoreCounter").textContent=`${totalCorrect} bonne${totalCorrect>1?"s":""} réponse${totalCorrect>1?"s":""}`;
+    $("progressBar").style.width=`${qIndex/24*100}%`;
+  }else{
+    const saved=activeStudents.filter(n=>(remedScores[n]||0)>=targetPoints).length;
+    $("qCounter").textContent=`Question ${remedQuestionCount}`;
+    $("scoreCounter").textContent=`${saved} sauvé${saved>1?"s":""} / ${activeStudents.length-1} à sauver`;
+    $("progressBar").style.width=`${Math.min(100,saved/Math.max(1,activeStudents.length-1)*100)}%`;
+  }
+}
+
+$("nextBtn").onclick=()=>{if(mode==="class")qIndex++;renderQuestion()};
+$("skipBtn").onclick=()=>{if(mode==="class")qIndex++;renderQuestion()};
+
+function startGame(){
+  readSelections();
+  activeStudents=getSelectedStudents();
+
+  if(selectedTenses.length===0){alert("Sélectionne au moins un temps.");return}
+  if(selectedGroups.length===0){alert("Sélectionne au moins un groupe de verbes.");return}
+  if(activeStudents.length===0){alert("Sélectionne au moins un élève.");return}
+  if(mode==="remed"&&activeStudents.length<2){alert("Le mode remédiation nécessite au moins deux élèves.");return}
+  if(availableCombos().length===0){alert("Aucune combinaison disponible avec ces réglages.");return}
+
+  targetPoints=Math.max(1,Math.min(10,parseInt($("targetPoints").value)||3));
+  totalCorrect=0;qIndex=0;lastStudent=null;remedQuestionCount=0;remedScores={};
+  activeStudents.forEach(n=>remedScores[n]=0);
+
+  questionDeck=buildClassDeck();
+  buildScoreboard();updateScoreboard();
+  $("summary").classList.remove("show");$("gameArea").style.display="block";document.body.classList.add("projection");renderQuestion();
+}
+$("startBtn").onclick=startGame;$("restartBtn").onclick=startGame;
+
+function finishGame(){
+  $("gameArea").style.display="none";$("summary").classList.add("show");$("progressBar").style.width="100%";
+  if(mode==="class"){
+    $("summaryTitle").textContent="Entraînement terminé !";$("finalScore").textContent=`${totalCorrect} / 24`;
+    $("finalText").textContent="Les questions ont été générées à partir des temps et groupes sélectionnés.";
+  }else{
+    const remaining=activeRemedStudents();$("summaryTitle").textContent="Remédiation terminée";$("finalScore").textContent="Tous sauf un";
+    $("finalText").innerHTML=remaining.length===1
+      ?`Tous les élèves ont atteint l’objectif sauf <strong>${remaining[0]}</strong>. Le jeu s’arrête ici, comme prévu.`
+      :"La partie est terminée.";
+  }
+}
+
+
+$("settingsBtn").onclick=()=>{
+  document.body.classList.remove("projection");
+  $("gameArea").style.display="block";
+  $("summary").classList.remove("show");
+  $("qCounter").textContent="Prêt";
+  $("scoreCounter").textContent="0 bonne réponse";
+  $("progressBar").style.width="0%";
+  $("studentDraw").style.display="block";
+  $("remedPlayers").classList.remove("show");
+  $("currentStudent").textContent="—";
+  $("exerciseTag").textContent="Choisis les paramètres puis commence";
+  $("questionText").textContent="La première question apparaîtra ici.";
+  $("interaction").innerHTML="";
+  setFeedback("");
+  $("skipBtn").disabled=true;
+  $("nextBtn").disabled=true;
+};
+
+renderStudents();readSelections();
+</script>
+</body>
+</html>
