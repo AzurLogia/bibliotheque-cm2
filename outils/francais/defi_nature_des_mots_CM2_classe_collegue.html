@@ -159,7 +159,7 @@ const CATEGORIES = {
 const ALL_KEYS=Object.keys(CATEGORIES);
 const INITIAL_SELECTED=["common","proper","def","indef","poss","demo"];
 const DEFAULTS=ALL_KEYS;
-const STUDENTS=["Malo","Maxence Gazhali","Milann","Ayane","Maëlyn","Maëlys","Célia","Lisa","Cassandra","Emy","Maxence Guillemot","Mila","Claudia","Kémany","William","Nolan","Pauline","Romane","Nathan","Emeth"];
+const STUDENTS=(()=>{try{const n=JSON.parse(localStorage.getItem("cm2-eleves-v1")||"[]");if(Array.isArray(n)&&n.length)return n.filter(x=>typeof x==="string"&&x.trim()).map(x=>x.trim())}catch(_){}return Array.from({length:20},(_,i)=>"Élève "+(i+1))})();
 let selected=[], deck=[], index=0, firstTryCorrect=0, mistakes=0, answered=false, lastSettings=null;
 let studentMode=true, studentDeck=[], studentIndex=0, currentStudent=null, studentStats={};
 
