@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Les mots caméléons – Polysémie</title>
+<style>
+  :root{
+    --bg:#f5f7fb;
+    --card:#ffffff;
+    --text:#18212f;
+    --muted:#667085;
+    --accent:#5b6ee1;
+    --accent2:#7c3aed;
+    --good:#1f9d67;
+    --warn:#d97706;
+    --danger:#dc2626;
+    --shadow:0 14px 30px rgba(24,33,47,.12);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+    background:linear-gradient(135deg,#eef2ff 0%,#f8fafc 60%,#fefce8 100%);
+    color:var(--text);
+    min-height:100vh;
+  }
+  .app{
+    width:min(1200px,96vw);
+    margin:20px auto;
+  }
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:18px;
+    margin-bottom:18px;
+  }
+  .title-wrap h1{
+    margin:0;
+    font-size:clamp(28px,4vw,48px);
+    letter-spacing:-.03em;
+  }
+  .title-wrap p{
+    margin:4px 0 0;
+    color:var(--muted);
+    font-size:clamp(15px,1.8vw,20px);
+  }
+  .scorebox{
+    background:#fff;
+    border-radius:18px;
+    padding:12px 18px;
+    box-shadow:var(--shadow);
+    font-weight:700;
+    min-width:160px;
+    text-align:center;
+  }
+  .score-num{
+    font-size:30px;
+    color:var(--accent2);
+  }
+  .panel{
+    background:rgba(255,255,255,.92);
+    backdrop-filter: blur(6px);
+    border-radius:24px;
+    box-shadow:var(--shadow);
+    padding:24px;
+    border:1px solid rgba(255,255,255,.6);
+  }
+  .progress{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .dot{
+    height:10px;
+    flex:1;
+    border-radius:999px;
+    background:#e5e7eb;
+  }
+  .dot.active{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .mission{
+    text-align:center;
+    margin:10px 0 22px;
+  }
+  .mission .eyebrow{
+    color:var(--accent2);
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    font-size:13px;
+  }
+  .mission h2{
+    font-size:clamp(24px,3.2vw,40px);
+    margin:6px 0 0;
+  }
+  .images{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    margin:18px 0 24px;
+  }
+  .image-card{
+    background:var(--card);
+    min-height:260px;
+    border-radius:22px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    border:2px solid #eef0f4;
+    position:relative;
+    overflow:hidden;
+  }
+  .image-card.hidden{
+    filter:grayscale(1);
+    background:repeating-linear-gradient(
+      45deg,#f3f4f6,#f3f4f6 12px,#eceff3 12px,#eceff3 24px
+    );
+  }
+  .emoji{
+    font-size:clamp(72px,10vw,130px);
+    line-height:1;
+    filter:drop-shadow(0 6px 8px rgba(0,0,0,.08));
+  }
+  .caption{
+    font-size:clamp(16px,2vw,24px);
+    font-weight:700;
+    text-align:center;
+  }
+  .mask{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:56px;
+    background:rgba(255,255,255,.65);
+    backdrop-filter:blur(3px);
+  }
+  .answer{
+    margin:16px auto 6px;
+    text-align:center;
+    padding:14px 18px;
+    max-width:760px;
+    border-radius:18px;
+    background:#f4f1ff;
+    border:2px solid #ddd6fe;
+    display:none;
+  }
+  .answer.show{display:block}
+  .answer .word{
+    font-size:clamp(38px,6vw,70px);
+    font-weight:900;
+    letter-spacing:.04em;
+    color:var(--accent2);
+  }
+  .answer .meaning{
+    font-size:18px;
+    color:#4b5563;
+    margin-top:4px;
+  }
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:12px;
+    margin-top:20px;
+  }
+  button{
+    border:0;
+    border-radius:14px;
+    padding:14px 20px;
+    font-size:17px;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(31,41,55,.10);
+    transition:.15s transform ease,.15s opacity ease;
+  }
+  button:hover{transform:translateY(-1px)}
+  button:active{transform:translateY(1px)}
+  .primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:white}
+  .secondary{background:white;color:var(--text);border:2px solid #e5e7eb}
+  .good{background:var(--good);color:white}
+  .bad{background:var(--danger);color:white}
+  .small{padding:10px 14px;font-size:15px}
+  .phase2{
+    display:none;
+  }
+  .sentence-card{
+    background:white;
+    border-radius:20px;
+    padding:22px;
+    margin:14px 0;
+    font-size:clamp(20px,2.3vw,30px);
+    font-weight:700;
+    border:2px solid #eef0f4;
+  }
+  .highlight{
+    color:var(--accent2);
+    text-decoration:underline;
+    text-decoration-thickness:4px;
+    text-underline-offset:5px;
+  }
+  .feedback{
+    text-align:center;
+    min-height:42px;
+    font-size:22px;
+    font-weight:800;
+    margin-top:10px;
+  }
+  .final-card{
+    display:none;
+    text-align:center;
+    padding:30px 20px;
+  }
+  .final-card h2{
+    font-size:clamp(30px,4vw,50px);
+    margin-bottom:10px;
+  }
+  .definition{
+    margin:20px auto;
+    max-width:850px;
+    background:#ecfdf5;
+    border:2px solid #a7f3d0;
+    padding:20px;
+    border-radius:18px;
+    font-size:clamp(20px,2.4vw,30px);
+    font-weight:800;
+  }
+  .teacher-note{
+    margin-top:18px;
+    color:var(--muted);
+    text-align:center;
+    font-size:14px;
+  }
+  @media(max-width:760px){
+    .images{grid-template-columns:1fr}
+    .image-card{min-height:190px}
+    .topbar{align-items:flex-start}
+    .scorebox{min-width:120px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="title-wrap">
+      <h1>Les mots caméléons</h1>
+      <p>Un même mot peut-il avoir plusieurs sens ?</p>
+    </div>
+    <div class="scorebox">
+      Score<br><span class="score-num" id="score">0</span>
+    </div>
+  </div>
+
+  <div class="panel" id="gamePanel">
+    <div class="progress" id="progress"></div>
+    <div class="mission">
+      <div class="eyebrow" id="roundLabel">Manche 1</div>
+      <h2 id="question">Quel mot pourrait convenir à toutes ces images ?</h2>
+    </div>
+
+    <div class="images" id="images"></div>
+
+    <div class="answer" id="answerBox">
+      <div class="word" id="answerWord"></div>
+      <div class="meaning" id="answerText"></div>
+    </div>
+
+    <div class="controls">
+      <button class="secondary" id="hintBtn">💡 Indice</button>
+      <button class="primary" id="revealBtn">✨ Révéler le mot</button>
+      <button class="good" id="pointBtn">+1 point</button>
+      <button class="secondary" id="nextBtn">Manche suivante →</button>
+    </div>
+
+    <div class="teacher-note" id="teacherNote">
+      Conseil : laisse les élèves proposer plusieurs réponses avant de révéler.
+    </div>
+  </div>
+
+  <div class="panel phase2" id="contextPanel">
+    <div class="mission">
+      <div class="eyebrow">Deuxième défi</div>
+      <h2>Le contexte change le sens</h2>
+    </div>
+    <div class="sentence-card" id="sent1"></div>
+    <div class="sentence-card" id="sent2"></div>
+
+    <div class="controls">
+      <button class="good" id="sameBtn">🟢 Même mot, sens différent</button>
+      <button class="bad" id="differentBtn">🔴 Deux mots différents</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div class="controls">
+      <button class="secondary" id="contextNext">Exemple suivant →</button>
+    </div>
+  </div>
+
+  <div class="panel final-card" id="finalPanel">
+    <h2>🎯 Ce qu’on a découvert</h2>
+    <div class="definition">
+      Un même mot peut avoir plusieurs sens.<br>
+      Le <strong>contexte</strong> permet de comprendre le sens utilisé.
+    </div>
+    <div style="font-size:30px;font-weight:900;color:#7c3aed;margin-top:18px;">
+      POLYSÉMIE = plusieurs sens
+    </div>
+    <p style="font-size:20px;color:#667085;">On peut maintenant chercher dans le dictionnaire comment ces différents sens sont présentés.</p>
+    <button class="primary" onclick="location.reload()">↻ Recommencer</button>
+  </div>
+</div>
+
+<script>
+const rounds = [
+  {
+    word:"SOURIS",
+    items:[
+      ["🐭","un petit animal"],
+      ["🖱️","un objet informatique"],
+      ["",""]
+    ],
+    hint:"Ce mot peut désigner un animal… mais aussi un objet posé près d’un ordinateur.",
+    text:"Un seul mot, deux réalités très différentes."
+  },
+  {
+    word:"FEUILLE",
+    items:[
+      ["🍃","sur un arbre"],
+      ["📄","pour écrire"],
+      ["📑","une feuille d’un dossier"]
+    ],
+    hint:"On peut en ramasser en automne… ou écrire dessus.",
+    text:"Le contexte nous indique de quelle « feuille » on parle."
+  },
+  {
+    word:"CLÉ",
+    items:[
+      ["🔑","pour ouvrir une porte"],
+      ["🎼","en musique"],
+      ["🗝️","une autre forme de clé"]
+    ],
+    hint:"Ce mot sert parfois à ouvrir… et parfois à lire de la musique.",
+    text:"Même orthographe, plusieurs sens."
+  },
+  {
+    word:"PIÈCE",
+    items:[
+      ["🪙","une monnaie"],
+      ["🚪","une partie d’une maison"],
+      ["🎭","au théâtre"]
+    ],
+    hint:"On peut la mettre dans sa poche, y dormir… ou la jouer sur scène.",
+    text:"Voici un mot qui possède de nombreux sens."
+  },
+  {
+    word:"LANGUE",
+    items:[
+      ["👅","dans la bouche"],
+      ["💬","pour communiquer"],
+      ["🇫🇷","une langue parlée"]
+    ],
+    hint:"Elle peut être dans la bouche… ou être parlée.",
+    text:"Le mot prend son sens grâce à la phrase."
+  },
+  {
+    word:"DENT",
+    items:[
+      ["🦷","dans la bouche"],
+      ["⚙️","sur un engrenage"],
+      ["🪚","sur une scie"]
+    ],
+    hint:"On peut en avoir dans la bouche… mais aussi sur certains objets.",
+    text:"Les objets peuvent parfois reprendre le nom d’une partie du corps."
+  }
+];
+
+const contexts = [
+  [
+    'Le <span class="highlight">courant</span> de la rivière est puissant.',
+    'Il n’y a plus de <span class="highlight">courant</span> dans la maison.',
+    true
+  ],
+  [
+    'Lina <span class="highlight">dévore</span> son sandwich.',
+    'Lina <span class="highlight">dévore</span> son roman.',
+    true
+  ],
+  [
+    'Le <span class="highlight">bouton</span> de ma veste est tombé.',
+    'Un <span class="highlight">bouton</span> est apparu sur mon front.',
+    true
+  ]
+];
+
+let current = 0;
+let score = 0;
+let contextIndex = 0;
+let thirdRevealed = false;
+
+const images = document.getElementById("images");
+const answerBox = document.getElementById("answerBox");
+const answerWord = document.getElementById("answerWord");
+const answerText = document.getElementById("answerText");
+const roundLabel = document.getElementById("roundLabel");
+const progress = document.getElementById("progress");
+const scoreEl = document.getElementById("score");
+
+function drawProgress(){
+  progress.innerHTML = "";
+  rounds.forEach((_,i)=>{
+    const d = document.createElement("div");
+    d.className = "dot" + (i <= current ? " active" : "");
+    progress.appendChild(d);
+  });
+}
+
+function renderRound(){
+  drawProgress();
+  const r = rounds[current];
+  roundLabel.textContent = `Manche ${current+1} / ${rounds.length}`;
+  images.innerHTML = "";
+  answerBox.classList.remove("show");
+  thirdRevealed = false;
+
+  r.items.forEach((item,i)=>{
+    const card = document.createElement("div");
+    card.className = "image-card";
+    if(i===2 && current===0){
+      card.classList.add("hidden");
+      card.innerHTML = '<div class="mask">?</div>';
+    } else if(i===2 && current>0){
+      card.classList.add("hidden");
+      card.innerHTML = '<div class="mask">?</div>';
+    } else {
+      card.innerHTML = `<div class="emoji">${item[0]}</div><div class="caption">${item[1]}</div>`;
+    }
+    card.dataset.index = i;
+    images.appendChild(card);
+  });
+  document.getElementById("hintBtn").textContent = "💡 Indice";
+}
+
+document.getElementById("hintBtn").onclick = ()=>{
+  const r = rounds[current];
+  const cards = [...document.querySelectorAll(".image-card")];
+  if(!thirdRevealed && r.items[2][0]){
+    const item = r.items[2];
+    cards[2].classList.remove("hidden");
+    cards[2].innerHTML = `<div class="emoji">${item[0]}</div><div class="caption">${item[1]}</div>`;
+    thirdRevealed = true;
+    document.getElementById("hintBtn").textContent = "💡 Donner un indice";
+  }else{
+    alert(r.hint);
+  }
+};
+
+document.getElementById("revealBtn").onclick = ()=>{
+  const r = rounds[current];
+  answerWord.textContent = r.word;
+  answerText.textContent = r.text;
+  answerBox.classList.add("show");
+};
+
+document.getElementById("pointBtn").onclick = ()=>{
+  score++;
+  scoreEl.textContent = score;
+};
+
+document.getElementById("nextBtn").onclick = ()=>{
+  if(current < rounds.length-1){
+    current++;
+    renderRound();
+  }else{
+    document.getElementById("gamePanel").style.display = "none";
+    document.getElementById("contextPanel").style.display = "block";
+    renderContext();
+  }
+};
+
+function renderContext(){
+  const c = contexts[contextIndex];
+  document.getElementById("sent1").innerHTML = c[0];
+  document.getElementById("sent2").innerHTML = c[1];
+  document.getElementById("feedback").textContent = "";
+}
+
+function answerContext(value){
+  const expected = contexts[contextIndex][2];
+  const fb = document.getElementById("feedback");
+  if(value === expected){
+    fb.textContent = "✅ Exact ! Le mot est le même, mais le sens change avec le contexte.";
+    fb.style.color = "#1f9d67";
+  }else{
+    fb.textContent = "❌ Pas tout à fait : regarde le mot écrit. C’est le même, mais son sens change.";
+    fb.style.color = "#dc2626";
+  }
+}
+
+document.getElementById("sameBtn").onclick = ()=>answerContext(true);
+document.getElementById("differentBtn").onclick = ()=>answerContext(false);
+
+document.getElementById("contextNext").onclick = ()=>{
+  if(contextIndex < contexts.length-1){
+    contextIndex++;
+    renderContext();
+  }else{
+    document.getElementById("contextPanel").style.display = "none";
+    document.getElementById("finalPanel").style.display = "block";
+  }
+};
+
+renderRound();
+</script>
+</body>
+</html>
