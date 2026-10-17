@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Répartiteur d'équipes – CM2</title>
+<style>
+:root{--bg:#f3f5fa;--ink:#172033;--muted:#6d7484}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:white;padding:17px 20px;box-shadow:0 2px 12px #26324d16}
+h1{margin:0 0 11px;font-size:22px}.controls{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+button,select,input{font:inherit}button{border:0;border-radius:10px;padding:9px 13px;font-weight:750;cursor:pointer;background:#3157d5;color:#fff}
+button.secondary{background:#e7eaf2;color:#29334c}select{border:1px solid #d8dce7;border-radius:9px;padding:8px;background:#fff}
+main{padding:17px}.help{font-size:13px;color:var(--muted);margin:0 0 14px}
+.pool{background:white;border-radius:15px;padding:13px;box-shadow:0 4px 15px #26324d13;margin-bottom:17px}
+.pool-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}.pool-title{font-size:18px;font-weight:850}
+.students{display:flex;flex-wrap:wrap;gap:8px}.student{border:1px solid #dfe3ec;background:#f8f9fc;border-radius:10px;padding:8px 10px;font-weight:720;cursor:pointer;user-select:none}
+.student:hover{transform:translateY(-1px);box-shadow:0 3px 8px #26324d18}
+#teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:14px}
+.team{background:#fff;border-radius:16px;overflow:hidden;border-top:8px solid var(--team);box-shadow:0 4px 15px #26324d13;min-height:160px}
+.team-head{padding:11px 12px 8px;display:flex;gap:8px;align-items:center}
+.team-name{font-weight:850;font-size:17px;border:1px solid #dfe3ec;border-radius:8px;padding:6px 8px;width:100%;outline:none}
+.team-name:focus{border-color:var(--team)}.count{white-space:nowrap;background:#f0f2f6;padding:5px 8px;border-radius:99px;font-size:12px}
+.members{padding:3px 10px 12px}.member{margin:7px 0;padding:8px;border-radius:10px;background:#f7f8fb;border:1px solid #e5e8ef;display:flex;align-items:center;gap:6px}
+.member .name{font-weight:720;flex:1}.member button{padding:5px 8px;border-radius:7px;background:var(--team);font-size:12px}
+.empty{color:#9aa0ae;text-align:center;padding:22px 5px;font-size:13px}
+.dialog{position:fixed;inset:0;background:#17203388;display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+.dialog.show{display:flex}.dialog-box{background:#fff;border-radius:17px;padding:17px;max-width:440px;width:100%;box-shadow:0 20px 50px #0003}
+.dialog h2{margin:0 0 6px;font-size:19px}.dialog p{margin:0 0 12px;color:var(--muted);font-size:13px}
+.team-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}.team-buttons button{padding:11px}.cancel{margin-top:10px;width:100%;background:#e7eaf2!important;color:#29334c!important}
+@media(max-width:600px){#teams{grid-template-columns:1fr}.team-buttons{grid-template-columns:1fr}.students{gap:6px}.student{padding:7px 9px}}
+</style>
+</head>
+<body><aside id="cm2roster" style="padding:10px 18px;background:#e9f2fc;color:#173954;font:14px system-ui"><span id="cm2rosterstatus"></span> <a href="../../ma-classe.html" style="font-weight:bold">Gérer ma classe</a></aside><script>document.addEventListener("DOMContentLoaded",()=>{const n=(()=>{try{return JSON.parse(localStorage.getItem("cm2-eleves-v1")||"[]").length}catch(e){return 0}})();document.getElementById("cm2rosterstatus").textContent=n?n+" élève(s) chargé(s) depuis Ma classe.":"Aucun élève enregistré : renseigne Ma classe avant de lancer une séance.";});</script>
+<header><h1>👥 Répartiteur d'équipes – CM2</h1>
+<div class="controls">
+<label>Nombre d'équipes <select id="teamCount"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label>
+<button id="save">💾 Enregistrer les groupes</button>
+<button class="secondary" id="export">⬇ Exporter</button>
+<button class="secondary" id="importBtn">⬆ Charger un fichier</button>
+<input type="file" id="importFile" accept=".json" style="display:none">
+<button class="secondary" id="reset">Tout remettre à zéro</button>
+</div></header>
+<main>
+<p class="help">Clique sur un élève non assigné, puis sur l'équipe dans laquelle tu veux le placer. Les noms des équipes sont modifiables directement. Une fois placé, un élève peut être déplacé ou remis dans la liste.</p>
+<section class="pool"><div class="pool-head"><div class="pool-title">Élèves à répartir</div><div id="remaining"></div></div><div class="students" id="pool"></div></section>
+<section class="pool" id="savedBox" style="margin-top:0">
+<div class="pool-head"><div class="pool-title">💾 Groupes enregistrés sur cet appareil</div></div>
+<div id="savedGroups" class="students"></div>
+</section>
+<div id="teams"></div>
+</main>
+<div class="dialog" id="dialog"><div class="dialog-box"><h2 id="dialogName"></h2><p>Dans quelle équipe placer cet élève ?</p><div class="team-buttons" id="teamButtons"></div><button class="cancel" id="cancel">Annuler</button></div></div>
+<script>
+const students=(()=>{try{const data=JSON.parse(localStorage.getItem("cm2-eleves-v1")||"[]");return Array.isArray(data)?data.filter(x=>typeof x==="string"&&x.trim()):[]}catch(e){return []}})();
+const colors=['#e05252','#3d75d6','#32a06f','#e0a12e','#8a5bd1','#20a3ad','#e26d9e','#697386'];
+let n=4, teams=[], names=[], selected=null;
+function init(keepNames=false){
+ n=+document.getElementById('teamCount').value;
+ teams=Array.from({length:n},()=>[]);
+ names=Array.from({length:n},(_,i)=>keepNames&&names[i]?names[i]:`Équipe ${i+1}`);
+ render();
+}
+function unassigned(){const used=new Set(teams.flat());return students.filter(s=>!used.has(s))}
+function render(){
+ const pool=document.getElementById('pool');pool.innerHTML='';
+ const free=unassigned();document.getElementById('remaining').textContent=`${free.length} restant${free.length>1?'s':''}`;
+ free.forEach(s=>{let b=document.createElement('div');b.className='student';b.textContent=s;b.onclick=()=>choose(s);pool.appendChild(b)});
+ const root=document.getElementById('teams');root.innerHTML='';
+ teams.forEach((arr,i)=>{
+  let card=document.createElement('section');card.className='team';card.style.setProperty('--team',colors[i%colors.length]);
+  card.innerHTML=`<div class="team-head"><input class="team-name" value="${escapeHtml(names[i])}" aria-label="Nom de l'équipe"><span class="count">${arr.length}</span></div><div class="members"></div>`;
+  card.querySelector('input').oninput=e=>names[i]=e.target.value;
+  let mem=card.querySelector('.members');
+  if(!arr.length)mem.innerHTML='<div class="empty">Aucun élève pour le moment</div>';
+  arr.forEach((s,j)=>{
+    let r=document.createElement('div');r.className='member';
+    r.innerHTML=`<span class="name">${s}</span><button class="change">Changer</button><button class="remove" title="Remettre dans la liste">↩</button>`;
+    r.querySelector('.change').onclick=()=>choose(s,i);
+    r.querySelector('.remove').onclick=()=>{teams[i].splice(j,1);render()};
+    mem.appendChild(r);
+  });
+  root.appendChild(card);
+ });
+}
+function choose(s,from=null){
+ selected={s,from};document.getElementById('dialogName').textContent=s;
+ const box=document.getElementById('teamButtons');box.innerHTML='';
+ teams.forEach((_,i)=>{if(i===from)return;let b=document.createElement('button');b.textContent=names[i]||`Équipe ${i+1}`;b.style.background=colors[i%colors.length];b.onclick=()=>assign(i);box.appendChild(b)});
+ document.getElementById('dialog').classList.add('show');
+}
+function assign(to){
+ if(selected.from!==null){const k=teams[selected.from].indexOf(selected.s);if(k>=0)teams[selected.from].splice(k,1)}
+ teams[to].push(selected.s);closeDialog();render();
+}
+function closeDialog(){document.getElementById('dialog').classList.remove('show');selected=null}
+function escapeHtml(x){return x.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
+document.getElementById('cancel').onclick=closeDialog;
+document.getElementById('dialog').onclick=e=>{if(e.target.id==='dialog')closeDialog()};
+document.getElementById('teamCount').onchange=()=>init(true);
+document.getElementById('reset').onclick=()=>{if(confirm("Remettre tous les élèves dans la liste ?"))init(true)};
+
+function snapshot(){
+ return {version:1, teamCount:n, names:[...names], teams:teams.map(x=>[...x])};
+}
+function loadSnapshot(data){
+ if(!data || !Array.isArray(data.teams) || !Array.isArray(data.names)) return alert("Fichier de groupes invalide.");
+ n=Math.max(2,Math.min(8,Number(data.teamCount)||data.teams.length));
+ document.getElementById('teamCount').value=String(n);
+ teams=Array.from({length:n},(_,i)=>Array.isArray(data.teams[i])?data.teams[i].filter(s=>students.includes(s)):[]);
+ names=Array.from({length:n},(_,i)=>data.names[i]||`Équipe ${i+1}`);
+ render(); renderSaved();
+}
+function saveLocal(){
+ const label=prompt("Nom de cet enregistrement :", "Mes groupes");
+ if(!label)return;
+ let saves={}; try{saves=JSON.parse(localStorage.getItem("cm2_team_saves")||"{}")}catch(e){}
+ saves[label]={...snapshot(), savedAt:new Date().toISOString()};
+ localStorage.setItem("cm2_team_saves",JSON.stringify(saves));
+ renderSaved();
+}
+function renderSaved(){
+ const box=document.getElementById('savedGroups'); if(!box)return; box.innerHTML='';
+ let saves={};try{saves=JSON.parse(localStorage.getItem("cm2_team_saves")||"{}")}catch(e){}
+ const keys=Object.keys(saves);
+ if(!keys.length){box.innerHTML='<span style="color:#8b92a2;font-size:13px">Aucun groupe enregistré sur cet appareil.</span>';return}
+ keys.forEach(k=>{
+  const wrap=document.createElement('div');wrap.className='student';wrap.style.display='flex';wrap.style.gap='7px';wrap.style.alignItems='center';
+  const name=document.createElement('span');name.textContent=k;name.style.flex='1';name.onclick=()=>loadSnapshot(saves[k]);
+  const del=document.createElement('button');del.textContent='✕';del.title='Supprimer';del.style.padding='3px 7px';del.onclick=e=>{e.stopPropagation();if(confirm(`Supprimer "${k}" ?`)){delete saves[k];localStorage.setItem("cm2_team_saves",JSON.stringify(saves));renderSaved()}};
+  wrap.append(name,del);box.appendChild(wrap);
+ });
+}
+function exportGroups(){
+ const data=JSON.stringify(snapshot(),null,2);
+ const blob=new Blob([data],{type:"application/json"});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+ a.download="groupes_CM2.json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function importGroups(file){
+ const reader=new FileReader();
+ reader.onload=()=>{try{loadSnapshot(JSON.parse(reader.result))}catch(e){alert("Impossible de lire ce fichier de groupes.")}};
+ reader.readAsText(file);
+}
+document.getElementById('save').onclick=saveLocal;
+document.getElementById('export').onclick=exportGroups;
+document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
+document.getElementById('importFile').onchange=e=>{if(e.target.files[0])importGroups(e.target.files[0]);e.target.value=''};
+
+init(); renderSaved();
+</script></body></html>
