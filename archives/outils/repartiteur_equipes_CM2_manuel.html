@@ -43,7 +43,7 @@ main{padding:17px}.help{font-size:13px;color:var(--muted);margin:0 0 14px}
 </main>
 <div class="dialog" id="dialog"><div class="dialog-box"><h2 id="dialogName"></h2><p>Dans quelle équipe placer cet élève ?</p><div class="team-buttons" id="teamButtons"></div><button class="cancel" id="cancel">Annuler</button></div></div>
 <script>
-const students=["Pauline", "Louane", "Clémence", "Meloe", "Maëlie", "Kaly", "Sean", "Theo", "Ewen", "Angel", "Alexei", "Julia", "Serigne", "Camille", "Manon", "Mattheo", "Romane", "Laya", "Salomé", "Elona", "Louis", "Timeo", "Gabriel", "Rafael"];
+const students=(()=>{try{const a=JSON.parse(localStorage.getItem("cm2-eleves-v1")||"[]");if(Array.isArray(a)&&a.length)return a.filter(x=>typeof x==="string"&&x.trim()).map(x=>x.trim())}catch(_){}return Array.from({length:24},(_,i)=>"Élève "+(i+1))})();
 const colors=['#e05252','#3d75d6','#32a06f','#e0a12e','#8a5bd1','#20a3ad','#e26d9e','#697386'];
 let n=4, teams=[], names=[], selected=null;
 function init(keepNames=false){
