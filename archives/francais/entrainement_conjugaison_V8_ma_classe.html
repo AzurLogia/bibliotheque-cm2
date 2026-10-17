@@ -304,11 +304,7 @@ button:disabled{opacity:.42;cursor:not-allowed}
 </div>
 
 <script>
-const studentNames=[
-  "Pauline","Louane","Clémence","Meloe","Maëlie","Kaly","Sean","Theo",
-  "Ewen","Angel","Alexei","Julia","Serigne","Camille","Manon","Mattheo",
-  "Romane","Laya","Salomé","Elona","Louis","Timeo","Gabriel","Rafael"
-];
+const studentNames=(()=>{try{const a=JSON.parse(localStorage.getItem("cm2-eleves-v1")||"[]");if(Array.isArray(a)&&a.length)return a.filter(x=>typeof x==="string"&&x.trim()).map(x=>x.trim())}catch(_){}return Array.from({length:24},(_,i)=>"Élève "+(i+1))})();
 
 const subjects=["Je","Tu","Il","Nous","Vous","Ils"];
 const tenseLabels={
