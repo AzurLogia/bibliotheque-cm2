@@ -1,1 +1,54 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Bibliothèque pédagogique CM2</title><style>body{margin:0;font:16px system-ui,sans-serif;background:#f5f7fb;color:#19304d}header{padding:38px 6%;background:#193453;color:white}h1{margin:0}main{max-width:1000px;margin:32px auto;padding:0 22px}.notice{padding:16px;background:#fff7e5;border-left:4px solid #d29b36;border-radius:8px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:24px}.card{background:white;border:1px solid #dfe6ee;border-radius:16px;padding:22px;box-shadow:0 5px 15px #182e4910}.card h2{font-size:1.1rem;margin-top:0}.card p{color:#5b6980}</style></head><body><header><h1>📚 Mes outils de classe</h1><p>Bibliothèque pédagogique · CM2</p></header><main><div class="notice">🚧 Mise en ligne en cours : les outils interactifs seront ajoutés progressivement, après vérification des fichiers destinés à être publics.</div><section class="grid"><div class="card"><h2>📖 Français</h2><p>Grammaire, conjugaison, vocabulaire et production écrite</p></div><div class="card"><h2>📐 Mathématiques</h2><p>Calculs, mesures et défis</p></div><div class="card"><h2>🏰 Histoire</h2><p>Le Moyen Âge et les révisions</p></div><div class="card"><h2>🌍 Anglais</h2><p>Bingos et activités interactives</p></div><div class="card"><h2>🏃 EPS</h2><p>Jeux et activités</p></div><div class="card"><h2>🎲 Outils de classe</h2><p>Production écrite et tirages aléatoires</p></div></section></main></body></html>
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mes outils de classe · CM2</title>
+<style>
+:root{font:16px system-ui,-apple-system,Segoe UI,sans-serif;color:#20344d;background:#f4f7fb}
+*{box-sizing:border-box}body{margin:0}header{background:#1c3859;color:#fff;padding:32px clamp(20px,5vw,72px)}.wrap{max-width:1100px;margin:auto}
+header h1{margin:0 0 8px;font-size:clamp(25px,3.5vw,38px)}header p{margin:0;color:#d6e3f3}
+main{max-width:1100px;margin:30px auto 70px;padding:0 20px}
+.toolbar{background:#fff;padding:18px;border:1px solid #dce5f1;border-radius:16px;display:flex;gap:10px;flex-wrap:wrap;box-shadow:0 4px 14px #1c38590a}
+input,select,button{font:inherit}input[type=search]{flex:1 1 250px;min-width:0;padding:12px 14px;border-radius:10px;border:1px solid #b6c7d9}
+select,.action{padding:11px;border:1px solid #c8d5e5;border-radius:10px;background:white;color:#233c5c}
+.action{cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #e1a82a;outline-offset:3px}
+.summary{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:24px 0 14px}
+.summary h2{margin:0;font-size:21px}.muted{color:#64748b;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:15px}
+.card{background:#fff;border:1px solid #dfe7f0;border-radius:17px;padding:20px;display:flex;flex-direction:column;gap:11px;min-height:195px;box-shadow:0 4px 12px #122b4108}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.pill{font-size:12px;color:#315c86;background:#eaf2fa;padding:5px 10px;border-radius:30px}
+.fav{cursor:pointer;border:0;background:transparent;color:#9aa8b8;font-size:25px;line-height:1;padding:2px}.fav.on{color:#da9e20}
+.card h3{margin:0;font-size:18px;line-height:1.35}.card p{margin:0;color:#5f6f85;font-size:14px;flex:1}
+.launch{display:inline-block;background:#234b77;color:white;text-decoration:none;padding:10px 13px;border-radius:10px;text-align:center;font-weight:600}
+.info{margin-top:26px;border:1px solid #e1e8f1;background:#fff;border-radius:15px;padding:18px;line-height:1.55}
+.empty{padding:50px 15px;text-align:center;color:#64748b}
+footer{margin-top:30px;color:#64748b;font-size:13px}
+</style></head><body>
+<header><div class="wrap"><h1>📚 Mes outils de classe</h1><p>Bibliothèque pédagogique · CM2 · Activités interactives</p></div></header>
+<main>
+<div class="toolbar"><input id="q" type="search" placeholder="Rechercher : longueurs, polysémie, conte…" aria-label="Rechercher une activité">
+<select id="cat" aria-label="Filtrer par matière">
+<option value="tout">Toutes les matières</option><option value="francais">📖 Français</option><option value="mathematiques">📐 Mathématiques</option><option value="histoire">🏰 Histoire</option><option value="anglais">🌍 Anglais</option><option value="eps">🏃 EPS</option><option value="outils">🎲 Outils de classe</option></select>
+<button id="favs" type="button" class="action" aria-pressed="false">☆ Favoris</button></div>
+<div class="summary"><h2>Les activités</h2><span class="muted" id="count"></span></div>
+<div id="grid" class="grid"></div>
+<section class="info"><strong>Une bibliothèque qui évolue</strong><p>Chaque activité s'ouvre dans un nouvel onglet. Les favoris sont mémorisés dans ce navigateur uniquement. De nouvelles activités seront ajoutées au catalogue au fur et à mesure de leur vérification, sans modifier les anciennes versions locales.</p></section>
+<footer>Bibliothèque pédagogique CM2 · GitHub Pages</footer>
+</main>
+<script>
+const activities=[{"id":1,"t":"Bingo des consignes","c":"anglais","url":"outils/anglais/Bingo_Classroom_Instructions_CM2.html","d":"Bingo interactif pour les instructions de classe","tags":"bingo,consignes,anglais"},{"id":2,"t":"Atelier conversions","c":"mathematiques","url":"outils/mathematiques/atelier_conversions_CM2.html","d":"Atelier de conversion de mesures","tags":"mesures,longueurs,conversions"},{"id":3,"t":"Défi longueurs","c":"mathematiques","url":"outils/mathematiques/defi_longueurs_CM2.html","d":"Associer et comparer des longueurs","tags":"mesures,longueurs"},{"id":4,"t":"Défi longueurs — difficile","c":"mathematiques","url":"outils/mathematiques/defi_longueurs_CM2_version_plus_difficile.html","d":"Version plus exigeante sur les longueurs","tags":"mesures,difficile"},{"id":5,"t":"Roues pour créer un conte","c":"outils","url":"outils/outils/roues_conte_production_ecrite_corrige.html","d":"Personnage, lieu et objectif pour écrire une histoire","tags":"production écrite,roues,conte"},{"id":6,"t":"Défi polysémie","c":"francais","url":"outils/francais/defi_polysemie_cm2_v4.html","d":"Les différents sens d'un mot","tags":"vocabulaire,polysémie"},{"id":7,"t":"Mots caméléons","c":"francais","url":"outils/francais/mots_cameleons_polysemie_cm2.html","d":"S'entraîner à comprendre la polysémie","tags":"vocabulaire,sens des mots"},{"id":8,"t":"Roue des jeux d'EPS","c":"eps","url":"outils/eps/roue_EPS_CM2_10_jeux_v3.html","d":"Tirage aléatoire des jeux d'EPS","tags":"sport,roue,jeux"}];
+const labels={francais:"📖 Français",mathematiques:"📐 Mathématiques",histoire:"🏰 Histoire",anglais:"🌍 Anglais",eps:"🏃 EPS",outils:"🎲 Outils de classe"};
+const $=id=>document.getElementById(id);
+let onlyFav=false,fav=[];
+try{fav=JSON.parse(localStorage.getItem("cm2-fav-v1")||"[]");if(!Array.isArray(fav))fav=[];}catch(e){fav=[]}
+function save(){try{localStorage.setItem("cm2-fav-v1",JSON.stringify(fav))}catch(e){}}
+function render(){const q=$("q").value.trim().toLocaleLowerCase("fr"),cat=$("cat").value;
+const shown=activities.filter(a=>(cat==="tout"||a.c===cat)&&(!onlyFav||fav.includes(a.id))&&([a.t,a.d,a.tags,labels[a.c]].join(" ").toLocaleLowerCase("fr").includes(q)));
+$("grid").replaceChildren();$("count").textContent=shown.length+" activité"+(shown.length>1?"s":"")+" affichée"+(shown.length>1?"s":"");
+if(!shown.length){const p=document.createElement("p");p.className="empty";p.textContent="Aucune activité ne correspond à cette recherche."; $("grid").append(p)}
+for(const a of shown){const card=document.createElement("article");card.className="card";
+const top=document.createElement("div");top.className="top";const pill=document.createElement("span");pill.className="pill";pill.textContent=labels[a.c];top.append(pill);
+const star=document.createElement("button");star.className="fav"+(fav.includes(a.id)?" on":"");star.textContent=fav.includes(a.id)?"★":"☆";star.title=fav.includes(a.id)?"Retirer des favoris":"Ajouter aux favoris";star.setAttribute("aria-label",star.title);star.onclick=()=>{fav=fav.includes(a.id)?fav.filter(x=>x!==a.id):[...fav,a.id];save();render()};top.append(star);
+const title=document.createElement("h3");title.textContent=a.t;const desc=document.createElement("p");desc.textContent=a.d;const link=document.createElement("a");link.href=a.url;link.target="_blank";link.rel="noopener";link.className="launch";link.textContent="Ouvrir l'activité ↗";card.append(top,title,desc,link);$("grid").append(card)}}
+$("q").addEventListener("input",render);$("cat").addEventListener("change",render);
+$("favs").onclick=()=>{onlyFav=!onlyFav;$("favs").textContent=onlyFav?"★ Tous les outils":"☆ Favoris";$("favs").setAttribute("aria-pressed",String(onlyFav));render()};render();
+</script></body></html>
