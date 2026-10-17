@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Number Race — Duels aléatoires</title>
+<style>
+:root{--a:#2563eb;--b:#ef4444;--bg1:#eef6ff;--bg2:#fff7ed;--ink:#1f2937;--muted:#6b7280}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:linear-gradient(135deg,var(--bg1),var(--bg2));min-height:100vh}
+.wrap{width:min(1180px,94vw);margin:auto;padding:28px 0 40px}
+h1{text-align:center;margin:0 0 6px;font-size:clamp(30px,4vw,48px)}
+.subtitle{text-align:center;color:var(--muted);margin-bottom:24px}
+.setup{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.team{background:white;border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.team.a{border:3px solid #93c5fd}.team.b{border:3px solid #fca5a5}
+.team h2{margin:0 0 8px}.team.a h2{color:var(--a)}.team.b h2{color:var(--b)}
+textarea{width:100%;min-height:220px;border:1px solid #d1d5db;border-radius:12px;padding:12px 14px;font-size:16px;line-height:1.45;resize:vertical}
+.hint{margin-top:6px;color:var(--muted);font-size:13px}
+.controls{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:16px 0}
+button{border:0;border-radius:12px;padding:12px 18px;font-weight:700;font-size:16px;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+.primary{background:#16a34a;color:white}.secondary{background:#374151;color:white}.ghost{background:white;border:1px solid #d1d5db}.danger{background:#b91c1c;color:white}
+.arena{background:white;border-radius:22px;padding:26px 20px;box-shadow:0 12px 36px rgba(0,0,0,.10);text-align:center;min-height:260px;display:flex;flex-direction:column;justify-content:center}
+.round{color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.duel{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px}
+.player{min-height:125px;display:flex;align-items:center;justify-content:center;border-radius:18px;padding:18px;font-size:clamp(30px,4.8vw,58px);font-weight:800;word-break:break-word}
+.player.a{background:#eff6ff;border:3px solid #60a5fa;color:#1d4ed8}
+.player.b{background:#fff1f2;border:3px solid #f87171;color:#dc2626}
+.vs{font-size:clamp(26px,3vw,40px);font-weight:900}
+.status{margin-top:14px;color:var(--muted)}
+.footer{text-align:center;margin-top:14px;color:var(--muted);font-size:13px}
+.hidden{display:none!important}
+@media(max-width:760px){.setup{grid-template-columns:1fr}.duel{grid-template-columns:1fr}.vs{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⚔️ Number Race</h1>
+  <div class="subtitle">Deux équipes déjà constituées, un duel aléatoire à chaque tour.</div>
+
+  <section id="setupSection">
+    <div class="setup">
+      <div class="team a">
+        <h2>Équipe A</h2>
+        <textarea id="teamA" placeholder="Un prénom par ligne"></textarea>
+        <div class="hint">Ex. Lucas, Emma, Noah…</div>
+      </div>
+      <div class="team b">
+        <h2>Équipe B</h2>
+        <textarea id="teamB" placeholder="Un prénom par ligne"></textarea>
+        <div class="hint">Les deux équipes doivent avoir le même nombre d'élèves.</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="primary" id="startBtn">Commencer</button>
+      <button class="ghost" id="demoBtn">Charger un exemple</button>
+    </div>
+  </section>
+
+  <section id="arenaSection" class="arena hidden">
+    <div class="round" id="roundLabel">Duel 1</div>
+    <div class="duel">
+      <div class="player a" id="playerA">—</div>
+      <div class="vs">VS</div>
+      <div class="player b" id="playerB">—</div>
+    </div>
+    <div class="controls">
+      <button class="primary" id="nextBtn">🎲 Nouvel affrontement</button>
+      <button class="secondary" id="swapBtn">↔️ Permuter les côtés</button>
+      <button class="ghost" id="editBtn">✏️ Modifier les équipes</button>
+      <button class="danger" id="restartBtn">🔄 Recommencer</button>
+    </div>
+    <div class="status" id="statusText"></div>
+  </section>
+
+  <div class="footer">Astuce : pendant les duels, appuie sur <b>Espace</b> ou <b>Entrée</b> pour lancer le suivant.</div>
+</div>
+
+<script>
+let originalA=[], originalB=[], remainingA=[], remainingB=[], round=0, sideSwapped=false;
+const $=id=>document.getElementById(id);
+function parseNames(text){return text.split(/\n+/).map(s=>s.trim()).filter(Boolean)}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function startGame(){
+  const a=parseNames($("teamA").value), b=parseNames($("teamB").value);
+  if(!a.length||!b.length){alert("Ajoute des prénoms dans les deux équipes.");return}
+  if(a.length!==b.length){alert("Les deux équipes doivent avoir le même nombre d'élèves.");return}
+  originalA=[...a]; originalB=[...b]; remainingA=shuffle(a); remainingB=shuffle(b); round=0; sideSwapped=false;
+  $("setupSection").classList.add("hidden"); $("arenaSection").classList.remove("hidden"); $("nextBtn").disabled=false; drawNext();
+}
+function drawNext(){
+  if(!remainingA.length||!remainingB.length){
+    $("playerA").textContent="Terminé !"; $("playerB").textContent="Bravo !";
+    $("roundLabel").textContent="Tous les élèves sont passés";
+    $("statusText").textContent="Clique sur « Recommencer » pour générer une nouvelle série.";
+    $("nextBtn").disabled=true; return;
+  }
+  const a=remainingA.pop(), b=remainingB.pop(); round++;
+  $("playerA").textContent=sideSwapped?b:a; $("playerB").textContent=sideSwapped?a:b;
+  $("roundLabel").textContent=`Duel ${round} / ${originalA.length}`;
+  $("statusText").textContent=`${remainingA.length} duel${remainingA.length>1?"s":""} restant${remainingA.length>1?"s":""} après celui-ci.`;
+}
+function restartGame(){remainingA=shuffle(originalA);remainingB=shuffle(originalB);round=0;sideSwapped=false;$("nextBtn").disabled=false;drawNext()}
+function editTeams(){$("arenaSection").classList.add("hidden");$("setupSection").classList.remove("hidden")}
+function swapSides(){sideSwapped=!sideSwapped; const x=$("playerA").textContent; $("playerA").textContent=$("playerB").textContent; $("playerB").textContent=x}
+$("startBtn").onclick=startGame; $("nextBtn").onclick=drawNext; $("restartBtn").onclick=restartGame; $("editBtn").onclick=editTeams; $("swapBtn").onclick=swapSides;
+$("demoBtn").onclick=()=>{$("teamA").value=["Alice","Bastien","Camille","Diego","Elena","Farid","Gabriel","Hana","Isaac","Jade","Kylian","Lina"].join("\n");$("teamB").value=["Maël","Nora","Oscar","Paola","Quentin","Rania","Sami","Tess","Ulysse","Valentine","Wassim","Zoé"].join("\n")};
+document.addEventListener("keydown",e=>{if(!$("arenaSection").classList.contains("hidden")&&(e.code==="Space"||e.code==="Enter")){e.preventDefault();if(!$("nextBtn").disabled)drawNext()}});
+</script>
+</body>
+</html>
