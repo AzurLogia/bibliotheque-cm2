@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>La roue des jeux – EPS CM2</title>
+<style>
+:root{--ink:#172033;--paper:#f7f8fc;--card:#fff;--accent:#2447d8;--muted:#667085}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(135deg,#eef2ff,#fff7ed);color:var(--ink)}
+header{text-align:center;padding:22px 16px 8px} h1{margin:0;font-size:clamp(28px,4vw,48px)} header p{margin:7px 0;color:var(--muted);font-weight:650}
+main{width:min(1180px,96vw);margin:auto;display:grid;grid-template-columns:minmax(440px,1.1fr) minmax(330px,.9fr);gap:26px;align-items:center;padding:10px 0 30px}
+.wheel-card,.info{background:rgba(255,255,255,.94);border-radius:24px;box-shadow:0 14px 40px #34405420;padding:22px}
+.wheel-wrap{position:relative;width:min(68vh,620px);max-width:100%;aspect-ratio:1;margin:auto}
+canvas{width:100%;height:100%;display:block}
+.pointer{position:absolute;right:-7px;top:50%;transform:translateY(-50%);width:0;height:0;border-top:20px solid transparent;border-bottom:20px solid transparent;border-right:0;border-left:42px solid #111827;filter:drop-shadow(0 2px 2px #0004)}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+button{border:0;border-radius:14px;padding:13px 18px;font-size:16px;font-weight:800;cursor:pointer}
+#spin{background:var(--accent);color:white;font-size:20px;padding:14px 30px;box-shadow:0 6px 14px #2447d84a}
+#spin:disabled{opacity:.45;cursor:not-allowed}.secondary{background:#eef2f6;color:#344054}.danger{background:#fff1f0;color:#b42318}
+.status{text-align:center;margin-top:12px;color:var(--muted);font-weight:700}
+.info{min-height:480px;display:flex;flex-direction:column;justify-content:center;text-align:center}
+.illust{width:210px;height:210px;border-radius:50%;display:grid;place-items:center;margin:0 auto 14px;background:radial-gradient(circle at 35% 30%,#fff,#dbe4ff);font-size:112px;border:8px solid white;box-shadow:0 10px 30px #34405425}
+.info h2{font-size:34px;margin:4px 0 8px}.label{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:900;margin-top:13px}.rules{font-size:19px;line-height:1.45;margin:5px auto;max-width:540px}.equip{font-weight:750}
+.placeholder .illust{font-size:88px}.placeholder h2{font-size:29px}.placeholder .rules{color:var(--muted)}
+.history{margin-top:18px;border-top:1px solid #e4e7ec;padding-top:14px}.chips{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}.chip{padding:6px 10px;background:#f2f4f7;border-radius:999px;font-size:13px;font-weight:700}
+.small{font-size:13px;color:var(--muted);margin-top:12px}
+@media(max-width:850px){main{grid-template-columns:1fr}.wheel-wrap{width:min(88vw,590px)}.info{min-height:390px}}
+</style>
+</head>
+<body>
+<header><h1>🎲 La roue des jeux</h1><p>EPS • Jeux traditionnels avec et sans ballon</p></header>
+<main>
+<section class="wheel-card">
+ <div class="wheel-wrap"><canvas id="wheel" width="900" height="900"></canvas><div class="pointer"></div></div>
+ <div class="controls">
+  <button id="spin">TOURNER LA ROUE</button>
+  <button class="secondary" id="undo">↩ Remettre le dernier jeu</button>
+  <button class="danger" id="reset">⟳ Réinitialiser</button>
+ </div>
+ <div class="status" id="status"></div>
+</section>
+<aside class="info placeholder" id="info">
+ <div class="illust">🏆</div>
+ <h2>Quel jeu allons-nous faire ?</h2>
+ <p class="rules">Tournez la roue. Le jeu tiré sera retiré automatiquement pour ne pas ressortir lors des prochaines séances.</p>
+ <div class="history"><div class="label">Jeux déjà tirés</div><div class="chips" id="chips"><span class="small">Aucun pour le moment.</span></div></div>
+</aside>
+</main>
+<script>
+const GAMES = [{"name": "Ballon capitaine", "icon": "🏐", "rules": "Deux équipes s’affrontent. Pour marquer un point, fais parvenir le ballon à ton capitaine placé dans sa zone, sans que l’autre équipe ne l’intercepte.", "equipment": "1 ballon, chasubles, plots"}, {"name": "Béret", "icon": "🏃", "rules": "Chaque joueur reçoit un numéro. Quand ton numéro est appelé, cours chercher le béret et rapporte-le dans ton camp sans te faire toucher.", "equipment": "1 foulard ou objet, plots"}, {"name": "Balle au prisonnier", "icon": "🎯", "rules": "Touche un adversaire avec le ballon pour l’envoyer en prison. Les prisonniers peuvent revenir en jeu selon la règle donnée par l’enseignant.", "equipment": "1 ou 2 ballons mousse, plots"}, {"name": "Balle assise", "icon": "🟠", "rules": "Si tu es touché directement par le ballon, assieds-toi. Pour revenir en jeu, récupère le ballon depuis ta position et réussis une action autorisée.", "equipment": "1 ballon mousse"}, {"name": "Épervier-ballon", "icon": "💨", "rules": "Traverse le terrain sans être touché par le ballon lancé par les éperviers. Si tu es touché, tu rejoins les éperviers pour la manche suivante.", "equipment": "1 ou 2 ballons mousse, plots"}, {"name": "Passe à dix", "icon": "🔟", "rules": "Ton équipe doit réussir dix passes consécutives sans que l’adversaire intercepte le ballon. Si le ballon est perdu, le compte repart à zéro.", "equipment": "1 ballon, chasubles"}, {"name": "Gendarmes et voleurs", "icon": "🚓", "rules": "Les gendarmes poursuivent les voleurs et les conduisent en prison lorsqu’ils les touchent. Les voleurs encore libres peuvent tenter de délivrer leurs partenaires.", "equipment": "Chasubles, plots"}, {"name": "Balle au château", "icon": "🏰", "rules": "Chaque équipe protège son château tout en essayant de faire tomber celui de l’adversaire avec le ballon. Il faut attaquer sans oublier de défendre !", "equipment": "Ballons mousse, quilles ou plots"}, {"name": "Balle aux zones", "icon": "📍", "rules": "Fais progresser le ballon par des passes jusqu’à la zone d’en-but adverse. Un point est marqué lorsqu’un partenaire reçoit correctement le ballon dans cette zone.", "equipment": "1 ballon, chasubles, plots"}, {"name": "Ballon chronomètre", "icon": "⏱️", "rules": "Une équipe fait circuler le ballon le plus vite possible pendant que l’autre réalise une course ou un parcours. Puis les rôles sont inversés.", "equipment": "1 ballon, plots"}];
+const palette=["#FFD166","#06D6A0","#7BDFF2","#B2F7EF","#F7A072","#CDB4DB","#90DBF4","#FFAFCC","#A3E635","#FDE68A","#93C5FD","#FDBA74"];
+const canvas=document.getElementById("wheel"),ctx=canvas.getContext("2d");
+const spinBtn=document.getElementById("spin"), resetBtn=document.getElementById("reset"), undoBtn=document.getElementById("undo");
+const info=document.getElementById("info"), status=document.getElementById("status");
+let remaining=GAMES.map((_,i)=>i), drawn=[], rotation=0, spinning=false;
+
+function drawWheel(){
+ const n=remaining.length, cx=450,cy=450,r=410;
+ ctx.clearRect(0,0,900,900);
+ if(!n){ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle="#e5e7eb";ctx.fill();ctx.fillStyle="#475467";ctx.font="bold 38px system-ui";ctx.textAlign="center";ctx.fillText("Tous les jeux ont été tirés !",cx,cy);return}
+ const step=Math.PI*2/n;
+ remaining.forEach((gi,j)=>{
+   const a0=rotation+j*step-step/2, a1=a0+step;
+   ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,a0,a1);ctx.closePath();ctx.fillStyle=palette[gi%palette.length];ctx.fill();ctx.strokeStyle="#fff";ctx.lineWidth=5;ctx.stroke();
+   ctx.save();ctx.translate(cx,cy);ctx.rotate(a0+step/2);
+   ctx.textAlign="right";ctx.textBaseline="middle";ctx.fillStyle="#172033";
+   const fs=n>10?22:n>7?25:29;ctx.font=`800 ${fs}px system-ui`;
+   let name=GAMES[gi].name; if(name.length>20) name=name.replace(" et "," & ");
+   ctx.fillText(GAMES[gi].icon+" "+name,r-25,0);ctx.restore();
+ });
+ ctx.beginPath();ctx.arc(cx,cy,72,0,Math.PI*2);ctx.fillStyle="#fff";ctx.fill();ctx.strokeStyle="#172033";ctx.lineWidth=8;ctx.stroke();
+ ctx.fillStyle="#172033";ctx.font="900 28px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("EPS",cx,cy);
+}
+function updateHistory(){
+ const chips=document.getElementById("chips"); if(!chips)return;
+ chips.innerHTML=drawn.length?drawn.map(i=>`<span class="chip">${GAMES[i].icon} ${GAMES[i].name}</span>`).join(""):`<span class="small">Aucun pour le moment.</span>`;
+ status.textContent=`${remaining.length} jeu${remaining.length>1?"x":""} encore dans la roue`;
+ spinBtn.disabled=spinning||remaining.length===0; undoBtn.disabled=spinning||drawn.length===0;
+}
+function showGame(i){
+ const g=GAMES[i]; info.classList.remove("placeholder");
+ info.innerHTML=`<div class="illust">${g.icon}</div><div class="label">Le jeu tiré est…</div><h2>${g.name}</h2>
+ <div class="label">Règle du jeu</div><p class="rules">${g.rules}</p>
+ <div class="label">Matériel</div><p class="equip">${g.equipment}</p>
+ <div class="history"><div class="label">Jeux déjà tirés</div><div class="chips" id="chips"></div></div>`;
+ updateHistory();
+}
+function easeOut(t){return 1-Math.pow(1-t,4)}
+spinBtn.onclick=()=>{
+ if(spinning||!remaining.length)return; spinning=true;updateHistory();
+ const n=remaining.length, winnerPos=Math.floor(Math.random()*n), step=Math.PI*2/n;
+ // Pointer is at angle 0 (right). Land chosen segment center there after several full turns.
+ const current=rotation, desired= -winnerPos*step;
+ let delta=((desired-current)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)+Math.PI*2*(5+Math.floor(Math.random()*3));
+ const start=performance.now(),dur=3600;
+ function anim(now){let t=Math.min(1,(now-start)/dur);rotation=current+delta*easeOut(t);drawWheel();
+   if(t<1)requestAnimationFrame(anim);else{
+     rotation=((rotation%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+     const gi=remaining[winnerPos]; drawn.push(gi); remaining.splice(winnerPos,1);
+     spinning=false; showGame(gi); drawWheel(); updateHistory();
+   }}
+ requestAnimationFrame(anim);
+};
+undoBtn.onclick=()=>{if(!drawn.length||spinning)return;const i=drawn.pop();remaining.push(i);info.classList.add("placeholder");info.innerHTML=`<div class="illust">↩️</div><h2>${GAMES[i].name} est revenu dans la roue</h2><p class="rules">Vous pouvez effectuer un nouveau tirage.</p><div class="history"><div class="label">Jeux déjà tirés</div><div class="chips" id="chips"></div></div>`;drawWheel();updateHistory()};
+resetBtn.onclick=()=>{if(spinning)return;remaining=GAMES.map((_,i)=>i);drawn=[];rotation=0;info.classList.add("placeholder");info.innerHTML=`<div class="illust">🏆</div><h2>Quel jeu allons-nous faire ?</h2><p class="rules">Tournez la roue. Le jeu tiré sera retiré automatiquement pour ne pas ressortir lors des prochaines séances.</p><div class="history"><div class="label">Jeux déjà tirés</div><div class="chips" id="chips"><span class="small">Aucun pour le moment.</span></div></div>`;drawWheel();updateHistory()};
+drawWheel();updateHistory();
+</script>
+</body></html>
