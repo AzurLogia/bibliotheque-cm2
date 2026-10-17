@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>La fabrique à virelangues · CM1–CM2</title>
+<style>
+:root{--ink:#202f3a;--muted:#53636d;--paper:#faf8f1;--white:#fff;--teal:#006d70;--teal-soft:#e3f3ef;--orange:#a44820;--border:#d6ddd8;--purple:#5a4382;--shadow:0 12px 32px #22352a0c;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--paper);font-size:17px}
+*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button,select,input[type=checkbox]{cursor:pointer}button{border:1px solid var(--border);border-radius:12px;padding:.7rem .95rem;color:var(--ink);background:var(--white);font-weight:700}button:hover{background:#f0f4ee}button:disabled{cursor:default;opacity:.45}button.primary{background:var(--teal);color:var(--white);border-color:var(--teal)}button.primary:hover{background:#005557}button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #d28018;outline-offset:3px}button[aria-pressed=true]{border-color:var(--teal);background:var(--teal-soft);color:#00585b}select,input[type=number],textarea{width:100%;padding:.65rem;border:1px solid var(--border);border-radius:9px;background:var(--white);color:var(--ink)}label{display:block;font-weight:700;font-size:.86rem;margin-bottom:.35rem}small,.sub{color:var(--muted);line-height:1.5}.shell{max-width:1500px;margin:auto;padding:24px 32px}header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}.eyebrow{font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);font-weight:700;margin:0 0 8px}h1{font-size:clamp(1.6rem,3vw,2.2rem);margin:0;letter-spacing:-.045em}h2{margin:0 0 16px;font-size:1.5rem}h3{font-size:1.07rem}p{line-height:1.55}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:22px}.settings{border:1px solid var(--border);border-radius:20px;background:#f0f2ea;padding:20px;align-self:start}.settings h2{font-size:1.05rem}.field{margin-bottom:19px}.settings small{display:block;font-size:.76rem}.settings summary{font-weight:700;cursor:pointer;margin:12px 0}.settings textarea{min-height:135px;font-size:.9rem;resize:vertical}.wide{width:100%}.stage{min-width:0}.card{background:var(--white);border:1px solid var(--border);border-radius:24px;padding:28px 32px;box-shadow:var(--shadow)}.cardtop{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}.tags{display:flex;gap:8px;flex-wrap:wrap}.tag{font-size:.79rem;padding:6px 10px;border-radius:7px;background:var(--teal-soft);color:#005759;font-weight:700}.tag.level2{background:#fff0d5;color:#804414}.tag.level3{background:#ede8f7;color:var(--purple)}#progress{font-size:.8rem;color:var(--muted)}.readerbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:24px;padding-bottom:15px;border-bottom:1px solid #e7eae6}.reader{font-weight:700;color:var(--teal);font-size:1rem}.readerbar button{font-size:.8rem;padding:.5rem .7rem}.sentence{font-size:clamp(2rem,3.9vw,3.7rem);line-height:1.35;font-weight:700;letter-spacing:.005em;min-height:220px;margin:26px 0 20px;overflow-wrap:break-word;display:flex;align-items:center}.phrase-inner{width:100%}.chunk{display:inline}.sentence.segmented .chunk{display:block;margin-bottom:.14em}.aidline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.83rem;color:var(--muted)}.aidline button{font-size:.83rem;padding:.55rem .8rem}.challenge{margin-top:20px;background:#f3f0e8;border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:20px;justify-content:space-between}.challenge .eyebrow{color:#805b29;font-size:.68rem;margin:0 0 4px}#challengeTitle{font-size:1.1rem;font-weight:700;margin:0 0 4px}#challengeText{font-size:.9rem;line-height:1.4;margin:0}#rerollChallenge{white-space:nowrap;font-size:.8rem}.actions{margin-top:22px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}.actions .primary{font-size:1.05rem;padding:.9rem 1.35rem}.timer{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.timeroutput{font-size:1.2rem;font-variant-numeric:tabular-nums;font-weight:700;min-width:57px;text-align:center}.timer button{font-size:.8rem;padding:.55rem .75rem}.timerlabel{font-size:.75rem;color:var(--muted);width:100%;text-align:right}.success{margin-top:20px;border:1px solid var(--border);border-radius:18px;padding:18px 22px;background:#f4f6f0;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.success h2{font-size:.87rem;margin:0 0 4px}.success p{font-size:.75rem;color:var(--muted);margin:0}.criteria{display:flex;gap:8px;flex-wrap:wrap}.criteria button{font-size:.82rem;padding:.65rem .85rem}.criteria button::before{content:'○';margin-right:6px}.criteria button[aria-pressed=true]::before{content:'✓'}.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:15px;font-size:.8rem;color:var(--muted)}.foot strong{color:var(--teal)}.notice{min-height:1.4em;color:var(--teal);font-size:.82rem;margin-top:10px}dialog{border:1px solid var(--border);border-radius:20px;padding:28px;width:min(830px,calc(100% - 32px));max-height:88vh;color:var(--ink);background:var(--paper)}dialog::backdrop{background:#17262299}.dialoghead{display:flex;align-items:center;justify-content:space-between;gap:16px}.dialoghead h2{margin:0}.dialoghead button{padding:.5rem .8rem}.guide ol{padding-left:24px}.guide li{margin:14px 0;line-height:1.55}.guide .note{background:var(--teal-soft);padding:14px;border-radius:12px}.bankhead{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:18px 0;flex-wrap:wrap}.bankhead p{margin:0;color:var(--muted);font-size:.86rem}.banklist{display:grid;gap:12px}.bankitem{padding:16px;background:var(--white);border:1px solid var(--border);border-radius:13px}.bankitem p{margin:10px 0;font-size:1.08rem}.bankitem button{padding:.4rem .7rem;font-size:.8rem}.warning{color:var(--orange)}#printArea{display:none}.focus-view .settings,.focus-view .success,.focus-view .foot,.focus-view .notice{display:none}.focus-view .layout{grid-template-columns:1fr}.focus-view .sentence{font-size:clamp(2.4rem,4.7vw,4.8rem);min-height:40vh}.focus-view .shell{max-width:1600px}.focus-view .card{padding:32px 46px}body:fullscreen{overflow:auto;background:var(--paper)}
+@media(max-width:900px){.shell{padding:18px}.layout{grid-template-columns:1fr}.settings{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;padding:16px}.settings h2{width:100%;margin:0}.settings .field{flex:1 1 140px;margin-bottom:0}.settings details{width:100%}.card{padding:22px}.sentence{min-height:180px}.challenge{align-items:flex-start}.success{padding:16px}.timer{margin-left:0}.timerlabel{text-align:left}}
+@media(max-width:520px){header{align-items:flex-start;flex-direction:column}.sentence{font-size:2rem}.challenge{flex-direction:column;gap:12px}.actions{align-items:flex-start;flex-direction:column}.criteria{width:100%}.criteria button{flex:1}.cardtop{align-items:flex-start}.focus-view .card{padding:20px}.focus-view .sentence{font-size:2.3rem}.timerlabel{text-align:left}}
+@media(min-width:901px) and (max-height:820px){.shell{padding:14px 24px}header{margin-bottom:12px}.card{padding:20px 24px}.readerbar{margin-top:12px;padding-bottom:10px}.sentence{min-height:150px;margin:18px 0;font-size:clamp(2rem,3.5vw,3.3rem)}.challenge{margin-top:12px;padding:12px 16px}.actions{margin-top:16px}.success{margin-top:12px;padding:12px 18px}.focus-view .card{padding:22px 32px}.focus-view .sentence{min-height:24vh;font-size:clamp(2.3rem,4vw,3.8rem)}}
+@media print{@page{size:A4;margin:12mm}body{background:white;color:black;font-size:11pt}.shell,dialog{display:none!important}#printArea{display:block}#printArea h1{font-size:18pt;margin:0 0 5mm}#printArea>p{font-size:10pt;margin:0 0 5mm}.printgrid{display:grid;grid-template-columns:1fr 1fr;gap:5mm}.printcard{border:1px dashed #777;padding:5mm;break-inside:avoid;min-height:55mm}.printcard strong{font-size:10pt}.printcard p{font-size:14pt;line-height:1.4;margin:4mm 0}.printcard small{font-size:9pt;color:#333}.printcard .check{font-size:9pt;line-height:1.5}.printfooter{font-size:9pt;margin-top:4mm}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header><div><p class="eyebrow">Atelier de lecture · CM1–CM2</p><h1>La fabrique à virelangues</h1></div><div class="toolbar"><button id="help">Comment jouer ?</button><button id="bank">Cartes & impression</button><button id="fullscreen" aria-pressed="false">Plein écran</button></div></header>
+<div class="layout">
+<aside class="settings" aria-label="Réglages du jeu">
+<h2>Le menu du jour</h2>
+<div class="field"><label for="level">Difficulté</label><select id="level"><option value="1">1 · Pour commencer</option><option value="2">2 · Ça se corse</option><option value="3">3 · Langue experte</option><option value="all">Tous les niveaux</option></select></div>
+<div class="field"><label for="sound">Sons à travailler</label><select id="sound"><option value="all">Tous les sons</option><option value="ch-s">CH / S</option><option value="r-l">R / L</option><option value="p-b">P / B</option><option value="t-d">T / D</option><option value="f-v">F / V</option><option value="m-n">M / N</option></select></div>
+<div class="field"><label for="mode">Type de défi</label><select id="mode"><option value="random">Un défi au hasard</option><option value="precis">Lecture précise</option><option value="echo">En écho</option><option value="triple">Trois fois de suite</option><option value="duo">En duo</option><option value="acteur">Comme un acteur</option></select></div>
+<div class="field"><label for="duration">Temps d’entraînement</label><select id="duration"><option value="15">15 secondes</option><option value="30" selected>30 secondes</option><option value="45">45 secondes</option><option value="60">60 secondes</option></select><small>Facultatif : le temps ne donne pas de points.</small></div>
+<details><summary>Tirage des élèves</summary><label for="names">Un prénom par ligne</label><textarea id="names" placeholder="Colle ici les prénoms du groupe d’APC." spellcheck="false"></textarea><button id="saveNames" class="wide">Utiliser cette liste</button><small id="namesStatus">Sans liste : toute la classe participe.</small></details>
+<details><summary>La partie</summary><p class="sub" style="font-size:.82rem">Les points sont collectifs. Coche ce que le groupe ou le lecteur a réussi.</p><button id="resetSession" class="wide">Recommencer la partie</button><small>Remet les réussites et les tirages à zéro.</small></details>
+</aside>
+<main class="stage">
+<section class="card" aria-label="Virelangue à lire">
+<div class="cardtop"><div class="tags"><span id="levelTag" class="tag"></span><span id="soundTag" class="tag"></span></div><span id="progress"></span></div>
+<div class="readerbar"><span id="reader" class="reader">À vous de jouer !</span><button id="drawStudent" disabled>Tirer un élève</button></div>
+<div id="sentence" class="sentence" aria-live="polite"><div id="phrase" class="phrase-inner"></div></div>
+<div class="aidline"><span id="tip"></span><button id="aid" aria-pressed="false">Découper la phrase</button></div>
+<div class="challenge"><div><p class="eyebrow">Le défi</p><p id="challengeTitle"></p><p id="challengeText"></p></div><button id="rerollChallenge">Autre défi</button></div>
+<div class="actions"><button id="next" class="primary">Nouveau virelangue →</button><div class="timer"><span class="timerlabel" id="timerLabel">Temps pour s’entraîner</span><output id="clock" class="timeroutput" aria-label="Temps restant">0:30</output><button id="startTimer">Démarrer</button><button id="resetTimer" aria-label="Remettre le minuteur à zéro">↺</button></div></div>
+</section>
+<section class="success" aria-label="Réussites validées par l’enseignant"><div><h2>Nos réussites sur cette carte</h2><p>Validation par l’enseignant · jusqu’à 3 points</p></div><div class="criteria"><button data-criterion="0" aria-pressed="false">Mots exacts</button><button data-criterion="1" aria-pressed="false">Sons bien articulés</button><button data-criterion="2" aria-pressed="false">Défi réussi</button></div></section>
+<div class="foot"><span><strong id="points">0</strong> points collectifs · <span id="rounds">1</span> carte jouée</span><span>On lit clairement, puis on recommence.</span></div>
+<div id="notice" class="notice" role="status" aria-live="polite"></div>
+</main>
+</div>
+</div>
+<dialog id="helpDialog" class="guide" aria-labelledby="helpTitle"><div class="dialoghead"><h2 id="helpTitle">Un petit atelier de 5 à 10 minutes</h2><button data-close="helpDialog" aria-label="Fermer l’aide">✕</button></div>
+<ol><li><strong>Choisir un niveau.</strong> Commencer par le niveau 1 et ajuster selon les lecteurs, quel que soit leur niveau de classe. On peut cibler une paire de sons.</li><li><strong>Lire et comprendre.</strong> L’enseignant lit la phrase, explique les mots inconnus, puis les élèves essaient lentement. « Découper la phrase » aide à travailler par morceaux.</li><li><strong>Relever le défi.</strong> En écho, en duo, trois fois de suite… Laisser plusieurs essais. Le minuteur sert uniquement à réserver un temps d’entraînement.</li><li><strong>Valider les réussites.</strong> Cocher « Mots exacts », « Sons bien articulés » et « Défi réussi » selon ce qui a été réussi. Chaque case ajoute un point collectif ; elle peut être décochée. On peut gagner ces points après s’être corrigé.</li><li><strong>Passer à une autre carte.</strong> Les cartes sont tirées sans répétition dans la sélection. Après un tour complet, la pioche recommence. Le lecteur reste le même jusqu’au prochain tirage d’élève.</li></ol>
+<p class="note">Les virelangues servent ici à jouer avec l’articulation, les répétitions et les intonations. Ils complètent les lectures de textes prévues en APC.</p>
+<p><strong>Les cinq défis :</strong> lecture précise, en écho, trois répétitions, en duo et comme un acteur. Pour ce dernier, une intention est tirée au sort.</p>
+<p><strong>Liste d’élèves :</strong> facultative, modifiable, conservée uniquement dans ce navigateur si celui-ci le permet. Vider la liste et cliquer sur « Utiliser cette liste » la supprime. Le tirage évite les répétitions avant que chacun ait eu un tour. Les scores repartent de zéro à la réouverture.</p>
+<p><strong>Hors connexion :</strong> tout le jeu est contenu dans ce fichier. La banque comporte quelques virelangues classiques et des phrases créées pour le jeu. Les niveaux sont indicatifs. Les cartes imprimables reprennent les filtres « Difficulté » et « Sons à travailler ».</p>
+</dialog>
+<dialog id="bankDialog" aria-labelledby="bankTitle"><div class="dialoghead"><h2 id="bankTitle">La boîte à cartes</h2><button data-close="bankDialog" aria-label="Fermer la banque">✕</button></div><div class="bankhead"><p id="bankCount"></p><button id="print">Imprimer ces cartes</button></div><div id="bankList" class="banklist"></div></dialog>
+<dialog id="resetDialog" aria-labelledby="resetTitle"><h2 id="resetTitle">Recommencer la partie ?</h2><p>Les points collectifs et les tirages seront remis à zéro. La liste d’élèves et les réglages seront conservés.</p><div class="toolbar"><button id="confirmReset" class="primary">Recommencer</button><button data-close="resetDialog">Continuer la partie</button></div></dialog>
+<div id="printArea"></div>
+<noscript>Ce jeu nécessite JavaScript. Ouvre le fichier dans Firefox, Chrome ou Edge avec JavaScript activé.</noscript>
+<script>
+'use strict';
+// Chaque phrase est écrite ici : aucune ressource ni connexion externe.
+const DATA=[
+ [1,'ch-s',['Un chasseur','sachant chasser','doit savoir chasser sans son chien.'],'classique'],
+ [1,'ch-s',['Six chats sages','cherchent six souris.'],'création'],
+ [1,'r-l',['Trois gros rats gris','grignotent trois grains de riz.'],'classique'],
+ [1,'r-l',['Lili lit','le livre de Rémi.'],'création'],
+ [1,'p-b',['Papa porte','le petit panier bleu.'],'création'],
+ [1,'p-b',['Bébé boit','dans un beau bol blanc.'],'création'],
+ [1,'t-d',['Ton tonton','tend ton tambour.'],'création'],
+ [1,'t-d',['Dora donne','deux dés dorés.'],'création'],
+ [1,'f-v',['Fanny fait voler','un foulard violet.'],'création'],
+ [1,'f-v',['Vingt fourmis','vont vers la forêt.'],'création'],
+ [1,'m-n',['Mamie mène','Mina à la maison.'],'création'],
+ [1,'m-n',['Ninon nomme','ses neuf nounours.'],'création'],
+ [2,'ch-s',['Les chaussettes de l’archiduchesse','sont-elles sèches','ou archisèches ?'],'classique'],
+ [2,'ch-s',['Sacha sèche ses chaussettes','sur six chaises sèches.'],'création'],
+ [2,'r-l',['La reine rit','en regardant le roi','ranger les rubans rouges.'],'création'],
+ [2,'r-l',['Le loup roule','le rouleau de laine','le long de la route.'],'création'],
+ [2,'p-b',['Le petit Paul prépare','de belles piles','de papiers pliés.'],'création'],
+ [2,'p-b',['Basile pose','un petit pot bleu','près du grand plat blanc.'],'création'],
+ [2,'t-d',['Tonton Toto trie','tes trente tickets','dans deux tiroirs.'],'création'],
+ [2,'t-d',['Dix dindons dodus','dodelinent doucement','devant deux tortues.'],'création'],
+ [2,'f-v',['Félix fait voler','vingt feuilles fines','vers la fenêtre.'],'création'],
+ [2,'f-v',['Valérie veut voir','le vieux vélo vert','de son frère.'],'création'],
+ [2,'m-n',['Manon mène','neuf minuscules moutons','dans la montagne.'],'création'],
+ [2,'m-n',['Nina nomme','ses neuf marionnettes','mais maman mélange leurs noms.'],'création'],
+ [3,'ch-s',['Ces six saucissons-ci','sont si secs','qu’on ne sait si c’en sont.'],'classique'],
+ [3,'ch-s',['Sacha cherche ses chaussons secs','chez son cher cousin Charles.'],'création'],
+ [3,'r-l',['Le rat râleur roule','le rouleau rouge','alors que le renard range les rubans.'],'création'],
+ [3,'r-l',['La libraire relit','le drôle de livre','que le livreur lui a livré.'],'création'],
+ [3,'p-b',['Paul plie les papiers bleus','puis Basile empile les papiers pliés','près du banc.'],'création'],
+ [3,'p-b',['Le brave Pablo prépare','de petits plats bien pleins','pour le bal de Bruno.'],'création'],
+ [3,'t-d',['Tonton Toto tente','de détordre ta tige tordue','tout en tenant ton tambour.'],'création'],
+ [3,'t-d',['Deux dindons dodus','détournent trente tortues têtues','du tas de terre.'],'création'],
+ [3,'f-v',['Fanny veut faire voler','vingt fines feuilles vertes','vers la vieille fenêtre fermée.'],'création'],
+ [3,'f-v',['Le vif vent fait frémir','les feuilles vertes','du vieux frêne de Flavie.'],'création'],
+ [3,'m-n',['Maman nomme les marionnettes de Manon','mais Manon mélange maintenant','les noms des marionnettes.'],'création'],
+ [3,'m-n',['Ninon mène neuf moutons noirs','mais Mina ramène maintenant','neuf moutons marron.'],'création'],
+ [1, "ch-s", ["Le chat chasse", "six souris sous la chaise."], "création"],
+ [1, "ch-s", ["Sophie cherche", "son chapeau chez Sacha."], "création"],
+ [1, "ch-s", ["Charles sèche", "ses chaussures sur le sol."], "création"],
+ [1, "ch-s", ["Six chiens sages", "suivent le chat sauvage."], "création"],
+ [1, "ch-s", ["Le singe cache", "ses chaussons dans sa chambre."], "création"],
+ [1, "ch-s", ["Sacha choisit", "six sachets de semences."], "création"],
+ [1, "ch-s", ["Ce chaton s’assoit", "sur ce coussin chaud."], "création"],
+ [1, "ch-s", ["La souris cherche", "du sucre chez le chat."], "création"],
+ [1, "ch-s", ["Chloé chasse", "les soucis de sa sœur."], "création"],
+ [1, "ch-s", ["Six chèvres sautent", "sur les souches sèches."], "création"],
+ [1, "ch-s", ["Le chien de Simon", "cache sa saucisse."], "création"],
+ [1, "ch-s", ["Sophie chante", "sa chanson sous la douche."], "création"],
+ [1, "ch-s", ["Le chat se sèche", "au soleil sur sa chaise."], "création"],
+ [1, "ch-s", ["Sacha dessine", "six chaussettes et six chapeaux."], "création"],
+ [1, "ch-s", ["Un chou sans sauce", "sèche sur cette assiette."], "création"],
+ [1, "ch-s", ["Les poussins cherchent", "le chemin du champ."], "création"],
+ [1, "ch-s", ["Charles choisit", "une chemise sans taches."], "création"],
+ [1, "ch-s", ["Six escargots se cachent", "sous un chêne."], "création"],
+ [1, "r-l", ["La loutre regarde", "le rat rouler."], "création"],
+ [1, "r-l", ["Rémi roule", "sur la route de Lille."], "création"],
+ [1, "r-l", ["Lola range", "les rubans de la reine."], "création"],
+ [1, "r-l", ["Le lapin roux", "roule dans les feuilles."], "création"],
+ [1, "r-l", ["Le roi relit", "la lettre de Lili."], "création"],
+ [1, "r-l", ["La renarde lèche", "le lait de la louve."], "création"],
+ [1, "r-l", ["Léa ramasse", "les grosses billes rondes."], "création"],
+ [1, "r-l", ["Le merle roule", "des perles sur le sol."], "création"],
+ [1, "r-l", ["Lili regarde", "la rivière briller."], "création"],
+ [1, "r-l", ["Le loup renifle", "le repas du renard."], "création"],
+ [1, "r-l", ["Le rat rallume", "la lampe rouge."], "création"],
+ [1, "r-l", ["Roland lave", "les lourds rouleaux."], "création"],
+ [1, "r-l", ["Lola déroule", "un long ruban rose."], "création"],
+ [1, "r-l", ["La libellule frôle", "les ronces du jardin."], "création"],
+ [1, "r-l", ["Le livre rouge", "glisse le long du mur."], "création"],
+ [1, "r-l", ["La reine réclame", "le collier de perles."], "création"],
+ [1, "r-l", ["Léon règle", "le réveil de Laure."], "création"],
+ [1, "r-l", ["Le lézard vert", "regarde la lune claire."], "création"],
+ [1, "p-b", ["Boris prépare", "une petite brioche."], "création"],
+ [1, "p-b", ["Papa balance", "le panier de pommes."], "création"],
+ [1, "p-b", ["Le bébé pousse", "la petite balle bleue."], "création"],
+ [1, "p-b", ["Baptiste plie", "son beau pantalon."], "création"],
+ [1, "p-b", ["Pablo plante", "de petits baobabs."], "création"],
+ [1, "p-b", ["Le boulanger pose", "le pain sur la planche."], "création"],
+ [1, "p-b", ["Barbara peint", "une porte bleue."], "création"],
+ [1, "p-b", ["Paul apporte", "des bonbons à Boubou."], "création"],
+ [1, "p-b", ["Le beau bateau", "passe près du pont."], "création"],
+ [1, "p-b", ["La poule blanche", "picore près du banc."], "création"],
+ [1, "p-b", ["Béatrice prépare", "un bol de petits pois."], "création"],
+ [1, "p-b", ["Le poney blanc", "passe la barrière."], "création"],
+ [1, "p-b", ["La petite brebis", "broute près du puits."], "création"],
+ [1, "p-b", ["Pierre déballe", "le beau paquet bleu."], "création"],
+ [1, "p-b", ["Bruno coupe", "une poire bien mûre."], "création"],
+ [1, "p-b", ["Le pirate barbu", "porte des bottes blanches."], "création"],
+ [1, "p-b", ["Papi ouvre", "la petite boîte bleue."], "création"],
+ [1, "p-b", ["Basile place", "le ballon près du poteau."], "création"],
+ [1, "t-d", ["Dina tape", "du doigt sur la table."], "création"],
+ [1, "t-d", ["Toto dessine", "deux petites tortues."], "création"],
+ [1, "t-d", ["Le dindon trotte", "derrière la tortue."], "création"],
+ [1, "t-d", ["Théo détache", "deux tickets du carnet."], "création"],
+ [1, "t-d", ["La tortue dort", "dans ta tente."], "création"],
+ [1, "t-d", ["David tient", "ton dé dans sa main."], "création"],
+ [1, "t-d", ["Tata découpe", "des tartines dorées."], "création"],
+ [1, "t-d", ["Deux danseurs tournent", "autour du tapis."], "création"],
+ [1, "t-d", ["Dora tend", "ta petite tasse."], "création"],
+ [1, "t-d", ["Tonton dit", "que ta toupie tourne."], "création"],
+ [1, "t-d", ["Le docteur touche", "ton petit doigt."], "création"],
+ [1, "t-d", ["Denis dépose", "trois tomates dans ton plat."], "création"],
+ [1, "t-d", ["La petite dent", "de Tom tombe."], "création"],
+ [1, "t-d", ["Dimitri tente", "de tirer deux traits."], "création"],
+ [1, "t-d", ["Ton dragon dort", "tout au fond."], "création"],
+ [1, "t-d", ["Titouan étend", "deux tapis dehors."], "création"],
+ [1, "t-d", ["Tu découpes", "dix petits triangles."], "création"],
+ [1, "t-d", ["Deux tortues attendent", "ton départ."], "création"],
+ [1, "f-v", ["La vache flaire", "les fleurs de Fanny."], "création"],
+ [1, "f-v", ["Victor ferme", "la fenêtre de Flavie."], "création"],
+ [1, "f-v", ["Violette fait", "une farce à son frère."], "création"],
+ [1, "f-v", ["Le vent fait", "flotter le voile vert."], "création"],
+ [1, "f-v", ["Félix trouve", "une fève verte."], "création"],
+ [1, "f-v", ["La fourmi visite", "la vieille ferme."], "création"],
+ [1, "f-v", ["Flavie fait", "vibrer sa flûte."], "création"],
+ [1, "f-v", ["Le vieux veau", "renifle le foin frais."], "création"],
+ [1, "f-v", ["Véra verse", "la farine dans le bol."], "création"],
+ [1, "f-v", ["François voit", "des vagues au fond."], "création"],
+ [1, "f-v", ["Le vampire", "fait fuir les fourmis."], "création"],
+ [1, "f-v", ["Fanny offre", "une fleur à Victor."], "création"],
+ [1, "f-v", ["La fée vole", "vers la vallée."], "création"],
+ [1, "f-v", ["Viviane fait", "des figures avec un fil."], "création"],
+ [1, "f-v", ["Le vélo vert", "file vers la forêt."], "création"],
+ [1, "f-v", ["Valentin ferme", "sa valise de fées."], "création"],
+ [1, "f-v", ["La fouine vive", "file vers la ferme."], "création"],
+ [1, "f-v", ["Le vent frais", "soulève les feuilles."], "création"],
+ [1, "m-n", ["Mina anime", "une marionnette nommée Nina."], "création"],
+ [1, "m-n", ["Nino emmène", "maman au cinéma."], "création"],
+ [1, "m-n", ["Maman donne", "une mandarine à Ninon."], "création"],
+ [1, "m-n", ["La marmotte Nina", "mange une noisette."], "création"],
+ [1, "m-n", ["Manon dessine", "une minuscule maison."], "création"],
+ [1, "m-n", ["Mémé nomme", "le nouveau mouton."], "création"],
+ [1, "m-n", ["Mon ami Nino", "mange des nouilles."], "création"],
+ [1, "m-n", ["Nina examine", "la monnaie de mamie."], "création"],
+ [1, "m-n", ["Marin promène", "la minuscule minette."], "création"],
+ [1, "m-n", ["La monitrice", "mène Nino en montagne."], "création"],
+ [1, "m-n", ["Maman demande", "le numéro de Nina."], "création"],
+ [1, "m-n", ["Manu termine", "une énorme banane."], "création"],
+ [1, "m-n", ["Ma minette", "miaule devant Ninon."], "création"],
+ [1, "m-n", ["Nina admire", "le manège de Manu."], "création"],
+ [1, "m-n", ["Noémie ramène", "la marmite de mamie."], "création"],
+ [1, "m-n", ["Mona dessine", "la mine de maman."], "création"],
+ [1, "m-n", ["Le marin Nino", "ramène une anémone."], "création"],
+ [1, "m-n", ["Maman noue", "mon nouveau kimono."], "création"],
+ [2, "ch-s", ["Le chat de Sacha", "chasse six souris grises", "sous la souche sèche."], "création"],
+ [2, "ch-s", ["Charles cherche ses chaussettes", "dans six sachets", "sans savoir où chercher."], "création"],
+ [2, "ch-s", ["Sophie choisit sa chemise", "puis sèche ses chaussures", "sur une chaise."], "création"],
+ [2, "ch-s", ["Six chiens se couchent", "sur six coussins", "dans la chambre de Charles."], "création"],
+ [2, "ch-s", ["Le chasseur chasse les soucis", "en chantant sa chanson", "sur le chemin."], "création"],
+ [2, "ch-s", ["Sacha se dépêche", "de cacher ses sucettes", "sous son chapeau de paille."], "création"],
+ [2, "ch-s", ["Le singe cherche", "les chaussons de Sophie", "sous les six chaises."], "création"],
+ [2, "ch-s", ["Chloé se sèche les cheveux", "sans salir sa chemise", "ni ses chaussons."], "création"],
+ [2, "ch-s", ["Les six chats de Simon", "se cachent chaque soir", "chez le charcutier."], "création"],
+ [2, "ch-s", ["Ces six chèvres sages", "cherchent un chemin", "sans souches ni chardons."], "création"],
+ [2, "ch-s", ["Sophie verse une sauce chaude", "sur les six choux", "de son cher Charles."], "création"],
+ [2, "ch-s", ["Chaque souris cherche", "une cachette sèche", "sous le chêne de Sacha."], "création"],
+ [2, "ch-s", ["Charles chasse les mouches", "sans toucher les six assiettes", "posées sur sa chaise."], "création"],
+ [2, "ch-s", ["Sacha accroche", "six chaussettes sèches", "sur une branche sans feuilles."], "création"],
+ [2, "ch-s", ["Le chien choisit", "sa saucisse sans sauce", "chez le marchand de choux."], "création"],
+ [2, "ch-s", ["Six chatons glissent", "sur la chaussée sèche", "et cherchent leur coussin."], "création"],
+ [2, "ch-s", ["Simon chuchote", "sa chanson préférée", "aux six chats de sa sœur."], "création"],
+ [2, "ch-s", ["Sophie suit", "les traces du chat sauvage", "jusqu’au champ de choux."], "création"],
+ [2, "r-l", ["Le renard roule le long ruban", "que la loutre déroule", "le long de la rivière."], "création"],
+ [2, "r-l", ["La reine relit la lettre", "que le roi lui a laissée", "près du livre rouge."], "création"],
+ [2, "r-l", ["Lola ramasse les perles rondes", "pendant que Rémi range", "les rubans lisses."], "création"],
+ [2, "r-l", ["Le lézard regarde la libellule", "voler au ras", "des ronces fleuries."], "création"],
+ [2, "r-l", ["Le livreur livre trois livres", "à la libraire", "qui relit le plus drôle."], "création"],
+ [2, "r-l", ["Lili règle le réveil", "de Roland", "pour le réveiller lundi."], "création"],
+ [2, "r-l", ["Le loup râleur réclame", "le repas de la loutre", "et le lait du renard."], "création"],
+ [2, "r-l", ["Roland déroule un rouleau", "de laine rouge", "sur le lourd lit de Lola."], "création"],
+ [2, "r-l", ["La loutre rattrape", "la balle rouge", "qui roule au bord de l’eau."], "création"],
+ [2, "r-l", ["Le merle regarde le lierre", "grimper lentement", "le long du mur gris."], "création"],
+ [2, "r-l", ["Le roi range les colliers", "tandis que la reine roule", "les rubans violets."], "création"],
+ [2, "r-l", ["Léa relie les lignes", "de la règle rouge", "sans raturer la feuille."], "création"],
+ [2, "r-l", ["Le lapin roux", "renifle les lilas", "et les roses de Laure."], "création"],
+ [2, "r-l", ["Lola réclame", "le joli bracelet", "que Roland a retrouvé lundi."], "création"],
+ [2, "r-l", ["Le gros rat gris", "glisse le long", "de la grille rouillée."], "création"],
+ [2, "r-l", ["La libraire sourit", "au livreur qui lui livre", "les livres de Lili."], "création"],
+ [2, "r-l", ["Léon ramène", "une longue règle claire", "pour tracer les lignes."], "création"],
+ [2, "r-l", ["La perle roule", "sous le rouleau", "que le renard a laissé là."], "création"],
+ [2, "p-b", ["Le petit pirate barbu", "prépare des brochettes", "pour le bal du port."], "création"],
+ [2, "p-b", ["Boris apporte", "un panier de poires", "au petit boulanger du bourg."], "création"],
+ [2, "p-b", ["La brebis blanche", "broute les petites pousses", "près du pont de bois."], "création"],
+ [2, "p-b", ["Pablo pose la boîte bleue", "sur la planche", "puis prépare le repas."], "création"],
+ [2, "p-b", ["Barbara plie", "les beaux papiers blancs", "pour emballer les petits paquets."], "création"],
+ [2, "p-b", ["Le bébé de Baptiste", "pousse la balle bleue", "sous le banc de papa."], "création"],
+ [2, "p-b", ["Paul passe", "par le petit pont", "pour apporter du pain à Bruno."], "création"],
+ [2, "p-b", ["Le poney blanc", "bondit près du puits", "puis broute au bord du pré."], "création"],
+ [2, "p-b", ["Béatrice prépare", "un petit pot de beurre", "pour les pains de Papi."], "création"],
+ [2, "p-b", ["Le beau bateau", "passe près du port", "pendant que le petit bateau balance."], "création"],
+ [2, "p-b", ["Bruno découpe", "des bandes de papier bleu", "pour décorer le préau."], "création"],
+ [2, "p-b", ["Papi apporte", "des pommes bien plates", "dans une petite bassine blanche."], "création"],
+ [2, "p-b", ["La poule de Basile", "picore de petits bouts de pain", "près du bac."], "création"],
+ [2, "p-b", ["Pierre peint", "des petits points blancs", "sur la barque de Pablo."], "création"],
+ [2, "p-b", ["Baptiste plonge", "la petite brosse", "dans un pot de peinture blanche."], "création"],
+ [2, "p-b", ["Le pompier barbu", "pousse la porte bleue", "puis porte le bébé dehors."], "création"],
+ [2, "p-b", ["Paul prépare", "des biscuits pour Bruno", "pendant que Barbara pèle les poires."], "création"],
+ [2, "p-b", ["La petite bulle", "passe par-dessus le banc", "puis éclate près du ballon."], "création"],
+ [2, "t-d", ["Tonton tient ton tambour", "tandis que Dora détache", "les tickets du carnet."], "création"],
+ [2, "t-d", ["Dimitri dessine", "deux tortues têtues", "tout autour de ta tente."], "création"],
+ [2, "t-d", ["Tata découpe", "dix tartines dorées", "dans le petit déjeuner de Denis."], "création"],
+ [2, "t-d", ["Toto tente de déplacer", "deux tas de terre", "avec ta petite truelle."], "création"],
+ [2, "t-d", ["Le docteur demande", "de tendre ton doigt", "tout droit devant toi."], "création"],
+ [2, "t-d", ["Deux dindons trottent", "derrière trois tortues", "devant la tente de Théo."], "création"],
+ [2, "t-d", ["David détache", "ton petit dragon", "du toit de ta tour."], "création"],
+ [2, "t-d", ["La tortue de Dora", "tourne autour", "des deux toupies de Titouan."], "création"],
+ [2, "t-d", ["Théo tend", "deux tickets datés", "au directeur du petit théâtre."], "création"],
+ [2, "t-d", ["Denis dessine", "des traits droits", "tout autour de ta carte."], "création"],
+ [2, "t-d", ["Tonton distribue", "trente dés", "dans trente petites boîtes."], "création"],
+ [2, "t-d", ["Dina tape", "du bout des doigts", "sur ton tambour tout doré."], "création"],
+ [2, "t-d", ["Le petit dragon", "détend ses pattes", "derrière le tas de terre."], "création"],
+ [2, "t-d", ["Toto tord", "la tige de droite", "puis détord celle de devant."], "création"],
+ [2, "t-d", ["Dora étend", "deux draps tout doux", "sur le toit de ta cabane."], "création"],
+ [2, "t-d", ["Titouan apporte", "deux tartes tièdes", "dans le jardin de David."], "création"],
+ [2, "t-d", ["Tu dois trier", "les tickets de théâtre", "datés de mardi dernier."], "création"],
+ [2, "t-d", ["Trois petites tortues", "attendent de dîner", "dans la tente de Denis."], "création"],
+ [2, "f-v", ["Le vent frais", "fait voler les foulards violets", "devant la vieille ferme."], "création"],
+ [2, "f-v", ["Félix veut voir", "les vagues frapper", "les falaises de la vallée."], "création"],
+ [2, "f-v", ["Violette fait", "des fleurs en feutrine", "pour la fête de Flavie."], "création"],
+ [2, "f-v", ["Victor verse", "la farine fine", "pour faire des gaufres avec Fanny."], "création"],
+ [2, "f-v", ["La vieille fouine", "flaire les feuilles vertes", "au fond de la forêt."], "création"],
+ [2, "f-v", ["Flavie ferme", "la fenêtre de François", "avant de faire sa valise."], "création"],
+ [2, "f-v", ["La fée Véra", "vole vers les fleurs violettes", "de la forêt voisine."], "création"],
+ [2, "f-v", ["Le veau de Victor", "renifle le foin frais", "devant la vieille vache."], "création"],
+ [2, "f-v", ["François fait", "vingt figures avec son vélo", "devant la ferme de Viviane."], "création"],
+ [2, "f-v", ["La fourmi va", "vers la fenêtre fermée", "avec une feuille verte."], "création"],
+ [2, "f-v", ["Viviane offre", "un foulard vert", "au frère de sa voisine Fanny."], "création"],
+ [2, "f-v", ["Le vent vif", "fait frissonner Flavie", "devant la fenêtre ouverte."], "création"],
+ [2, "f-v", ["Valentin veut", "une fève verte", "pour faire pousser une forêt."], "création"],
+ [2, "f-v", ["Fanny vérifie", "les fils de la voile", "avant de la faire voler."], "création"],
+ [2, "f-v", ["La vieille fée", "fait vibrer sa flûte", "devant les vaches de Victor."], "création"],
+ [2, "f-v", ["Véra trouve", "une fleur fanée", "dans la vieille valise de Félix."], "création"],
+ [2, "f-v", ["Les feuilles volent", "vers la fontaine", "quand le vent souffle fort."], "création"],
+ [2, "f-v", ["La vive fouine", "fait fuir les vaches", "vers le fond de la ferme."], "création"],
+ [2, "m-n", ["Maman ramène", "une énorme mandarine", "et une minuscule banane pour Ninon."], "création"],
+ [2, "m-n", ["Nino anime", "une nouvelle marionnette", "que Manon a nommée Mina."], "création"],
+ [2, "m-n", ["La monitrice emmène", "Manu et Nina", "admirer les marmottes de la montagne."], "création"],
+ [2, "m-n", ["Mémé demande", "le nom du nouveau marin", "qui ramène les anémones."], "création"],
+ [2, "m-n", ["Ninon promène", "la minette de Manon", "dans le minuscule jardin de mamie."], "création"],
+ [2, "m-n", ["Manu termine", "son immense dessin", "en nommant les animaux de la montagne."], "création"],
+ [2, "m-n", ["Mina examine", "la monnaie de maman", "avant de la donner à Ninon."], "création"],
+ [2, "m-n", ["Mon ami Marin", "ramène une marmite neuve", "pour la maison de mamie."], "création"],
+ [2, "m-n", ["Noémie imagine", "une machine minuscule", "pour animer les marionnettes de Nino."], "création"],
+ [2, "m-n", ["Maman noue", "le nouveau kimono de Nina", "pendant que Manon mange."], "création"],
+ [2, "m-n", ["Ninon nomme", "neuf animaux minuscules", "que maman a modelés lundi."], "création"],
+ [2, "m-n", ["La marmotte Mona", "mange neuf noisettes", "devant la minette de mamie."], "création"],
+ [2, "m-n", ["Manon donne", "des noms amusants", "aux marionnettes de sa monitrice Nina."], "création"],
+ [2, "m-n", ["Mamie examine", "les notes de musique", "que Ninon a dessinées ce matin."], "création"],
+ [2, "m-n", ["Nino demande", "une nouvelle manivelle", "pour le manège miniature de Manu."], "création"],
+ [2, "m-n", ["La minette", "miaule maintenant", "devant la maison de Ninon et de maman."], "création"],
+ [2, "m-n", ["Mona amène", "une amie nommée Nina", "au nouveau cinéma de la commune."], "création"],
+ [2, "m-n", ["Maman murmure", "le nom de Manon", "mais Ninon murmure le nom de Mina."], "création"],
+ [3, "ch-s", ["Si Sacha sèche ses chaussons", "sur six chaises sèches,", "sur quelles chaises Charles sèche-t-il ses chaussettes ?"], "création"],
+ [3, "ch-s", ["Six chats sages chassent six souris", "sous six souches sèches", "sans salir les chaussons de Sacha."], "création"],
+ [3, "ch-s", ["Sophie cherche chez Charles", "six sachets de sucre", "que Charles a cachés sous sa chemise sèche."], "création"],
+ [3, "ch-s", ["Le chasseur sachant siffler", "chasse sans chien sur la chaussée", "tandis que son chien cherche sa saucisse."], "création"],
+ [3, "ch-s", ["Chaque souris se cache", "sous la chaise de chaque chat", "sans que chaque chat sache où chercher."], "création"],
+ [3, "ch-s", ["Sacha choisit six chaussettes sèches", "puis Charles choisit six chaussettes sales", "sans savoir ce que Sacha choisit."], "création"],
+ [3, "ch-s", ["Sophie chuchote sa chanson", "si doucement que les six chats", "cherchent sans cesse à saisir chaque son."], "création"],
+ [3, "ch-s", ["Sur ce chemin sans souches,", "six chèvres cherchent six choux", "pendant que six chats chassent les souris."], "création"],
+ [3, "ch-s", ["Ces chaussures sèchent-elles", "sur ces chaises sèches", "ou ces chaises sèchent-elles sous ces chaussures sales ?"], "création"],
+ [3, "ch-s", ["Sacha chasse les mouches de sa chambre", "sans toucher les sachets de sucre", "cachés chez sa sœur Sophie."], "création"],
+ [3, "ch-s", ["Six chiens cherchent six chats", "mais ces six chats se cachent", "chez six chasseurs qui cherchent leurs chiens."], "création"],
+ [3, "ch-s", ["Charles sert six choux sans sauce", "tandis que Sophie sert six sauces chaudes", "sans y mettre de choux."], "création"],
+ [3, "ch-s", ["Ce chat sage sait-il", "si Sacha sèche sa chemise", "ou si sa sœur sèche ses chaussons chez Charles ?"], "création"],
+ [3, "ch-s", ["Sophie sèche ses cheveux sous son chapeau", "sans savoir que son chapeau sèche", "sur les cheveux de Sacha."], "création"],
+ [3, "ch-s", ["Si ce sachet de semences se déchire,", "sache chercher chaque semence", "sans secouer les six sachets suivants."], "création"],
+ [3, "ch-s", ["Les six chaussons du chasseur", "sèchent sous les six chaises", "sur lesquelles sèchent les chemises de sa sœur."], "création"],
+ [3, "ch-s", ["Sacha cache une saucisse sèche", "sous chaque sachet de sucre", "puis cherche ses six saucisses chez Charles."], "création"],
+ [3, "ch-s", ["Chaque soir, six chats de cirque", "sautent sur six chaises sèches", "sans renverser les six choux de Sophie."], "création"],
+ [3, "r-l", ["La loutre roule le rouleau rouge", "que le renard déroule", "alors que le loup réclame son long ruban."], "création"],
+ [3, "r-l", ["Le livreur livre les livres de Laure", "à la libraire Lola", "qui relit leurs titres pour les ranger."], "création"],
+ [3, "r-l", ["Roland règle le réveil de Lili", "mais Lili dérègle le réveil de Roland", "pour le régler lundi."], "création"],
+ [3, "r-l", ["Le rat roux roule les perles claires", "sur la règle rouge", "que le lapin rallonge le long du mur."], "création"],
+ [3, "r-l", ["La reine réclame le collier de perles", "que le roi regarde", "alors que Laure réclame le bracelet royal."], "création"],
+ [3, "r-l", ["Le loup râleur relit le drôle de livre", "que la loutre lui a prêté", "près de la rivière claire."], "création"],
+ [3, "r-l", ["Lola déroule le long rouleau de laine", "tandis que Roland roule", "les longs rubans de la reine Laure."], "création"],
+ [3, "r-l", ["Le renard ralentit le long du lierre", "pour regarder la libellule", "frôler les larges feuilles des rosiers."], "création"],
+ [3, "r-l", ["Lili relie les lignes de la règle", "sans raturer la lettre", "que Roland a relue lors de la récréation."], "création"],
+ [3, "r-l", ["Trois gros rats râleurs regardent", "trois longs rouleaux rouges rouler", "le long de la grille de Lola."], "création"],
+ [3, "r-l", ["La libraire relit le livre livré", "par le livreur de Lille", "avant de le relier pour Laure."], "création"],
+ [3, "r-l", ["Le lézard regarde les roses de Laure", "alors que le merle regarde", "les lilas de la reine."], "création"],
+ [3, "r-l", ["Roland rallume la lumière de la librairie", "pour retrouver la règle", "que Lili a glissée sous les livres."], "création"],
+ [3, "r-l", ["La loutre rattrape le rouleau de laine", "que le renard laisse rouler", "le long de la rivière."], "création"],
+ [3, "r-l", ["Léon réclame la règle claire de Laure", "mais Laure réclame", "le long rouleau rouge de Léon."], "création"],
+ [3, "r-l", ["Le roi relit la lettre de la reine", "alors que la reine relie", "les livres que le roi lui a livrés."], "création"],
+ [3, "r-l", ["Le rat glisse derrière la grille", "pour regarder le loup", "dérouler la longue laine rouge de Roland."], "création"],
+ [3, "r-l", ["Laure range les bracelets de perles", "alors que Lili roule les rubans", "et que Roland relie les livres."], "création"],
+ [3, "p-b", ["Baptiste prépare des petits pains blancs", "pendant que Pablo prépare des petits pains bruns", "pour le bal de Barbara."], "création"],
+ [3, "p-b", ["Le petit pirate barbu porte", "une petite boîte de biscuits", "puis pose la boîte près du bateau blanc."], "création"],
+ [3, "p-b", ["Barbara plie les papiers de Pablo", "puis Pablo plie les papiers de Barbara", "pour préparer de beaux paquets."], "création"],
+ [3, "p-b", ["La petite brebis blanche broute", "près de la barrière du pré", "pendant que le poney brun broute près du pont."], "création"],
+ [3, "p-b", ["Bruno peint des petits points bleus", "sur la porte blanche", "puis Paul peint des petits points blancs sur la porte bleue."], "création"],
+ [3, "p-b", ["Le boulanger prépare du bon pain", "pendant que le petit pâtissier", "prépare de belles brioches pour le banquet."], "création"],
+ [3, "p-b", ["Papa déballe le petit paquet bleu", "que Papi a emballé", "puis Papi déballe le beau paquet blanc de papa."], "création"],
+ [3, "p-b", ["Paul apporte de petits pots de beurre", "pour les pains de Baptiste", "et les brioches de la petite Barbara."], "création"],
+ [3, "p-b", ["Le bébé de Bruno pousse", "la petite balle de Pablo", "pendant que Pablo pousse le beau ballon de Bruno."], "création"],
+ [3, "p-b", ["Le beau bateau blanc passe près", "du petit pont de bois", "puis le petit bateau bleu passe près du port."], "création"],
+ [3, "p-b", ["Basile prépare de belles brochettes", "dans un petit plat blanc", "pendant que Pierre prépare les pommes pour le barbecue."], "création"],
+ [3, "p-b", ["Béatrice brosse les bottes de Pierre", "puis Pierre brosse les bottes de Béatrice", "près du petit banc bleu."], "création"],
+ [3, "p-b", ["Le petit pompier barbu pousse", "la porte du bâtiment blanc", "pour porter le bébé près du beau camion."], "création"],
+ [3, "p-b", ["La poule blanche de Pablo picore", "les petits bouts de pain", "que Baptiste a posés près du puits."], "création"],
+ [3, "p-b", ["Pablo replie les bords du papier bleu", "puis Barbara plie", "les bords du papier blanc pour préparer la boîte."], "création"],
+ [3, "p-b", ["Le poney de Paul bondit par-dessus", "la petite barrière blanche", "puis broute près de la brebis de Bruno."], "création"],
+ [3, "p-b", ["Papi prépare de petits biscuits", "pour le bébé de Barbara", "mais Barbara préfère les brioches préparées par papa."], "création"],
+ [3, "p-b", ["Le pirate prend la petite barque bleue", "pendant que Bruno prépare", "le beau bateau blanc pour partir du port."], "création"],
+ [3, "t-d", ["Tonton Toto détache trente tickets", "tandis que tata Dora", "date les trente tickets détachés par tonton Toto."], "création"],
+ [3, "t-d", ["Deux dindons dodus trottent", "devant dix tortues têtues", "tandis que dix tortues têtues trottent derrière deux dindons dodus."], "création"],
+ [3, "t-d", ["Dimitri tente de détordre", "la tige que Toto a tordue", "mais Toto tord de nouveau la tige détordue."], "création"],
+ [3, "t-d", ["Dora découpe dix tartines dorées", "tandis que Denis découpe", "trente petites tartes dans le dessert de tonton."], "création"],
+ [3, "t-d", ["Le docteur te dit de tendre", "ton petit doigt tout droit", "pendant que Toto tend deux doigts devant toi."], "création"],
+ [3, "t-d", ["Titouan dessine trois traits droits", "autour des deux dragons dorés", "que David dessine tout au bout de ta carte."], "création"],
+ [3, "t-d", ["Ton tonton tient ton tambour", "tandis que ton dragon tente", "de taper du bout des doigts sur ton tambour."], "création"],
+ [3, "t-d", ["Deux tortues de Dora détournent", "trois tortues de Denis", "du tas de terre que Toto tente de déplacer."], "création"],
+ [3, "t-d", ["Tu dois dater tous tes tickets", "tandis que Denis doit trier", "tous les tickets datés de ton théâtre."], "création"],
+ [3, "t-d", ["Tata tend deux tasses tièdes", "à tonton qui tend", "deux tartines dorées à la petite Dina."], "création"],
+ [3, "t-d", ["Toto tente de tracer trente traits", "tandis que David tente", "de dessiner deux tours tout autour de tes traits."], "création"],
+ [3, "t-d", ["Denis détache le dragon du toit", "pendant que Dimitri détache", "les deux petites tortues de la tour de Théo."], "création"],
+ [3, "t-d", ["Trois dindons de tata Dora", "attendent de dîner", "devant les dix petites tortues de tonton Dimitri."], "création"],
+ [3, "t-d", ["David tend ton ticket de théâtre", "au directeur qui date", "tous les tickets de théâtre tendus par tes amis."], "création"],
+ [3, "t-d", ["Tonton détord ta tige tordue", "tout en tentant de tenir", "les deux tiges droites que Dora te tend."], "création"],
+ [3, "t-d", ["Dina tape trois fois du doigt", "sur ta table", "tandis que Théo tape deux fois sur ton tambour doré."], "création"],
+ [3, "t-d", ["Deux tortues têtues tentent de tirer", "ton dragon doré", "tandis que ton dragon tente de tirer les deux tortues."], "création"],
+ [3, "t-d", ["Tu détaches deux tickets de train", "datés de mardi dernier", "puis tu tries les tickets de ta tante Dora."], "création"],
+ [3, "f-v", ["Fanny fait voler vingt foulards verts", "vers la fenêtre de Flavie", "tandis que Flavie fait voler vingt feuilles violettes."], "création"],
+ [3, "f-v", ["Le vent vif fait frémir", "les fines feuilles de la forêt", "et fait vibrer la vieille flûte de Viviane."], "création"],
+ [3, "f-v", ["Victor veut faire des gaufres", "avec la farine de Flavie", "mais Flavie veut faire des flans pour Victor."], "création"],
+ [3, "f-v", ["La vieille fouine flaire les fleurs", "devant la ferme de François", "puis file vers les vignes de la vallée."], "création"],
+ [3, "f-v", ["La fée Véra fait voler", "les voiles violettes de Viviane", "vers les feuilles vertes de la forêt voisine."], "création"],
+ [3, "f-v", ["Félix vérifie les fils de la voile", "avant de faire voler", "le vieux cerf-volant vert de son frère Victor."], "création"],
+ [3, "f-v", ["La vieille vache de Flavie", "renifle le foin frais de Victor", "pendant que son veau va vers la forêt."], "création"],
+ [3, "f-v", ["Viviane verse la farine fine", "pour faire des gaufres", "puis Fanny verse la farine de Viviane pour faire des flans."], "création"],
+ [3, "f-v", ["Le vélo vert de Victor file", "devant la vieille ferme", "tandis que le vélo violet de Fanny file vers la forêt."], "création"],
+ [3, "f-v", ["Violette offre des fleurs fraîches", "à la voisine de Félix", "mais Félix offre un foulard violet à la voisine de Violette."], "création"],
+ [3, "f-v", ["Le vent fait voler les feuilles vertes", "vers la fenêtre fermée", "de la vieille ferme de François et de Viviane."], "création"],
+ [3, "f-v", ["La vive fourmi veut faire", "un voyage vers la forêt", "mais le vent frais la fait revenir vers les fleurs."], "création"],
+ [3, "f-v", ["Flavie fait vibrer sa flûte", "devant la fenêtre de Véra", "tandis que Véra fait frissonner les feuilles de sa fougère."], "création"],
+ [3, "f-v", ["Le vieux vampire veut voir", "la fête des fées de la vallée", "mais les fées font fuir le vieux vampire."], "création"],
+ [3, "f-v", ["Fanny ferme la valise de Victor", "puis Victor ferme", "la vieille fenêtre de Fanny pour éviter le vent frais."], "création"],
+ [3, "f-v", ["La vieille fouine fait fuir", "les veaux de la ferme", "vers la vallée fleurie que François vient de visiter."], "création"],
+ [3, "f-v", ["Félix veut vingt fèves fraîches", "pour faire vingt petits flans", "tandis que Violette veut vingt fleurs pour sa fête."], "création"],
+ [3, "f-v", ["Victor vérifie les fils violets", "des filets de François", "avant que François vérifie les fils verts des filets de Victor."], "création"],
+ [3, "m-n", ["Maman nomme la marionnette de Ninon", "mais Ninon renomme la marionnette", "que maman nomme maintenant devant Manon."], "création"],
+ [3, "m-n", ["Nina emmène Manon en montagne", "tandis que Manu ramène Nino", "dans la minuscule maison de mamie Mona."], "création"],
+ [3, "m-n", ["Mémé demande le nom de Mina", "mais Mina demande le nom de mémé", "pendant que Ninon murmure le nom de Manon."], "création"],
+ [3, "m-n", ["Nino anime les marionnettes de Manu", "puis Manu anime les marionnettes de Nino", "devant maman et mamie Ninon."], "création"],
+ [3, "m-n", ["Manon donne neuf noms nouveaux", "aux neuf minuscules moutons", "que maman ramène maintenant de la montagne de Nina."], "création"],
+ [3, "m-n", ["La monitrice Mona emmène Manu", "admirer les marmottes de la montagne", "mais Manu emmène Mona admirer les anémones."], "création"],
+ [3, "m-n", ["Mina examine la monnaie de mamie", "pendant que mamie examine", "la nouvelle machine à monnaie de Ninon."], "création"],
+ [3, "m-n", ["Mon ami Marin ramène", "une énorme marmite pour maman", "mais maman demande une minuscule marmite pour Nina."], "création"],
+ [3, "m-n", ["Ninon imagine une maison minuscule", "pour la minette de Manon", "tandis que Manon imagine un immense manège pour Ninon."], "création"],
+ [3, "m-n", ["Maman emmène Nina au cinéma", "mais Nina demande maintenant", "à maman de ramener Manon dans la maison de mamie."], "création"],
+ [3, "m-n", ["La marmotte Mona mange", "neuf noisettes minuscules", "tandis que la minette Nina miaule devant les mandarines de maman."], "création"],
+ [3, "m-n", ["Manu nomme les animaux de Nina", "mais Nina mélange les noms", "des animaux que Manu nomme maintenant."], "création"],
+ [3, "m-n", ["Mamie murmure le nom de Manon", "pendant que Manon murmure", "le nom de la nouvelle marionnette de mamie."], "création"],
+ [3, "m-n", ["Noémie donne une nouvelle manivelle", "à Manu qui anime", "les minuscules mannequins du manège de Ninon."], "création"],
+ [3, "m-n", ["Maman noue le kimono de Nino", "puis Nino noue le kimono de Manon", "devant la minette de mamie Mona."], "création"],
+ [3, "m-n", ["Nina ramène neuf minuscules anémones", "à maman qui ramène", "neuf énormes mandarines à mamie et à Manon."], "création"],
+ [3, "m-n", ["La monitrice examine les notes de Manon", "mais Manon examine", "les nouvelles notes de musique de la monitrice Nina."], "création"],
+ [3, "m-n", ["Mina mène les moutons de Ninon", "mais Ninon ramène maintenant", "les moutons que Mina mène près de la maison de maman."], "création"]
+].map((a,id)=>({id,level:a[0],sound:a[1],chunks:a[2],origin:a[3],text:a[2].join(' ')}));
+const SOUNDS={'ch-s':'CH / S','r-l':'R / L','p-b':'P / B','t-d':'T / D','f-v':'F / V','m-n':'M / N'};
+const TIPS={'ch-s':'Soigne la différence entre « ch » et « s ».','r-l':'Prends le temps de bien distinguer « r » et « l ».','p-b':'Écoute bien les « p » et les « b ».','t-d':'Distingue les « t » et les « d ».','f-v':'Soigne les « f » et les « v ».','m-n':'Prends le temps de distinguer les « m » et les « n ».'};
+const CHALLENGES={
+ precis:{title:'La lecture précise',text:'Lis la phrase lentement, puis relis-la à ton rythme en gardant tous les mots.'},
+ echo:{title:'La lecture en écho',text:'L’enseignant lit un morceau. Répète-le, puis lis la phrase entière.'},
+ triple:{title:'Trois fois de suite',text:'Dis la phrase trois fois sans changer les mots. Garde un rythme confortable.'},
+ duo:{title:'Le duo',text:'À deux : chacun lit un morceau à tour de rôle, puis vous lisez la phrase ensemble.'},
+ acteur:{title:'Comme un acteur',text:''}
+};
+const INTENTIONS=['avec une voix joyeuse','comme si tu étais très étonné','avec un ton mystérieux','comme un présentateur enthousiaste','comme si tu posais une question','avec une voix de robot, en restant bien compréhensible'];
+const $=id=>document.getElementById(id);
+let current=null,used=new Set(),history=[],currentRound=null,students=[],studentQueue=[],lastStudent='',lastCard=null,segmented=false;
+let timerHandle=null,remaining=30,deadline=0,lastChallenge='';
+function pick(items){return items[Math.floor(Math.random()*items.length)];}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function selection(){return DATA.filter(d=>($('level').value==='all'||d.level===Number($('level').value))&&($('sound').value==='all'||d.sound===$('sound').value));}
+function say(message){$('notice').textContent=message;}
+function paintPhrase(){const el=$('phrase');el.replaceChildren();current.chunks.forEach((part,i)=>{const span=document.createElement('span');span.className='chunk';span.textContent=part;el.append(span);if(i<current.chunks.length-1)el.append(document.createTextNode(' '));});$('sentence').classList.toggle('segmented',segmented);$('aid').setAttribute('aria-pressed',String(segmented));$('aid').textContent=segmented?'Afficher la phrase entière':'Découper la phrase';}
+function paintScore(){const total=history.reduce((sum,r)=>sum+r.criteria.filter(Boolean).length,0);$('points').textContent=total;$('rounds').textContent=history.length;$('rounds').nextSibling.textContent=history.length===1?' carte jouée':' cartes jouées';document.querySelectorAll('[data-criterion]').forEach(btn=>btn.setAttribute('aria-pressed',String(currentRound.criteria[Number(btn.dataset.criterion)])));}
+function setChallenge(){let key=$('mode').value;if(key==='random'){let keys=Object.keys(CHALLENGES).filter(k=>k!==lastChallenge);key=pick(keys);}lastChallenge=key;$('challengeTitle').textContent=CHALLENGES[key].title;$('challengeText').textContent=key==='acteur'?'Lis la phrase '+pick(INTENTIONS)+'. Articule pour que les autres comprennent.':CHALLENGES[key].text;}
+function updateProgress(){const pool=selection();const n=pool.filter(d=>used.has(d.id)).length;$('progress').textContent=n+' / '+pool.length+' cartes de la pioche';}
+function showCard(card){current=card;lastCard=card.id;used.add(card.id);currentRound={id:card.id,criteria:[false,false,false]};history.push(currentRound);$('levelTag').className='tag level'+card.level;$('levelTag').textContent=['','Pour commencer','Ça se corse','Langue experte'][card.level];$('soundTag').textContent='Sons '+SOUNDS[card.sound];$('tip').textContent=TIPS[card.sound];paintPhrase();setChallenge();paintScore();resetTimer();updateProgress();}
+function nextCard(){const pool=selection();let available=pool.filter(d=>!used.has(d.id));let recycled=false;if(!available.length){pool.forEach(d=>used.delete(d.id));available=pool.length>1?pool.filter(d=>d.id!==lastCard):pool;recycled=true;}showCard(pick(available));say(recycled?'Toutes les cartes de cette sélection ont été vues : nouvelle pioche.':'');}
+function formatTime(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function paintTimer(){$('clock').textContent=formatTime(remaining);}
+function stopTimer(){if(timerHandle!==null)clearInterval(timerHandle);timerHandle=null;$('startTimer').textContent=remaining===0?'Rejouer':'Démarrer';}
+function resetTimer(){stopTimer();remaining=Number($('duration').value);paintTimer();$('startTimer').textContent='Démarrer';$('timerLabel').textContent='Temps pour s’entraîner';}
+function tick(){remaining=Math.max(0,Math.ceil((deadline-performance.now())/1000));paintTimer();if(remaining===0){stopTimer();$('timerLabel').textContent='Temps terminé · on fait le point';say('Entraînement terminé. Vous pouvez encore reprendre la phrase tranquillement.');}}
+function toggleTimer(){if(timerHandle!==null){tick();stopTimer();if(remaining>0){$('startTimer').textContent='Reprendre';$('timerLabel').textContent='En pause';}return;}if(remaining===0)resetTimer();deadline=performance.now()+remaining*1000;timerHandle=setInterval(tick,100);$('startTimer').textContent='Pause';$('timerLabel').textContent='On s’entraîne';}
+function normalizeNames(text){return [...new Set(text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean))].slice(0,60);}
+function useNames(save){students=normalizeNames($('names').value);$('names').value=students.join('\n');studentQueue=[];lastStudent='';$('drawStudent').disabled=students.length===0;$('reader').textContent='À vous de jouer !';$('namesStatus').textContent=students.length?students.length+' élèves dans le tirage.':'Sans liste : toute la classe participe.';if(save){try{if(students.length)localStorage.setItem('fabrique-virelangues-names-v1',JSON.stringify(students));else localStorage.removeItem('fabrique-virelangues-names-v1');say(students.length?'Liste enregistrée dans ce navigateur.':'Liste supprimée. Tout le groupe peut participer.');}catch(e){say('Liste utilisable pour cette partie ; ce navigateur ne permet pas de la conserver.');}}}
+function drawStudent(){if(!students.length)return;if(!studentQueue.length){studentQueue=shuffle(students);if(studentQueue.length>1&&studentQueue[studentQueue.length-1]===lastStudent)[studentQueue[0],studentQueue[studentQueue.length-1]]=[studentQueue[studentQueue.length-1],studentQueue[0]];}lastStudent=studentQueue.pop();$('reader').textContent='À toi, '+lastStudent+' !';say((students.length-studentQueue.length)+' / '+students.length+' élèves passés dans ce tour.');}
+function showBank(){const pool=selection();$('bankCount').textContent=pool.length+' cartes · sélection du menu du jour';$('bankList').replaceChildren();pool.forEach(d=>{const box=document.createElement('article');box.className='bankitem';const tag=document.createElement('small');tag.textContent='Niveau '+d.level+' · Sons '+SOUNDS[d.sound]+' · '+(d.origin==='classique'?'Virelangue classique':'Phrase créée pour le jeu');const text=document.createElement('p');text.textContent=d.text;const play=document.createElement('button');play.textContent='Jouer cette carte';play.addEventListener('click',()=>{showCard(d);$('bankDialog').close();say('Carte choisie dans la banque.');});box.append(tag,text,play);$('bankList').append(box);});$('bankDialog').showModal();}
+function printCards(){const target=$('printArea');target.replaceChildren();const title=document.createElement('h1');title.textContent='La fabrique à virelangues · CM1–CM2';const intro=document.createElement('p');intro.textContent='Lire lentement, articuler, puis recommencer. Défis : en écho, trois fois, en duo ou avec une intention.';const grid=document.createElement('div');grid.className='printgrid';selection().forEach(d=>{const card=document.createElement('article');card.className='printcard';const heading=document.createElement('strong');heading.textContent='Niveau '+d.level+' · Sons '+SOUNDS[d.sound];const text=document.createElement('p');text.textContent=d.text;const aid=document.createElement('small');aid.textContent='Par morceaux : '+d.chunks.join(' / ');const check=document.createElement('p');check.className='check';check.textContent='□ Mots exacts  □ Sons bien articulés  □ Défi réussi';card.append(heading,text,aid,check);grid.append(card);});target.append(title,intro,grid);$('bankDialog').close();window.print();}
+async function fullscreen(){if(document.fullscreenElement){await document.exitFullscreen();return;}document.body.classList.add('focus-view');$('fullscreen').textContent='Quitter le plein écran';$('fullscreen').setAttribute('aria-pressed','true');if(document.body.requestFullscreen){try{await document.body.requestFullscreen();}catch(e){say('Affichage agrandi activé. Utilise F11 pour le plein écran du navigateur.');}}else say('Affichage agrandi activé. Utilise le plein écran de ton navigateur.');}
+$('fullscreen').addEventListener('click',()=>{if(document.body.classList.contains('focus-view')&&!document.fullscreenElement){document.body.classList.remove('focus-view');$('fullscreen').textContent='Plein écran';$('fullscreen').setAttribute('aria-pressed','false');return;}fullscreen().catch(()=>say('Utilise F11 pour le plein écran du navigateur.'));});
+document.addEventListener('fullscreenchange',()=>{const active=!!document.fullscreenElement;document.body.classList.toggle('focus-view',active);$('fullscreen').textContent=active?'Quitter le plein écran':'Plein écran';$('fullscreen').setAttribute('aria-pressed',String(active));});
+$('next').addEventListener('click',nextCard);$('aid').addEventListener('click',()=>{segmented=!segmented;paintPhrase();});$('rerollChallenge').addEventListener('click',()=>{setChallenge();currentRound.criteria[2]=false;paintScore();say('Nouveau défi sur la même carte : les deux réussites de lecture sont conservées.');});
+$('level').addEventListener('change',nextCard);$('sound').addEventListener('change',nextCard);$('mode').addEventListener('change',()=>{setChallenge();currentRound.criteria[2]=false;paintScore();});$('duration').addEventListener('change',resetTimer);
+document.querySelectorAll('[data-criterion]').forEach(btn=>btn.addEventListener('click',()=>{const i=Number(btn.dataset.criterion);currentRound.criteria[i]=!currentRound.criteria[i];paintScore();say(currentRound.criteria[i]?'Une réussite validée !':'Validation retirée.');}));
+$('startTimer').addEventListener('click',toggleTimer);$('resetTimer').addEventListener('click',resetTimer);$('saveNames').addEventListener('click',()=>useNames(true));$('drawStudent').addEventListener('click',drawStudent);$('help').addEventListener('click',()=>$('helpDialog').showModal());$('bank').addEventListener('click',showBank);$('print').addEventListener('click',printCards);document.querySelectorAll('[data-close]').forEach(btn=>btn.addEventListener('click',()=>$(btn.dataset.close).close()));
+$('resetSession').addEventListener('click',()=>$('resetDialog').showModal());$('confirmReset').addEventListener('click',()=>{history=[];used.clear();studentQueue=[];lastStudent='';lastCard=null;$('reader').textContent='À vous de jouer !';$('resetDialog').close();nextCard();say('Nouvelle partie !');});
+try{const saved=JSON.parse(localStorage.getItem('fabrique-virelangues-names-v1')||'[]');if(Array.isArray(saved))$('names').value=saved.filter(x=>typeof x==='string').join('\n');}catch(e){}
+useNames(false);nextCard();
+</script>
+</body>
+</html>
