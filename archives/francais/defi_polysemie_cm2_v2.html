@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Défi polysémie – CM2</title>
+<style>
+:root{
+  --bg1:#f6f7fb;
+  --bg2:#eef2ff;
+  --card:#ffffff;
+  --text:#172033;
+  --muted:#687086;
+  --purple:#6d5dfc;
+  --purple2:#8b5cf6;
+  --green:#1f9d67;
+  --red:#d64545;
+  --amber:#d18b00;
+  --line:#e7e9f0;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  color:var(--text);
+  background:linear-gradient(135deg,var(--bg2),var(--bg1));
+  min-height:100vh;
+}
+.app{
+  width:min(1180px,95vw);
+  margin:18px auto 40px;
+}
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  margin-bottom:18px;
+}
+h1{
+  margin:0;
+  font-size:clamp(28px,4vw,48px);
+}
+.subtitle{
+  color:var(--muted);
+  margin-top:4px;
+  font-size:18px;
+}
+.score{
+  background:#fff;
+  padding:12px 18px;
+  border-radius:16px;
+  box-shadow:0 12px 26px rgba(20,26,45,.10);
+  font-weight:800;
+  text-align:center;
+  min-width:150px;
+}
+.score strong{
+  display:block;
+  font-size:30px;
+  color:var(--purple);
+}
+.panel{
+  background:rgba(255,255,255,.95);
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:24px;
+  box-shadow:0 14px 36px rgba(20,26,45,.11);
+  padding:24px;
+}
+.nav{
+  display:flex;
+  gap:8px;
+  margin-bottom:18px;
+}
+.bar{
+  height:10px;
+  flex:1;
+  background:#e9ebf2;
+  border-radius:999px;
+}
+.bar.active{
+  background:linear-gradient(90deg,var(--purple),var(--purple2));
+}
+.phase{
+  text-align:center;
+}
+.eyebrow{
+  color:var(--purple);
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  font-size:13px;
+  font-weight:900;
+}
+.phase h2{
+  margin:6px 0 4px;
+  font-size:clamp(24px,3vw,38px);
+}
+.phase p{
+  margin:0;
+  color:var(--muted);
+  font-size:17px;
+}
+.card{
+  background:#fff;
+  border:2px solid var(--line);
+  border-radius:18px;
+  padding:18px 20px;
+  margin:14px 0;
+}
+.clue{
+  font-size:clamp(19px,2.2vw,28px);
+  font-weight:700;
+  text-align:left;
+}
+.clue .n{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:#f0edff;
+  color:var(--purple);
+  margin-right:10px;
+  font-size:17px;
+}
+.mystery-word{
+  display:none;
+  text-align:center;
+  font-size:clamp(42px,6vw,76px);
+  font-weight:1000;
+  color:var(--purple);
+  letter-spacing:.06em;
+  margin:18px 0 8px;
+}
+.explain{
+  display:none;
+  max-width:850px;
+  margin:0 auto 10px;
+  text-align:center;
+  color:#4c556a;
+  font-size:18px;
+}
+.controls{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-top:18px;
+}
+button{
+  border:0;
+  border-radius:14px;
+  padding:13px 18px;
+  font-size:16px;
+  font-weight:850;
+  cursor:pointer;
+  box-shadow:0 8px 18px rgba(30,35,55,.09);
+}
+.primary{background:linear-gradient(90deg,var(--purple),var(--purple2));color:#fff}
+.secondary{background:#fff;border:2px solid var(--line);color:var(--text)}
+.good{background:var(--green);color:#fff}
+.bad{background:var(--red);color:#fff}
+.amber{background:var(--amber);color:#fff}
+.answers{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:18px;
+}
+.answer-btn{
+  text-align:left;
+  background:#fff;
+  border:2px solid var(--line);
+  min-height:86px;
+  font-size:17px;
+  line-height:1.35;
+}
+.answer-btn:hover{border-color:#c9c4ff}
+.feedback{
+  margin-top:14px;
+  min-height:34px;
+  text-align:center;
+  font-weight:900;
+  font-size:19px;
+}
+.statement{
+  font-size:clamp(21px,2.5vw,31px);
+  font-weight:800;
+  text-align:center;
+  padding:22px;
+  background:#fafaff;
+  border:2px solid #e7e2ff;
+  border-radius:18px;
+  margin-top:16px;
+}
+.wordmark{
+  color:var(--purple);
+  text-decoration:underline;
+  text-decoration-thickness:4px;
+  text-underline-offset:4px;
+}
+.definition-list{
+  display:grid;
+  gap:12px;
+  margin-top:18px;
+}
+.def-item{
+  border:2px solid var(--line);
+  border-radius:16px;
+  padding:16px 18px;
+  font-size:18px;
+  font-weight:700;
+  background:#fff;
+  cursor:pointer;
+}
+.def-item.selected{
+  outline:4px solid #ddd6fe;
+}
+.def-item.correct{
+  border-color:#9ad9bc;
+  background:#effbf5;
+}
+.def-item.wrong{
+  border-color:#efb0b0;
+  background:#fff4f4;
+}
+.hidden{display:none}
+.final{
+  text-align:center;
+}
+.final-box{
+  background:#eefbf4;
+  border:2px solid #b8e6cd;
+  border-radius:20px;
+  padding:22px;
+  font-size:clamp(20px,2.4vw,30px);
+  font-weight:850;
+  max-width:900px;
+  margin:20px auto;
+}
+.smallnote{
+  color:var(--muted);
+  text-align:center;
+  margin-top:14px;
+  font-size:14px;
+}
+@media(max-width:760px){
+  .answers{grid-template-columns:1fr}
+  .topbar{align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div>
+      <h1>Défi polysémie</h1>
+      <div class="subtitle">Plusieurs sens, un seul mot : à vous de mener l’enquête.</div>
+    </div>
+    <div class="score">Score<strong id="score">0</strong></div>
+  </div>
+
+  <div class="panel" id="panel">
+    <div class="nav" id="nav"></div>
+
+    <section id="phase1">
+      <div class="phase">
+        <div class="eyebrow">Niveau 1 — Mot mystère</div>
+        <h2>Quel mot relie tous ces indices ?</h2>
+        <p>Attention : les indices ne sont pas toujours concrets.</p>
+      </div>
+      <div id="clues"></div>
+      <div class="mystery-word" id="mysteryWord"></div>
+      <div class="explain" id="mysteryExplain"></div>
+      <div class="controls">
+        <button class="secondary" id="showClueBtn">➕ Afficher l’indice suivant</button>
+        <button class="primary" id="revealBtn">✨ Révéler</button>
+        <button class="good" id="pointBtn">+1 point</button>
+        <button class="secondary" id="nextMysteryBtn">Mot suivant →</button>
+      </div>
+    </section>
+
+    <section id="phase2" class="hidden">
+      <div class="phase">
+        <div class="eyebrow">Niveau 2 — Quel sens ?</div>
+        <h2>Quel sens du mot est utilisé ici ?</h2>
+        <p>Choisissez la définition qui correspond précisément au contexte.</p>
+      </div>
+      <div class="statement" id="sentence"></div>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="senseFeedback"></div>
+      <div class="controls">
+        <button class="secondary" id="nextSenseBtn">Exemple suivant →</button>
+      </div>
+    </section>
+
+    <section id="phase3" class="hidden">
+      <div class="phase">
+        <div class="eyebrow">Niveau 3 — Dictionnaire menteur</div>
+        <h2>Une définition est fausse. Laquelle ?</h2>
+        <p>Repérez la définition qui n’appartient pas au mot proposé.</p>
+      </div>
+      <div class="statement" id="liarWord"></div>
+      <div class="definition-list" id="defs"></div>
+      <div class="feedback" id="liarFeedback"></div>
+      <div class="controls">
+        <button class="primary" id="checkLiarBtn">Vérifier</button>
+        <button class="secondary" id="nextLiarBtn">Mot suivant →</button>
+      </div>
+    </section>
+
+    <section id="final" class="hidden final">
+      <div class="phase">
+        <div class="eyebrow">Bilan</div>
+        <h2>Ce qu’on vient de découvrir</h2>
+      </div>
+      <div class="final-box">
+        Un même mot peut avoir plusieurs sens.<br>
+        Pour comprendre le sens précis, on observe le <strong>contexte</strong>.<br>
+        Dans le dictionnaire, ces différents sens sont souvent numérotés.
+      </div>
+      <div style="font-size:34px;font-weight:950;color:#6d5dfc;">POLYSÉMIE = plusieurs sens</div>
+      <div class="controls">
+        <button class="primary" onclick="location.reload()">↻ Recommencer</button>
+      </div>
+    </section>
+
+    <div class="smallnote">Mode vidéoprojecteur : les élèves peuvent répondre oralement avant toute révélation.</div>
+  </div>
+</div>
+
+<script>
+const mysteries = [
+  {
+    word:"SOURCE",
+    clues:[
+      "On peut la voir jaillir au pied d’une montagne.",
+      "Un journaliste doit vérifier la sienne avant de publier une information.",
+      "On peut chercher celle d’un problème."
+    ],
+    explain:"SOURCE peut désigner une origine concrète ou figurée."
+  },
+  {
+    word:"BRANCHE",
+    clues:[
+      "Elle peut porter des feuilles et des fruits.",
+      "On peut travailler dans une branche professionnelle.",
+      "Une rivière peut parfois se diviser en plusieurs branches."
+    ],
+    explain:"BRANCHE garde l’idée d’une division qui part d’un ensemble."
+  },
+  {
+    word:"COURANT",
+    clues:[
+      "Il peut entraîner un nageur dans une rivière.",
+      "Il permet de faire fonctionner un appareil électrique.",
+      "On parle aussi d’un courant artistique ou d’un courant d’idées."
+    ],
+    explain:"COURANT peut évoquer un déplacement, une circulation ou une tendance."
+  },
+  {
+    word:"LIGNE",
+    clues:[
+      "On peut la tracer avec une règle.",
+      "Un bus suit une ligne précise.",
+      "Un texte est composé de plusieurs lignes."
+    ],
+    explain:"LIGNE peut désigner un tracé, un trajet ou une rangée."
+  },
+  {
+    word:"FOYER",
+    clues:[
+      "Il peut désigner l’endroit où brûle un feu.",
+      "Il peut aussi désigner une famille vivant sous le même toit.",
+      "On parle d’un foyer d’incendie pour désigner son point de départ."
+    ],
+    explain:"FOYER renvoie souvent à l’idée d’un centre ou d’un lieu principal."
+  }
+];
+
+const senses = [
+  {
+    sentence:'Le directeur a la <span class="wordmark">charge</span> de l’organisation de la sortie.',
+    answers:[
+      "Ce qu’un véhicule transporte.",
+      "Une responsabilité confiée à quelqu’un.",
+      "Une attaque menée contre un adversaire.",
+      "Une quantité d’électricité."
+    ],
+    correct:1
+  },
+  {
+    sentence:'Cette chaîne diffuse un nouveau documentaire ce soir.',
+    answers:[
+      "Suite de maillons métalliques.",
+      "Ensemble de montagnes alignées.",
+      "Entreprise ou canal de télévision.",
+      "Suite d’opérations industrielles."
+    ],
+    correct:2
+  },
+  {
+    sentence:'Le sommet offre un magnifique point de vue.',
+    answers:[
+      "Un signe de ponctuation.",
+      "Un endroit précis.",
+      "Une manière d’envisager une question.",
+      "Une unité obtenue dans un jeu."
+    ],
+    correct:2
+  },
+  {
+    sentence:'Le siège de l’entreprise se trouve à Lyon.',
+    answers:[
+      "Meuble fait pour s’asseoir.",
+      "Lieu principal d’une organisation.",
+      "Action d’encercler une ville.",
+      "Partie du corps sur laquelle on s’assoit."
+    ],
+    correct:1
+  }
+];
+
+const liars = [
+  {
+    word:"VOLUME",
+    defs:[
+      "Espace occupé par un objet.",
+      "Livre appartenant à une série ou un ensemble.",
+      "Intensité d’un son.",
+      "Vitesse à laquelle se déplace un véhicule."
+    ],
+    liar:3
+  },
+  {
+    word:"TERRAIN",
+    defs:[
+      "Étendue de sol.",
+      "Espace aménagé pour pratiquer un sport.",
+      "Domaine dans lequel on mène une étude ou une action.",
+      "Objet servant à mesurer une distance."
+    ],
+    liar:3
+  },
+  {
+    word:"RÉSEAU",
+    defs:[
+      "Ensemble de routes ou de lignes reliées entre elles.",
+      "Ensemble d’ordinateurs ou d’appareils connectés.",
+      "Ensemble de relations entre personnes.",
+      "Petit cours d’eau temporaire."
+    ],
+    liar:3
+  }
+];
+
+let score=0;
+let phase=1;
+let mysteryIndex=0;
+let clueCount=1;
+let senseIndex=0;
+let liarIndex=0;
+let selectedLiar=null;
+
+const scoreEl=document.getElementById("score");
+const nav=document.getElementById("nav");
+
+function updateNav(){
+  nav.innerHTML="";
+  for(let i=1;i<=3;i++){
+    const b=document.createElement("div");
+    b.className="bar"+(i<=phase?" active":"");
+    nav.appendChild(b);
+  }
+}
+
+function addPoint(){
+  score++;
+  scoreEl.textContent=score;
+}
+document.getElementById("pointBtn").onclick=addPoint;
+
+function renderMystery(){
+  const m=mysteries[mysteryIndex];
+  clueCount=1;
+  document.getElementById("mysteryWord").style.display="none";
+  document.getElementById("mysteryExplain").style.display="none";
+  document.getElementById("mysteryWord").textContent=m.word;
+  document.getElementById("mysteryExplain").textContent=m.explain;
+  renderClues();
+}
+function renderClues(){
+  const m=mysteries[mysteryIndex];
+  const box=document.getElementById("clues");
+  box.innerHTML="";
+  m.clues.slice(0,clueCount).forEach((c,i)=>{
+    const div=document.createElement("div");
+    div.className="card clue";
+    div.innerHTML=`<span class="n">${i+1}</span>${c}`;
+    box.appendChild(div);
+  });
+}
+document.getElementById("showClueBtn").onclick=()=>{
+  if(clueCount<3){
+    clueCount++;
+    renderClues();
+  }
+};
+document.getElementById("revealBtn").onclick=()=>{
+  document.getElementById("mysteryWord").style.display="block";
+  document.getElementById("mysteryExplain").style.display="block";
+};
+document.getElementById("nextMysteryBtn").onclick=()=>{
+  if(mysteryIndex<mysteries.length-1){
+    mysteryIndex++;
+    renderMystery();
+  }else{
+    phase=2;
+    updateNav();
+    document.getElementById("phase1").classList.add("hidden");
+    document.getElementById("phase2").classList.remove("hidden");
+    renderSense();
+  }
+};
+
+function renderSense(){
+  const s=senses[senseIndex];
+  document.getElementById("sentence").innerHTML=s.sentence;
+  document.getElementById("senseFeedback").textContent="";
+  const box=document.getElementById("answers");
+  box.innerHTML="";
+  s.answers.forEach((a,i)=>{
+    const btn=document.createElement("button");
+    btn.className="answer-btn";
+    btn.innerHTML=`<strong>${String.fromCharCode(65+i)}.</strong> ${a}`;
+    btn.onclick=()=>{
+      const fb=document.getElementById("senseFeedback");
+      if(i===s.correct){
+        fb.textContent="✅ Oui. Le contexte permet d’identifier précisément ce sens.";
+        fb.style.color="#1f9d67";
+        addPoint();
+      }else{
+        fb.textContent="❌ Ce sens existe peut-être, mais il ne correspond pas à cette phrase.";
+        fb.style.color="#d64545";
+      }
+    };
+    box.appendChild(btn);
+  });
+}
+document.getElementById("nextSenseBtn").onclick=()=>{
+  if(senseIndex<senses.length-1){
+    senseIndex++;
+    renderSense();
+  }else{
+    phase=3;
+    updateNav();
+    document.getElementById("phase2").classList.add("hidden");
+    document.getElementById("phase3").classList.remove("hidden");
+    renderLiar();
+  }
+};
+
+function renderLiar(){
+  const l=liars[liarIndex];
+  selectedLiar=null;
+  document.getElementById("liarWord").innerHTML=`Mot proposé : <span class="wordmark">${l.word}</span>`;
+  document.getElementById("liarFeedback").textContent="";
+  const box=document.getElementById("defs");
+  box.innerHTML="";
+  l.defs.forEach((d,i)=>{
+    const div=document.createElement("div");
+    div.className="def-item";
+    div.textContent=d;
+    div.onclick=()=>{
+      [...box.children].forEach(x=>x.classList.remove("selected"));
+      div.classList.add("selected");
+      selectedLiar=i;
+    };
+    box.appendChild(div);
+  });
+}
+document.getElementById("checkLiarBtn").onclick=()=>{
+  const l=liars[liarIndex];
+  const items=[...document.getElementById("defs").children];
+  if(selectedLiar===null) return;
+  items.forEach((el,i)=>{
+    if(i===l.liar) el.classList.add("correct");
+    if(i===selectedLiar && selectedLiar!==l.liar) el.classList.add("wrong");
+  });
+  const fb=document.getElementById("liarFeedback");
+  if(selectedLiar===l.liar){
+    fb.textContent="✅ Exact : cette définition ne correspond pas au mot.";
+    fb.style.color="#1f9d67";
+    addPoint();
+  }else{
+    fb.textContent="❌ Cette définition existe. Cherchez celle qui n’a aucun lien avec le mot.";
+    fb.style.color="#d64545";
+  }
+};
+document.getElementById("nextLiarBtn").onclick=()=>{
+  if(liarIndex<liars.length-1){
+    liarIndex++;
+    renderLiar();
+  }else{
+    document.getElementById("phase3").classList.add("hidden");
+    document.getElementById("final").classList.remove("hidden");
+  }
+};
+
+updateNav();
+renderMystery();
+</script>
+</body>
+</html>
