@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Créateur d'équipes – CM2</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#172033;--muted:#687086;--accent:#3157d5}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{padding:18px 22px;background:#fff;box-shadow:0 2px 14px #1b2a4a14;position:sticky;top:0;z-index:10}
+h1{font-size:22px;margin:0 0 12px}.controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+button,select{border:0;border-radius:11px;padding:10px 14px;font-weight:700;font-size:14px}
+button{background:var(--accent);color:#fff;cursor:pointer} button.secondary{background:#e8ecf8;color:#273657}
+select{background:#eef1f8;color:#172033}
+main{padding:20px}.hint{color:var(--muted);font-size:13px;margin:0 0 15px}
+#teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;align-items:start}
+.team{background:var(--card);border-radius:17px;overflow:hidden;box-shadow:0 5px 18px #26324d17;border-top:8px solid var(--team)}
+.team-head{padding:13px 14px 9px;display:flex;justify-content:space-between;align-items:center}
+.team-title{font-size:18px;font-weight:850}.count{font-size:13px;background:#f0f2f7;border-radius:99px;padding:5px 9px}
+.members{padding:5px 11px 12px;min-height:80px}
+.student{background:#f8f9fc;border:1px solid #e6e9f1;border-radius:11px;margin:7px 0;padding:9px 9px;display:flex;align-items:center;gap:7px}
+.name{font-weight:750;flex:1;min-width:0}.move{display:flex;gap:4px}
+.move button{padding:5px 8px;border-radius:8px;font-size:13px;background:var(--team);min-width:29px}
+footer{padding:0 20px 22px;color:var(--muted);font-size:12px}
+@media(max-width:600px){header{position:static}.controls{align-items:stretch}.controls>*{flex:1}main{padding:14px}#teams{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<h1>🎲 Créateur d'équipes – CM2</h1>
+<div class="controls">
+<label>Nombre d'équipes
+<select id="teamCount">
+<option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+</select></label>
+<button id="generate">Créer / mélanger les équipes</button>
+<button id="balance" class="secondary">Rééquilibrer</button>
+<button id="reset" class="secondary">Réinitialiser</button>
+</div>
+</header>
+<main>
+<p class="hint">Les équipes sont créées aléatoirement et aussi équilibrées que possible. Utilise ◀ et ▶ à côté d'un prénom pour le déplacer instantanément vers l'équipe voisine.</p>
+<div id="teams"></div>
+</main>
+<footer>24 élèves • Fonctionne hors connexion • Aucun prénom n'est envoyé sur Internet.</footer>
+<script>
+const original = ["Pauline", "Louane", "Clémence", "Meloe", "Maëlie", "Kaly", "Sean", "Theo", "Ewen", "Angel", "Alexei", "Julia", "Serigne", "Camille", "Manon", "Mattheo", "Romane", "Laya", "Salomé", "Elona", "Louis", "Timeo", "Gabriel", "Rafael"];
+let teamCount=4, teams=[];
+const colors=['#e05252','#3d75d6','#32a06f','#e0a12e','#8a5bd1','#20a3ad','#e26d9e','#697386'];
+
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function generate(){
+ teamCount=+document.getElementById('teamCount').value;
+ teams=Array.from({length:teamCount},()=>[]);
+ shuffle(original).forEach((s,i)=>teams[i%teamCount].push(s));
+ render();
+}
+function render(){
+ const box=document.getElementById('teams'); box.innerHTML='';
+ teams.forEach((members,i)=>{
+  const card=document.createElement('section'); card.className='team'; card.style.setProperty('--team',colors[i%colors.length]);
+  card.innerHTML=`<div class="team-head"><div class="team-title">Équipe ${i+1}</div><div class="count">${members.length} élève${members.length>1?'s':''}</div></div><div class="members"></div>`;
+  const list=card.querySelector('.members');
+  members.forEach((s,j)=>{
+   const row=document.createElement('div');row.className='student';
+   row.innerHTML=`<span class="name">${s}</span><span class="move">${i>0?`<button title="Équipe précédente" data-dir="-1">◀</button>`:''}${i<teams.length-1?`<button title="Équipe suivante" data-dir="1">▶</button>`:''}</span>`;
+   row.querySelectorAll('button').forEach(b=>b.onclick=()=>move(i,j,+b.dataset.dir));
+   list.appendChild(row);
+  }); box.appendChild(card);
+ });
+}
+function move(from,index,dir){
+ const to=from+dir;if(to<0||to>=teams.length)return;
+ const [s]=teams[from].splice(index,1);teams[to].push(s);render();
+}
+function rebalance(){
+ let all=shuffle(teams.flat()); teams=Array.from({length:teamCount},()=>[]);
+ all.forEach((s,i)=>teams[i%teamCount].push(s));render();
+}
+document.getElementById('generate').onclick=generate;
+document.getElementById('balance').onclick=rebalance;
+document.getElementById('reset').onclick=()=>{document.getElementById('teamCount').value='4';generate()};
+document.getElementById('teamCount').onchange=generate;
+generate();
+</script>
+</body>
+</html>
