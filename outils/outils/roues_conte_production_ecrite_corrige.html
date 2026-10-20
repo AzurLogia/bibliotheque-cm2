@@ -22,8 +22,54 @@ function persist(){try{localStorage.setItem(KEY,JSON.stringify(Object.fromEntrie
 function addHistory(values){history.push(values);history=history.slice(-60);try{localStorage.setItem(HISTORY_KEY,JSON.stringify(history))}catch(e){}renderHistory()}
 function renderHistory(){const list=document.getElementById('historyList');list.replaceChildren();document.getElementById('historyEmpty').hidden=history.length>0;document.getElementById('clearHistory').disabled=!history.length;history.forEach((vals,i)=>{const li=document.createElement('li');const b=document.createElement('b');b.textContent='Proposition '+(i+1)+' : ';li.append(b,vals[0]+' · '+vals[1]+' · '+vals[2]);list.append(li)})}
 function normalize(a){return Array.isArray(a)?a.filter(x=>typeof x==='string').map(x=>x.trim()).filter(Boolean).slice(0,150):[]}
-function textLines(ctx,str,maxWidth,maxLines=2){const words=str.split(/\s+/),lines=[];let line='';for(const word of words){const candidate=line?line+' '+word:word;if(ctx.measureText(candidate).width>maxWidth&&line){lines.push(line);line=word}else line=candidate}if(line)lines.push(line);if(lines.length>maxLines){const kept=lines.slice(0,maxLines);let last=kept[maxLines-1];while(last.length&&ctx.measureText(last+'…').width>maxWidth)last=last.slice(0,-1);kept[maxLines-1]=last+'…';return kept}return lines}
-function draw(s){const canvas=s.el.querySelector('canvas'),ctx=canvas.getContext('2d');if(!ctx)return;const W=700;canvas.width=canvas.height=W;const R=W/2,N=s.items.length;ctx.clearRect(0,0,W,W);ctx.translate(R,R);if(!N){ctx.beginPath();ctx.arc(0,0,R-3,0,Math.PI*2);ctx.fillStyle='#f0f1f4';ctx.fill();ctx.strokeStyle='#d3d7df';ctx.lineWidth=4;ctx.setLineDash([14,11]);ctx.beginPath();ctx.arc(0,0,R-21,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#8b91a0';ctx.font='bold 30px Trebuchet MS, sans-serif';ctx.textAlign='center';ctx.fillText('ROUE VIDE',0,-13);ctx.font='22px Trebuchet MS, sans-serif';ctx.fillText('Ajoutez vos idées !',0,27);return}const step=Math.PI*2/N,palette=colors[s.id];for(let i=0;i<N;i++){const a=-Math.PI/2+(i-.5)*step,b=a+step;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,R-3,a,b);ctx.closePath();ctx.fillStyle=palette[i%palette.length];ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();const center=-Math.PI/2+i*step;ctx.save();ctx.rotate(center);ctx.translate(0,-R*.64);ctx.fillStyle='#203149';ctx.textAlign='center';ctx.textBaseline='middle';const size=N<=5?30:N<=9?25:N<=15?21:16;ctx.font=`bold ${size}px Trebuchet MS, sans-serif`;const txt=textLines(ctx,s.items[i],N<=6?R*.73:R*.59,N>18?1:2);const lineheight=size*1.16;txt.forEach((line,j)=>ctx.fillText(line,0,(j-(txt.length-1)/2)*lineheight));ctx.restore()}}
+function textLines(ctx,str,maxWidth,maxLines=2){
+ const words=str.trim().split(/\s+/),lines=[];let line='';
+ for(const word of words){
+  const candidate=line?line+' '+word:word;
+  if(ctx.measureText(candidate).width>maxWidth&&line){lines.push(line);line=word}else line=candidate;
+ }
+ if(line)lines.push(line);
+ const limited=lines.slice(0,maxLines);
+ if(lines.length>maxLines)limited[maxLines-1]+='…';
+ return limited.map(t=>{while(t.length>1&&ctx.measureText(t).width>maxWidth)t=t.slice(0,-(t.endsWith('…')?2:1))+'…';return t});
+}
+function draw(s){
+ const canvas=s.el.querySelector('canvas'),ctx=canvas.getContext('2d');if(!ctx)return;
+ const W=700,R=W/2,N=s.items.length;canvas.width=canvas.height=W;ctx.clearRect(0,0,W,W);ctx.translate(R,R);
+ if(!N){
+  ctx.beginPath();ctx.arc(0,0,R-3,0,Math.PI*2);ctx.fillStyle='#f0f1f4';ctx.fill();
+  ctx.strokeStyle='#d3d7df';ctx.lineWidth=4;ctx.setLineDash([14,11]);ctx.beginPath();ctx.arc(0,0,R-21,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#8b91a0';ctx.font='bold 30px Trebuchet MS, sans-serif';ctx.textAlign='center';ctx.fillText('ROUE VIDE',0,-13);
+  ctx.font='22px Trebuchet MS, sans-serif';ctx.fillText('Ajoutez vos idées !',0,27);return;
+ }
+ const step=2*Math.PI/N,palette=colors[s.id];
+ for(let i=0;i<N;i++){
+  const center=-Math.PI/2+i*step,a=center-step/2,b=center+step/2;
+  ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,R-3,a,b);ctx.closePath();
+  ctx.fillStyle=palette[i%palette.length];ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
+  ctx.save();
+  // Clip each caption to its own sector: long labels can never invade the next one.
+  ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,R-8,a+.012,b-.012);ctx.closePath();ctx.clip();
+  ctx.rotate(center+Math.PI/2);
+  const radius=R*.67;
+  ctx.translate(0,-radius);
+  // Width is calculated from the actual slice angle rather than the wheel diameter.
+  const sectorWidth=2*(radius-20)*Math.sin(step/2)-18;
+  const maxWidth=Math.max(22,Math.min(R*.78,sectorWidth));
+  const availableHeight=R*.40;
+  let font=N<=5?28:N<=9?23:N<=14?19:N<=20?16:13;
+  let lines=[];
+  while(font>=10){
+   ctx.font='bold '+font+'px Trebuchet MS, sans-serif';
+   lines=textLines(ctx,s.items[i],maxWidth,N>20?1:2);
+   if(lines.length*font*1.2<=availableHeight)break;
+   font--;
+  }
+  ctx.fillStyle='#203149';ctx.textAlign='center';ctx.textBaseline='middle';
+  lines.forEach((line,j)=>ctx.fillText(line,0,(j-(lines.length-1)/2)*font*1.25,maxWidth));
+  ctx.restore();
+ }
+}
 function renderList(s){const ul=s.el.querySelector('.items');ul.replaceChildren();s.items.forEach((name,i)=>{const li=document.createElement('li'),span=document.createElement('span'),b=document.createElement('button');span.textContent=name;b.type='button';b.textContent='×';b.title='Supprimer « '+name+' »';b.setAttribute('aria-label',b.title);b.addEventListener('click',()=>{if(s.spinning)return;s.items.splice(i,1);s.result=null;changed(s)});li.append(span,b);ul.append(li)});s.el.querySelector('.count').textContent=`${s.items.length} proposition${s.items.length>1?'s':''}`;s.el.querySelector('.clear').disabled=s.items.length===0;}
 function updateResult(s){s.el.querySelector('.result strong').textContent=s.result??'À découvrir…';const p=document.querySelector('#summary');const vals=ids.map(id=>states[id]?.result ?? null);if(vals.every(v=>v===null)){p.innerHTML='<span class="muted">Complétez les roues, puis lancez les tirages pour découvrir les ingrédients de votre histoire.</span>';return}p.replaceChildren();const segments=[['Personnage',vals[0]],['Lieu',vals[1]],['Objectif',vals[2]]];for(let i=0;i<segments.length;i++){if(i)p.append(' · ');const strong=document.createElement('b');strong.textContent=segments[i][0]+' : ';p.append(strong,segments[i][1]??'à tirer')}}
 function changed(s){persist();draw(s);renderList(s);updateResult(s);s.el.querySelector('.spin').disabled=!s.items.length;s.el.querySelector('.wheel-disc').style.transition='none';s.rotation=0;s.el.querySelector('.wheel-disc').style.transform='rotate(0deg)';}
