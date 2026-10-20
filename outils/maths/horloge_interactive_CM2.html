@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Horloge interactive · CM2</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f2f5fa;color:#23344d;font:16px system-ui,Arial}header{background:#fff;padding:18px 24px;border-bottom:1px solid #e1e5ed}h1{margin:0;font-size:26px}header p{margin:5px 0;color:#69788a}.layout{max-width:1350px;margin:auto;padding:20px;display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px}.box{background:white;border:1px solid #e0e6ef;border-radius:17px;padding:18px;margin-bottom:15px;box-shadow:0 4px 13px #20334d08}h2{font-size:18px;margin:0 0 13px}label{display:block;margin:9px 0;font-size:14px}select,input,button{font:inherit}select,input[type=number]{padding:8px;border:1px solid #cbd4e2;border-radius:9px;background:#fff;max-width:100%}select{width:100%}input[type=checkbox]{accent-color:#285cbb;margin-right:6px}button{background:#305bc0;color:white;border:0;border-radius:9px;padding:10px 13px;font-weight:700;cursor:pointer}button.secondary{background:#e8eef9;color:#28456e}button:disabled{opacity:.5;cursor:default}.buttons{display:flex;gap:8px;flex-wrap:wrap}.main{text-align:center}.clock{width:min(100%,530px);touch-action:none;user-select:none;cursor:crosshair;display:block;margin:auto}.face{fill:#fff;stroke:#263d62;stroke-width:5}.hand{stroke-linecap:round;cursor:grab}.hour{stroke:#d63d42;stroke-width:11}.minute{stroke:#286bd4;stroke-width:8}.second{stroke:#20252c;stroke-width:3}.tick{stroke:#65748a}.info{font-size:20px;font-weight:750;margin:8px 0 15px}.answer{min-height:35px;font-weight:800;color:#246845}.prompt{font-size:clamp(19px,2.5vw,30px);font-weight:800;min-height:45px}.small{font-size:12px;color:#77869a}.legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;font-weight:700;font-size:13px}.legend .red{color:#d63d42}.legend .blue{color:#286bd4}.legend .black{color:#20252c}.student-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.students{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;max-height:230px;overflow:auto}.students label{margin:0;font-size:13px}.tag{background:#edf4fe;border-radius:8px;padding:9px}.result{font-size:18px;margin:10px 0}.selected{font-size:12px;color:#536b84}@media(max-width:850px){.layout{grid-template-columns:1fr}.clock{max-width:500px}}@media print{aside,header .small,.buttons{display:none}.layout{display:block}}
+</style></head><body>
+<header><h1>🕒 L'horloge interactive</h1><p>Lire l'heure · Manipuler les aiguilles · Matin et après-midi</p><a class="small" href="../../index.html">← Retour à la bibliothèque CM2</a></header>
+<div class="layout"><aside>
+<section class="box"><h2>Activité</h2><label>Mode<select id="mode"><option value="free">Horloge libre</option><option value="read">Lire l'heure (ardoise)</option><option value="set">Régler les aiguilles</option><option value="convert">Matin ↔ après-midi</option></select></label><label>Difficulté<select id="difficulty"><option value="hours">Heures entières</option><option value="halves">Heures et demi-heures</option><option value="quarters">Quarts d'heure</option><option value="fives" selected>De 5 en 5 minutes</option><option value="all">Toutes les minutes</option></select></label><label>Période<select id="period"><option value="morning">Matin (0 h à 11 h)</option><option value="afternoon">Après-midi / soir (12 h à 23 h)</option><option value="both" selected>Matin et après-midi</option></select></label></section>
+<section class="box"><h2>Paramètres du cadran</h2>
+<label><input type="checkbox" id="showHours" checked>Afficher les nombres des heures</label>
+<label><input type="checkbox" id="showMinutes">Afficher les nombres des minutes</label>
+<label><input type="checkbox" id="showHourHand" checked>Aiguille rouge des heures</label>
+<label><input type="checkbox" id="showMinuteHand" checked>Aiguille bleue des minutes</label>
+<label><input type="checkbox" id="showSecondHand" checked>Trotteuse noire</label>
+<label><input type="checkbox" id="showDigital">Afficher l'heure numérique (en mode libre)</label>
+</section>
+<section class="box"><h2>Élèves participants</h2><div class="buttons"><button class="secondary" id="allStudents">Tous</button><button class="secondary" id="noneStudents">Aucun</button><button class="secondary" id="pickStudent">🎲 Tirer un élève</button></div><p class="selected" id="selectionStatus"></p><div class="students" id="studentList"></div><p class="tag" id="chosenStudent">Aucun élève tiré</p><p class="small">Liste récupérée depuis « Ma classe » sur ce navigateur.</p></section>
+</aside><main class="box main">
+<div class="prompt" id="prompt">Déplace les aiguilles directement sur l'horloge.</div>
+<svg class="clock" id="clock" viewBox="0 0 600 600" role="img" aria-label="Horloge interactive"><circle class="face" cx="300" cy="300" r="278"/><g id="ticks"></g><g id="numbersHours"></g><g id="numbersMinutes"></g><line class="hand hour" id="hourHand" x1="300" y1="329" x2="300" y2="154"/><line class="hand minute" id="minuteHand" x1="300" y1="335" x2="300" y2="92"/><line class="hand second" id="secondHand" x1="300" y1="337" x2="300" y2="72"/><circle cx="300" cy="300" r="10" fill="#26364e"/></svg>
+<div class="legend"><span class="red">● Heures</span><span class="blue">● Minutes</span><span class="black">● Secondes</span></div>
+<div class="info" id="digital"></div><div class="answer" id="answer"></div>
+<div class="buttons" style="justify-content:center"><button id="next">🎲 Nouvelle question</button><button class="secondary" id="reveal">Afficher la correction</button><button class="secondary" id="check">✔ Vérifier les aiguilles</button><button class="secondary" id="reset">↺ Remettre à zéro</button></div>
+<p class="small">Fais glisser les aiguilles à la souris ou avec le doigt. Pour régler une heure, commence par les minutes puis ajuste les heures si nécessaire.</p>
+</main></div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';
+let hour=10,minute=10,second=0,targetHour=10,targetMinute=10,drag=null,previousAngle=null,chosen=null;
+const fmt=(h,m)=>String(h).padStart(2,'0')+' h '+String(m).padStart(2,'0');
+const mod=(x,n)=>(x%n+n)%n;
+const selected=new Set();
+let roster=[];try{const value=JSON.parse(localStorage.getItem('cm2-eleves-v1')||'[]');if(Array.isArray(value))roster=value.filter(x=>typeof x==='string'&&x.trim())}catch(e){}
+function drawStudents(){const root=$('studentList');root.replaceChildren();roster.forEach((name,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=selected.has(i);c.onchange=()=>{if(c.checked)selected.add(i);else selected.delete(i);updateSelection()};l.append(c,document.createTextNode(name));root.append(l)});updateSelection()}
+function updateSelection(){$('selectionStatus').textContent=selected.size+' / '+roster.length+' élèves sélectionnés'}
+$('allStudents').onclick=()=>{roster.forEach((_,i)=>selected.add(i));drawStudents()};
+$('noneStudents').onclick=()=>{selected.clear();drawStudents()};
+$('pickStudent').onclick=()=>{const arr=[...selected];if(!arr.length){$('chosenStudent').textContent='Sélectionne au moins un élève.';return}chosen=roster[arr[Math.floor(Math.random()*arr.length)]];$('chosenStudent').textContent='🎤 '+chosen};
+roster.forEach((_,i)=>selected.add(i));drawStudents();
+function el(type,attrs,txt){const n=document.createElementNS(NS,type);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));if(txt!==undefined)n.textContent=txt;return n}
+for(let i=0;i<60;i++){const a=i*Math.PI/30,r=i%5===0?248:259,outer=267;$('ticks').append(el('line',{x1:300+Math.sin(a)*r,y1:300-Math.cos(a)*r,x2:300+Math.sin(a)*outer,y2:300-Math.cos(a)*outer,stroke:i%5===0?'#344969':'#aeb9c9','stroke-width':i%5===0?4:2}))}
+for(let i=1;i<=12;i++){const a=i*Math.PI/6;$('numbersHours').append(el('text',{x:300+Math.sin(a)*205,y:300-Math.cos(a)*205+9,'text-anchor':'middle','font-size':32,'font-weight':800,fill:'#243a5c'},i))}
+for(let i=0;i<12;i++){const a=i*Math.PI/6;$('numbersMinutes').append(el('text',{x:300+Math.sin(a)*244,y:300-Math.cos(a)*244+6,'text-anchor':'middle','font-size':17,'font-weight':700,fill:'#286bd4'},String(i*5).padStart(2,'0')))}
+function hand(id,degrees){$(id).setAttribute('transform','rotate('+degrees+' 300 300)')}
+function redraw(){hand('hourHand',(hour%12+minute/60)*30);hand('minuteHand',minute*6);hand('secondHand',second*6);
+$('numbersHours').style.display=$('showHours').checked?'':'none';$('numbersMinutes').style.display=$('showMinutes').checked?'':'none';
+$('hourHand').style.display=$('showHourHand').checked?'':'none';$('minuteHand').style.display=$('showMinuteHand').checked?'':'none';$('secondHand').style.display=$('showSecondHand').checked?'':'none';
+$('digital').textContent=$('mode').value==='free'&&$('showDigital').checked?fmt(hour,minute)+' : '+String(second).padStart(2,'0'):'';
+}
+function randomTime(){const level=$('difficulty').value;const options=level==='hours'?[0]:level==='halves'?[0,30]:level==='quarters'?[0,15,30,45]:level==='fives'?Array.from({length:12},(_,i)=>i*5):Array.from({length:60},(_,i)=>i);const p=$('period').value;const start=p==='afternoon'?12:0,end=p==='morning'?12:24;return [start+Math.floor(Math.random()*(end-start)),options[Math.floor(Math.random()*options.length)]]}
+function newQuestion(){[targetHour,targetMinute]=randomTime();$('answer').textContent='';second=0;
+const mode=$('mode').value;
+if(mode==='read'){hour=targetHour;minute=targetMinute;$('prompt').textContent='Quelle heure indique cette horloge ? Écris ta réponse sur ton ardoise.'}
+else if(mode==='set'){hour=12;minute=0;$('prompt').textContent='Règle les aiguilles sur '+fmt(targetHour,targetMinute)+'.'}
+else if(mode==='convert') {hour=targetHour;minute=targetMinute;$('prompt').textContent='Convertis '+fmt(targetHour,targetMinute)+' dans l’autre période (12 h plus tôt ou plus tard).'}
+else{$('prompt').textContent='Déplace librement les aiguilles.'}
+$('check').style.display=mode==='set'?'':'none';redraw()}
+function correct(){
+const mode=$('mode').value;
+if(mode==='set'){$('answer').textContent='Correction : '+fmt(targetHour,targetMinute)+'.';hour=targetHour;minute=targetMinute}
+else if(mode==='convert'){$('answer').textContent='Réponse : '+fmt(mod(targetHour+12,24),targetMinute)+'.'}
+else if(mode==='read')$('answer').textContent='Réponse : '+fmt(targetHour,targetMinute)+'.';
+else $('answer').textContent='Horloge actuelle : '+fmt(hour,minute)+'.';
+redraw();
+}
+$('reveal').onclick=correct;
+$('check').onclick=()=>{const ok=(hour%12===targetHour%12&&minute===targetMinute);$('answer').textContent=ok?'✅ Bravo, les aiguilles sont bien placées !':'🔎 Pas encore : vérifie la position des deux aiguilles.'};
+$('reset').onclick=()=>{hour=12;minute=0;second=0;$('answer').textContent='';redraw()};
+$('next').onclick=newQuestion;$('mode').onchange=newQuestion;
+['difficulty','period'].forEach(k=>$(k).onchange=newQuestion);
+['showHours','showMinutes','showHourHand','showMinuteHand','showSecondHand','showDigital'].forEach(k=>$(k).onchange=redraw);
+function eventAngle(e){const p=$('clock').createSVGPoint();p.x=e.clientX;p.y=e.clientY;const m=$('clock').getScreenCTM();if(!m)return 0;const q=p.matrixTransform(m.inverse());return mod(Math.atan2(q.x-300,300-q.y)*180/Math.PI,360)}
+function circularDelta(a,b){return mod(a-b+180,360)-180}
+$('clock').addEventListener('pointerdown',e=>{
+ if($('mode').value==='read'||$('mode').value==='convert')return;
+ const a=eventAngle(e),rect=$('clock').getBoundingClientRect(),scale=600/rect.width;
+ const p=$('clock').createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform($('clock').getScreenCTM().inverse());
+ const r=Math.hypot(q.x-300,q.y-300);
+ if(r<30)return;
+ // Nearest visible hand angle, with generous touch target; fallback minutes.
+ const choices=[['hour',(hour%12+minute/60)*30,$('showHourHand').checked],['minute',minute*6,$('showMinuteHand').checked],['second',second*6,$('showSecondHand').checked]].filter(x=>x[2]);
+ if(!choices.length)return;
+ choices.sort((x,y)=>Math.abs(circularDelta(a,x[1]))-Math.abs(circularDelta(a,y[1])));
+ drag=choices[0][0];previousAngle=a;$('clock').setPointerCapture(e.pointerId);e.preventDefault()
+});
+$('clock').addEventListener('pointermove',e=>{
+ if(!drag)return;const a=eventAngle(e),d=circularDelta(a,previousAngle);previousAngle=a;
+ if(drag==='minute'){let t=minute+d/6;while(t<0){t+=60;hour=mod(hour-1,24)}while(t>=60){t-=60;hour=mod(hour+1,24)}minute=mod(Math.round(t),60)}
+ if(drag==='hour'){const total=hour*60+minute+d*2;hour=mod(Math.floor(total/60),24);minute=mod(Math.round(mod(total,60)),60)}
+ if(drag==='second')second=mod(Math.round(second+d/6),60);
+ $('answer').textContent='';redraw()
+});
+function stopDrag(){drag=null;previousAngle=null}
+$('clock').addEventListener('pointerup',stopDrag);$('clock').addEventListener('pointercancel',stopDrag);$('clock').addEventListener('lostpointercapture',stopDrag);
+newQuestion();
+</script></body></html>
