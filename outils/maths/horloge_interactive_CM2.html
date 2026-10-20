@@ -13,7 +13,7 @@
 <label><input type="checkbox" id="showHourHand" checked>Aiguille rouge des heures</label>
 <label><input type="checkbox" id="showMinuteHand" checked>Aiguille bleue des minutes</label>
 <label><input type="checkbox" id="showSecondHand" checked>Trotteuse noire</label>
-<label><input type="checkbox" id="showDigital">Afficher l'heure numérique (en mode libre)</label>
+<label><input type="checkbox" id="independent" checked>Aiguilles indépendantes (mode conseillé)</label><label>Vitesse de manipulation<select id="speed"><option value="0.22">Très lente</option><option value="0.38" selected>Lente</option><option value="0.65">Normale</option><option value="1">Directe</option></select></label><label><input type="checkbox" id="showDigital">Afficher l'heure numérique (en mode libre)</label>
 </section>
 <section class="box"><h2>Élèves participants</h2><div class="buttons"><button class="secondary" id="allStudents">Tous</button><button class="secondary" id="noneStudents">Aucun</button><button class="secondary" id="pickStudent">🎲 Tirer un élève</button></div><p class="selected" id="selectionStatus"></p><div class="students" id="studentList"></div><p class="tag" id="chosenStudent">Aucun élève tiré</p><p class="small">Liste récupérée depuis « Ma classe » sur ce navigateur.</p></section>
 </aside><main class="box main">
@@ -27,7 +27,7 @@
 <script>
 'use strict';
 const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';
-let hour=10,minute=10,second=0,targetHour=10,targetMinute=10,drag=null,previousAngle=null,chosen=null;
+let hour=10,minute=10,second=0,hourAngle=305,minuteAngle=60,secondAngle=0,targetHour=10,targetMinute=10,drag=null,previousAngle=null,chosen=null;
 const fmt=(h,m)=>String(h).padStart(2,'0')+' h '+String(m).padStart(2,'0');
 const mod=(x,n)=>(x%n+n)%n;
 const selected=new Set();
@@ -43,7 +43,7 @@ for(let i=0;i<60;i++){const a=i*Math.PI/30,r=i%5===0?248:259,outer=267;$('ticks'
 for(let i=1;i<=12;i++){const a=i*Math.PI/6;$('numbersHours').append(el('text',{x:300+Math.sin(a)*205,y:300-Math.cos(a)*205+9,'text-anchor':'middle','font-size':32,'font-weight':800,fill:'#243a5c'},i))}
 for(let i=0;i<12;i++){const a=i*Math.PI/6;$('numbersMinutes').append(el('text',{x:300+Math.sin(a)*244,y:300-Math.cos(a)*244+6,'text-anchor':'middle','font-size':17,'font-weight':700,fill:'#286bd4'},String(i*5).padStart(2,'0')))}
 function hand(id,degrees){$(id).setAttribute('transform','rotate('+degrees+' 300 300)')}
-function redraw(){hand('hourHand',(hour%12+minute/60)*30);hand('minuteHand',minute*6);hand('secondHand',second*6);
+function redraw(){hand('hourHand',hourAngle);hand('minuteHand',minuteAngle);hand('secondHand',secondAngle);
 $('numbersHours').style.display=$('showHours').checked?'':'none';$('numbersMinutes').style.display=$('showMinutes').checked?'':'none';
 $('hourHand').style.display=$('showHourHand').checked?'':'none';$('minuteHand').style.display=$('showMinuteHand').checked?'':'none';$('secondHand').style.display=$('showSecondHand').checked?'':'none';
 $('digital').textContent=$('mode').value==='free'&&$('showDigital').checked?fmt(hour,minute)+' : '+String(second).padStart(2,'0'):'';
@@ -55,41 +55,63 @@ if(mode==='read'){hour=targetHour;minute=targetMinute;$('prompt').textContent='Q
 else if(mode==='set'){hour=12;minute=0;$('prompt').textContent='Règle les aiguilles sur '+fmt(targetHour,targetMinute)+'.'}
 else if(mode==='convert') {hour=targetHour;minute=targetMinute;$('prompt').textContent='Convertis '+fmt(targetHour,targetMinute)+' dans l’autre période (12 h plus tôt ou plus tard).'}
 else{$('prompt').textContent='Déplace librement les aiguilles.'}
-$('check').style.display=mode==='set'?'':'none';redraw()}
+hourAngle=(hour%12+minute/60)*30;minuteAngle=minute*6;secondAngle=0;$('check').style.display=mode==='set'?'':'none';redraw()}
 function correct(){
 const mode=$('mode').value;
-if(mode==='set'){$('answer').textContent='Correction : '+fmt(targetHour,targetMinute)+'.';hour=targetHour;minute=targetMinute}
+if(mode==='set'){$('answer').textContent='Correction : '+fmt(targetHour,targetMinute)+'.';hour=targetHour;minute=targetMinute;hourAngle=(hour%12+minute/60)*30;minuteAngle=minute*6}
 else if(mode==='convert'){$('answer').textContent='Réponse : '+fmt(mod(targetHour+12,24),targetMinute)+'.'}
 else if(mode==='read')$('answer').textContent='Réponse : '+fmt(targetHour,targetMinute)+'.';
 else $('answer').textContent='Horloge actuelle : '+fmt(hour,minute)+'.';
 redraw();
 }
 $('reveal').onclick=correct;
-$('check').onclick=()=>{const ok=(hour%12===targetHour%12&&minute===targetMinute);$('answer').textContent=ok?'✅ Bravo, les aiguilles sont bien placées !':'🔎 Pas encore : vérifie la position des deux aiguilles.'};
-$('reset').onclick=()=>{hour=12;minute=0;second=0;$('answer').textContent='';redraw()};
+$('check').onclick=()=>{const near=(a,b)=>Math.abs(circularDelta(a,b));const ok=near(hourAngle,(targetHour%12+targetMinute/60)*30)<=7&&near(minuteAngle,targetMinute*6)<=8;$('answer').textContent=ok?'✅ Bravo, les aiguilles sont bien placées !':'🔎 Pas encore : vérifie la position des deux aiguilles.'};
+$('reset').onclick=()=>{hour=12;minute=0;second=0;hourAngle=0;minuteAngle=0;secondAngle=0;$('answer').textContent='';redraw()};
 $('next').onclick=newQuestion;$('mode').onchange=newQuestion;
 ['difficulty','period'].forEach(k=>$(k).onchange=newQuestion);
 ['showHours','showMinutes','showHourHand','showMinuteHand','showSecondHand','showDigital'].forEach(k=>$(k).onchange=redraw);
-function eventAngle(e){const p=$('clock').createSVGPoint();p.x=e.clientX;p.y=e.clientY;const m=$('clock').getScreenCTM();if(!m)return 0;const q=p.matrixTransform(m.inverse());return mod(Math.atan2(q.x-300,300-q.y)*180/Math.PI,360)}
+function point(e){const p=$('clock').createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform($('clock').getScreenCTM().inverse())}
+function eventAngle(e){const q=point(e);return mod(Math.atan2(q.x-300,300-q.y)*180/Math.PI,360)}
 function circularDelta(a,b){return mod(a-b+180,360)-180}
+function handDistance(q,angle,len){const rad=angle*Math.PI/180,dx=Math.sin(rad),dy=-Math.cos(rad);const vx=q.x-300,vy=q.y-300;const projection=Math.max(0,Math.min(len,vx*dx+vy*dy));return Math.hypot(vx-projection*dx,vy-projection*dy)}
+$('independent').onchange=()=>{if(!$('independent').checked){hourAngle=(hour%12+minute/60)*30;minuteAngle=minute*6;redraw()}};
 $('clock').addEventListener('pointerdown',e=>{
  if($('mode').value==='read'||$('mode').value==='convert')return;
- const a=eventAngle(e),rect=$('clock').getBoundingClientRect(),scale=600/rect.width;
- const p=$('clock').createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform($('clock').getScreenCTM().inverse());
- const r=Math.hypot(q.x-300,q.y-300);
- if(r<30)return;
- // Nearest visible hand angle, with generous touch target; fallback minutes.
- const choices=[['hour',(hour%12+minute/60)*30,$('showHourHand').checked],['minute',minute*6,$('showMinuteHand').checked],['second',second*6,$('showSecondHand').checked]].filter(x=>x[2]);
- if(!choices.length)return;
- choices.sort((x,y)=>Math.abs(circularDelta(a,x[1]))-Math.abs(circularDelta(a,y[1])));
- drag=choices[0][0];previousAngle=a;$('clock').setPointerCapture(e.pointerId);e.preventDefault()
+ const q=point(e),r=Math.hypot(q.x-300,q.y-300);if(r<35||r>280)return;
+ const options=[['hour',hourAngle,175,$('showHourHand').checked],['minute',minuteAngle,208,$('showMinuteHand').checked],['second',secondAngle,228,$('showSecondHand').checked]].filter(x=>x[3]);
+ if(!options.length)return;
+ const hit=e.target?.id;
+ const fromTarget={'hourHand':'hour','minuteHand':'minute','secondHand':'second'}[hit];
+ if(fromTarget&&options.some(o=>o[0]===fromTarget))drag=fromTarget;
+ else{
+  // Distance to the actual hand segment, not simply its direction from center.
+  options.sort((x,y)=>handDistance(q,x[1],x[2])-handDistance(q,y[1],y[2]));
+  if(handDistance(q,options[0][1],options[0][2])>33)return;
+  drag=options[0][0];
+ }
+ previousAngle=eventAngle(e);$('clock').setPointerCapture(e.pointerId);e.preventDefault();
 });
 $('clock').addEventListener('pointermove',e=>{
- if(!drag)return;const a=eventAngle(e),d=circularDelta(a,previousAngle);previousAngle=a;
- if(drag==='minute'){let t=minute+d/6;while(t<0){t+=60;hour=mod(hour-1,24)}while(t>=60){t-=60;hour=mod(hour+1,24)}minute=mod(Math.round(t),60)}
- if(drag==='hour'){const total=hour*60+minute+d*2;hour=mod(Math.floor(total/60),24);minute=mod(Math.round(mod(total,60)),60)}
- if(drag==='second')second=mod(Math.round(second+d/6),60);
- $('answer').textContent='';redraw()
+ if(!drag)return;
+ const angle=eventAngle(e),sensitivity=Number($('speed').value),delta=circularDelta(angle,previousAngle)*sensitivity;previousAngle=angle;
+ const separate=$('independent').checked;
+ if(drag==='minute'){
+  minuteAngle=mod(minuteAngle+delta,360);
+  const before=hour*60+minute;minute=mod(Math.round(minuteAngle/6),60);
+  if(!separate){
+   hourAngle=mod(hourAngle+delta/12,360);
+   const diff=minute-Math.floor(mod(before,60));
+   if(diff< -30)hour=mod(hour+1,24);
+   if(diff>30)hour=mod(hour-1,24);
+  }
+ }
+ if(drag==='hour'){
+  hourAngle=mod(hourAngle+delta,360);
+  if(!separate){minuteAngle=mod(minuteAngle+delta*12,360);minute=mod(Math.round(minuteAngle/6),60)}
+  hour=mod(Math.floor(hourAngle/30),12)+(hour>=12?12:0);
+ }
+ if(drag==='second'){secondAngle=mod(secondAngle+delta,360);second=mod(Math.round(secondAngle/6),60)}
+ $('answer').textContent='';redraw();
 });
 function stopDrag(){drag=null;previousAngle=null}
 $('clock').addEventListener('pointerup',stopDrag);$('clock').addEventListener('pointercancel',stopDrag);$('clock').addEventListener('lostpointercapture',stopDrag);
