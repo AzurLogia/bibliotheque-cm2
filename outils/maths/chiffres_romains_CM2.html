@@ -19,7 +19,18 @@ if(mode==='toRoman'){q.instruction='Écris ce nombre en chiffres romains.';q.pro
 if(mode==='toArabic'){q.instruction='Quel nombre est écrit en chiffres romains ?';q.prompt=r;q.solution=String(n)}
 if(mode==='mcq'){q.instruction='Quelle écriture romaine correspond à ce nombre ?';q.prompt=String(n);q.solution=r;const set=new Set([r]);let tries=0;while(set.size<4&&tries++<100){let val=Math.max(1,Math.min(max,n+(Math.floor(Math.random()*25)-12)));set.add(roman(val))}for(let x=1;set.size<4&&x<=max;x++)set.add(roman(x));q.options=shuffle([...set].slice(0,4))}
 if(mode==='compare'){let m=rand(max);if(max>1)while(m===n)m=rand(max);q.instruction='Compare ces deux nombres romains ( <, > ou = ).';q.prompt=r+'   …   '+roman(m);q.solution=n<m?'<':n>m?'>':'=';q.explanation=n+' '+q.solution+' '+m}
-if(mode==='error'){q.instruction='Cette écriture est incorrecte. Écris sa forme correcte.';q.prompt=r.length>1?r.replace('IV','IIII').replace('IX','VIIII').replace('XL','XXXX').replace('XC','LXXXX').replace('CD','CCCC').replace('CM','DCCCC'):r+'I';if(q.prompt===r||parseRoman(q.prompt)!==null){q.prompt=roman(Math.min(3999,n))+'I'}q.solution=roman(Math.min(3999,n+1));if(q.prompt!==r+'I'){q.solution=r;q.explanation='La forme canonique est '+r+'.'}}
+if(mode==='error'){
+ const substitutions=[['CM','DCCCC'],['CD','CCCC'],['XC','LXXXX'],['XL','XXXX'],['IX','VIIII'],['IV','IIII']];
+ let value=n,valid=roman(value),pair=substitutions.find(([x])=>valid.includes(x));
+ if(!pair){
+  const candidates=Array.from({length:max},(_,i)=>i+1).filter(x=>substitutions.some(([token])=>roman(x).includes(token)));
+  value=candidates[Math.floor(Math.random()*candidates.length)]||4;valid=roman(value);
+  pair=substitutions.find(([x])=>valid.includes(x));
+ }
+ q.instruction='Corrige cette écriture romaine non conforme aux règles.';
+ q.prompt=valid.replace(pair[0],pair[1]);q.solution=valid;
+ q.explanation='On utilise '+pair[0]+' plutôt que '+pair[1]+'.';
+}
 return q}
 function next(){current=generate();questionNo++;revealed=false;$('progress').textContent='Question '+questionNo;$('instruction').textContent=current.instruction;$('question').textContent=current.prompt;$('solution').textContent='';$('explanation').textContent='';$('typed').value='';$('choices').replaceChildren();const interactive=$('response').value==='screen';$('answerArea').hidden=!interactive||current.mode==='mcq';$('choices').hidden=!interactive||current.mode!=='mcq';$('verify').hidden=!interactive||current.mode==='mcq';$('reveal').hidden=false;if(interactive&&current.mode==='mcq')current.options.forEach(opt=>{const b=document.createElement('button');b.textContent=opt;b.onclick=()=>{if(revealed)return;finish(opt===current.solution);b.classList.add(opt===current.solution?'correct':'wrong')};$('choices').append(b)});stats()}
 function finish(ok){if(revealed)return;revealed=true;corrected++;if(ok)success++;$('solution').textContent=(ok===true?'✅ Correct ! ':ok===false?'❌ À corriger · ':'Correction : ')+current.solution;$('explanation').textContent=current.explanation;$('reveal').hidden=true;$('verify').hidden=true;stats()}
