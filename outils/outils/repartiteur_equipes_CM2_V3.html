@@ -28,12 +28,20 @@ main{padding:17px}.help{font-size:13px;color:var(--muted);margin:0 0 14px}
 .dialog h2{margin:0 0 6px;font-size:19px}.dialog p{margin:0 0 12px;color:var(--muted);font-size:13px}
 .team-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}.team-buttons button{padding:11px}.cancel{margin-top:10px;width:100%;background:#e7eaf2!important;color:#29334c!important}
 @media(max-width:600px){#teams{grid-template-columns:1fr}.team-buttons{grid-template-columns:1fr}.students{gap:6px}.student{padding:7px 9px}}
+
+.level-panel{margin-bottom:16px}.level-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:7px;margin-top:10px}
+.level-row{display:flex;justify-content:space-between;align-items:center;gap:6px;background:#f6f8fc;padding:7px 9px;border-radius:9px;font-size:14px}
+.level-row select{padding:5px 7px}.notice{font-size:13px;color:#697386;margin-top:9px}
+details summary{cursor:pointer;font-weight:800}.auto{background:#16765d}.random{background:#7254ad}
+@media print{header .controls,.pool,.level-panel,#savedBox,.member button,#cm2roster{display:none!important}.team{break-inside:avoid}body{background:white}}
 </style>
 </head>
 <body><aside id="cm2roster" style="padding:10px 18px;background:#e9f2fc;color:#173954;font:14px system-ui"><span id="cm2rosterstatus"></span> <a href="../../ma-classe.html" style="font-weight:bold">Gérer ma classe</a></aside><script>document.addEventListener("DOMContentLoaded",()=>{const n=(()=>{try{return JSON.parse(localStorage.getItem("cm2-eleves-v1")||"[]").length}catch(e){return 0}})();document.getElementById("cm2rosterstatus").textContent=n?n+" élève(s) chargé(s) depuis Ma classe.":"Aucun élève enregistré : renseigne Ma classe avant de lancer une séance.";});</script>
 <header><h1>👥 Répartiteur d'équipes – CM2</h1>
 <div class="controls">
 <label>Nombre d'équipes <select id="teamCount"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label>
+<button class="random" id="autoRandom">🎲 Tirage aléatoire</button>
+<button class="auto" id="autoBalanced">⚖️ Équipes équilibrées</button>
 <button id="save">💾 Enregistrer les groupes</button>
 <button class="secondary" id="export">⬇ Exporter</button>
 <button class="secondary" id="importBtn">⬆ Charger un fichier</button>
@@ -42,6 +50,10 @@ main{padding:17px}.help{font-size:13px;color:var(--muted);margin:0 0 14px}
 </div></header>
 <main>
 <p class="help">Clique sur un élève non assigné, puis sur l'équipe dans laquelle tu veux le placer. Les noms des équipes sont modifiables directement. Une fois placé, un élève peut être déplacé ou remis dans la liste.</p>
+<section class="pool level-panel"><details id="levelsPanel"><summary>⚙️ Régler le niveau des élèves (1 à 5)</summary>
+<p class="notice">1 = besoin d'accompagnement · 3 = intermédiaire · 5 = très autonome. Les niveaux sont modifiables et mémorisés sur cet appareil. Ce panneau reste fermé pendant la présentation des équipes.</p>
+<div class="level-grid" id="levelGrid"></div><div class="notice">Les niveaux servent uniquement à la répartition équilibrée et ne sont pas affichés dans les équipes.</div>
+</details></section>
 <section class="pool"><div class="pool-head"><div class="pool-title">Élèves à répartir</div><div id="remaining"></div></div><div class="students" id="pool"></div></section>
 <section class="pool" id="savedBox" style="margin-top:0">
 <div class="pool-head"><div class="pool-title">💾 Groupes enregistrés sur cet appareil</div></div>
@@ -54,6 +66,64 @@ main{padding:17px}.help{font-size:13px;color:var(--muted);margin:0 0 14px}
 const students=(()=>{try{const data=JSON.parse(localStorage.getItem("cm2-eleves-v1")||"[]");return Array.isArray(data)?data.filter(x=>typeof x==="string"&&x.trim()):[]}catch(e){return []}})();
 const colors=['#e05252','#3d75d6','#32a06f','#e0a12e','#8a5bd1','#20a3ad','#e26d9e','#697386'];
 let n=4, teams=[], names=[], selected=null;
+const LEVEL_KEY='cm2_team_levels_v1';
+let levels={};try{levels=JSON.parse(localStorage.getItem(LEVEL_KEY)||'{}');if(!levels||typeof levels!=='object'||Array.isArray(levels))levels={}}catch(e){levels={}}
+function levelOf(s){const v=Number(levels[s]);return Number.isInteger(v)&&v>=1&&v<=5?v:3}
+function renderLevels(){
+ const box=document.getElementById('levelGrid');box.innerHTML='';
+ students.forEach(s=>{
+  const row=document.createElement('label');row.className='level-row';
+  const name=document.createElement('span');name.textContent=s;
+  const sel=document.createElement('select');sel.setAttribute('aria-label','Niveau de '+s);
+  for(let i=1;i<=5;i++){const opt=document.createElement('option');opt.value=i;opt.textContent=i;sel.appendChild(opt)}
+  sel.value=String(levelOf(s));
+  sel.onchange=()=>{levels[s]=Number(sel.value);localStorage.setItem(LEVEL_KEY,JSON.stringify(levels))};
+  row.append(name,sel);box.appendChild(row);
+ });
+}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function autoCreate(balanced){
+ if(students.length===0){alert('Ajoute les élèves dans « Ma classe » avant de constituer des équipes.');return}
+ if(teams.some(t=>t.length)&&!confirm('Remplacer la répartition actuelle par de nouvelles équipes ?'))return;
+ const capacities=Array.from({length:n},(_,i)=>Math.floor(students.length/n)+(i<students.length%n?1:0));
+ let result=Array.from({length:n},()=>[]);
+ if(!balanced){
+  const shuffled=shuffle(students);let k=0;
+  capacities.forEach((cap,i)=>{result[i]=shuffled.slice(k,k+cap);k+=cap});
+ }else{
+  // Essais multiples avec descente locale: effectifs fixés et somme des niveaux aussi proche que possible.
+  const target=students.reduce((sum,s)=>sum+levelOf(s),0)/n;
+  const penalty=arr=>arr.reduce((sum,t)=>sum+Math.pow(t.reduce((z,s)=>z+levelOf(s),0)-target,2),0);
+  let best=null,bestScore=Infinity;
+  for(let restart=0;restart<35;restart++){
+   let arr=Array.from({length:n},()=>[]);
+   const order=shuffle(students).sort((a,b)=>levelOf(b)-levelOf(a));
+   for(const s of order){
+    const choices=arr.map((t,i)=>({i,score:(t.reduce((z,x)=>z+levelOf(x),0)+levelOf(s))/capacities[i]}))
+     .filter(x=>arr[x.i].length<capacities[x.i]).sort((a,b)=>a.score-b.score);
+    const i=choices[0].i;arr[i].push(s);
+   }
+   let score=penalty(arr);
+   for(let pass=0;pass<12;pass++){
+    let improved=false,move=null,newScore=score;
+    for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)for(let a=0;a<arr[i].length;a++)for(let b=0;b<arr[j].length;b++){
+     const x=arr[i][a],y=arr[j][b];if(levelOf(x)===levelOf(y))continue;
+     [arr[i][a],arr[j][b]]=[y,x];const sc=penalty(arr);
+     [arr[i][a],arr[j][b]]=[x,y];
+     if(sc<newScore-0.00001){newScore=sc;move=[i,j,a,b];improved=true}
+    }
+    if(!improved)break;
+    const [i,j,a,b]=move;[arr[i][a],arr[j][b]]=[arr[j][b],arr[i][a]];score=newScore;
+   }
+   if(score<bestScore){best=arr.map(t=>[...t]);bestScore=score}
+  }
+  result=best;
+ }
+ teams=result;render();
+}
+document.getElementById('autoRandom').onclick=()=>autoCreate(false);
+document.getElementById('autoBalanced').onclick=()=>autoCreate(true);
+
 function init(keepNames=false){
  n=+document.getElementById('teamCount').value;
  teams=Array.from({length:n},()=>[]);
@@ -74,7 +144,7 @@ function render(){
   if(!arr.length)mem.innerHTML='<div class="empty">Aucun élève pour le moment</div>';
   arr.forEach((s,j)=>{
     let r=document.createElement('div');r.className='member';
-    r.innerHTML=`<span class="name">${s}</span><button class="change">Changer</button><button class="remove" title="Remettre dans la liste">↩</button>`;
+    r.innerHTML=`<span class="name">${escapeHtml(s)}</span><button class="change">Changer</button><button class="remove" title="Remettre dans la liste">↩</button>`;
     r.querySelector('.change').onclick=()=>choose(s,i);
     r.querySelector('.remove').onclick=()=>{teams[i].splice(j,1);render()};
     mem.appendChild(r);
@@ -100,7 +170,7 @@ document.getElementById('teamCount').onchange=()=>init(true);
 document.getElementById('reset').onclick=()=>{if(confirm("Remettre tous les élèves dans la liste ?"))init(true)};
 
 function snapshot(){
- return {version:1, teamCount:n, names:[...names], teams:teams.map(x=>[...x])};
+ return {version:2, teamCount:n, names:[...names], teams:teams.map(x=>[...x]), levels:{...levels}};
 }
 function loadSnapshot(data){
  if(!data || !Array.isArray(data.teams) || !Array.isArray(data.names)) return alert("Fichier de groupes invalide.");
@@ -108,6 +178,7 @@ function loadSnapshot(data){
  document.getElementById('teamCount').value=String(n);
  teams=Array.from({length:n},(_,i)=>Array.isArray(data.teams[i])?data.teams[i].filter(s=>students.includes(s)):[]);
  names=Array.from({length:n},(_,i)=>data.names[i]||`Équipe ${i+1}`);
+ if(data.levels&&typeof data.levels==='object'&&!Array.isArray(data.levels)){for(const s of students){const v=Number(data.levels[s]);if(Number.isInteger(v)&&v>=1&&v<=5)levels[s]=v}localStorage.setItem(LEVEL_KEY,JSON.stringify(levels));renderLevels()}
  render(); renderSaved();
 }
 function saveLocal(){
@@ -146,5 +217,5 @@ document.getElementById('export').onclick=exportGroups;
 document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
 document.getElementById('importFile').onchange=e=>{if(e.target.files[0])importGroups(e.target.files[0]);e.target.value=''};
 
-init(); renderSaved();
+init(); renderLevels(); renderSaved();
 </script></body></html>
