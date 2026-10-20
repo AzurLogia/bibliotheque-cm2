@@ -1,4 +1,4 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ma classe · Bibliothèque CM2</title><style>*{box-sizing:border-box}body{font:16px system-ui,Arial,sans-serif;margin:0;background:#f3f6fa;color:#19334f}header{background:#193656;color:white;padding:26px max(20px,calc((100vw - 850px)/2))}header a{color:#d3e4f8;text-decoration:none}main{max-width:850px;margin:28px auto;padding:0 20px}.card{background:white;border:1px solid #dce5f0;border-radius:16px;padding:23px;margin-bottom:16px}textarea{width:100%;min-height:260px;border:1px solid #b7c8d8;border-radius:10px;padding:12px;resize:vertical;font:16px system-ui}button{background:#214a79;color:white;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;font:inherit;margin:8px 8px 0 0}.secondary{background:#e6edf5;color:#213a56}.danger{background:#9c3640}p,li{line-height:1.5}.hint{color:#586c81}#status{font-weight:600;color:#266c51}</style></head><body><header><a href="./">← Retour à la bibliothèque</a><h1>👥 Ma classe</h1><p>Une liste privée, conservée uniquement dans ce navigateur.</p></header><main><section class="card"><h2>Liste des élèves</h2><p>Un prénom par ligne. Aucune liste n'est préremplie : elle ne figure donc pas dans les fichiers publics du site.</p><label for="names"><strong>Prénoms de ma classe</strong></label><textarea id="names" placeholder="Un prénom par ligne…"></textarea><div><button id="save">Enregistrer dans ce navigateur</button><button class="secondary" id="export">Exporter ma liste</button><button class="secondary" id="import">Importer un fichier</button><input id="file" type="file" accept=".txt,text/plain" hidden><button class="danger" id="clear">Effacer la liste locale</button></div><p id="status" role="status"></p></section><section class="card"><h2>Comment ça fonctionnera ?</h2><p>Les outils adaptés à ce système pourront lire la liste enregistrée ici depuis le même navigateur et le même site. Tu pourras ainsi réutiliser tes prénoms sans les diffuser sur GitHub.</p><p class="hint">La liste est stockée par ton navigateur sur cet appareil : elle n'est pas synchronisée entre ton ordinateur personnel et celui de l'école. Pour la retrouver ailleurs, utilise « Exporter » puis « Importer ». Évite cette fonction sur un poste partagé sans session personnelle.</p><p class="hint">Les outils existants qui disposent de leurs propres listes ne sont pas encore tous reliés à cette page. Leur adaptation sera faite progressivement.</p></section></main><script>
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ma classe · Bibliothèque CM2</title><style>*{box-sizing:border-box}body{font:16px system-ui,Arial,sans-serif;margin:0;background:#f3f6fa;color:#19334f}header{background:#193656;color:white;padding:26px max(20px,calc((100vw - 850px)/2))}header a{color:#d3e4f8;text-decoration:none}main{max-width:850px;margin:28px auto;padding:0 20px}.card{background:white;border:1px solid #dce5f0;border-radius:16px;padding:23px;margin-bottom:16px}textarea{width:100%;min-height:260px;border:1px solid #b7c8d8;border-radius:10px;padding:12px;resize:vertical;font:16px system-ui}button{background:#214a79;color:white;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;font:inherit;margin:8px 8px 0 0}.secondary{background:#e6edf5;color:#213a56}.danger{background:#9c3640}p,li{line-height:1.5}.hint{color:#586c81}#status{font-weight:600;color:#266c51}</style></head><body><header><a href="./">← Retour à la bibliothèque</a><h1>👥 Ma classe</h1><p>Une liste privée, conservée uniquement dans ce navigateur.</p></header><main><section class="card"><h2>Liste des élèves</h2><p>Un prénom par ligne. Aucune liste n'est préremplie : elle ne figure donc pas dans les fichiers publics du site.</p><label for="names"><strong>Prénoms de ma classe</strong></label><textarea id="names" placeholder="Un prénom par ligne…"></textarea><div><button id="save">Enregistrer dans ce navigateur</button><button class="secondary" id="export">Exporter ma liste</button><button class="secondary" id="import">Importer un fichier</button><input id="file" type="file" accept=".txt,text/plain" hidden><button class="danger" id="clear">Effacer la liste locale</button></div><p id="status" role="status"></p></section><section class="card"><h2>💾 Sauvegarde globale de la bibliothèque</h2><p>Transfère en un seul fichier les prénoms, équipes, niveaux, listes et tirages des roues, ainsi que les réglages locaux compatibles.</p><button id="backupAll">⬇ Exporter toutes mes données</button><button class="secondary" id="restoreAll">⬆ Importer une sauvegarde globale</button><input type="file" id="backupFile" accept=".json,application/json" hidden><p class="hint">La restauration remplace les données enregistrées sur cet appareil. Une copie des données actuelles sera téléchargée avant toute modification. Garde ces fichiers dans un emplacement privé.</p><p id="backupStatus" role="status"></p></section><section class="card"><h2>Comment ça fonctionnera ?</h2><p>Les outils adaptés à ce système pourront lire la liste enregistrée ici depuis le même navigateur et le même site. Tu pourras ainsi réutiliser tes prénoms sans les diffuser sur GitHub.</p><p class="hint">La liste est stockée par ton navigateur sur cet appareil : elle n'est pas synchronisée entre ton ordinateur personnel et celui de l'école. Pour la retrouver ailleurs, utilise « Exporter » puis « Importer ». Évite cette fonction sur un poste partagé sans session personnelle.</p><p class="hint">Les outils existants qui disposent de leurs propres listes ne sont pas encore tous reliés à cette page. Leur adaptation sera faite progressivement.</p></section></main><script>
 const KEY="cm2-eleves-v1",$=id=>document.getElementById(id);
 function parse(s){return [...new Set(s.split(/\r?\n/).map(x=>x.trim()).filter(Boolean))];}
 function setStatus(s){$("status").textContent=s;}
@@ -7,4 +7,50 @@ $("save").onclick=()=>{try{const list=parse($("names").value);localStorage.setIt
 $("clear").onclick=()=>{if(confirm("Supprimer la liste de ce navigateur ?")){localStorage.removeItem(KEY);$("names").value="";setStatus("Liste effacée de ce navigateur.")}};
 $("export").onclick=()=>{const list=parse($("names").value);if(!list.length)return setStatus("Aucun prénom à exporter.");const b=new Blob([list.join("\n")],{type:"text/plain;charset=utf-8"});const u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="ma_classe_prenoms.txt";a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);setStatus("Liste exportée. Conserve ce fichier dans un endroit privé.")};
 $("import").onclick=()=>$("file").click();$("file").onchange=async e=>{const f=e.target.files[0];if(!f)return;const s=await f.text();$("names").value=parse(s).join("\n");setStatus("Liste chargée. Clique sur « Enregistrer » pour l'utiliser.");e.target.value=""};
+
+const BACKUP_KEYS=['cm2-eleves-v1','cm2_team_saves','cm2_team_levels_v1','roues-histoire-classe-v1','roues-histoire-listes-v1','roues-histoire-tirages-v1','biblio_CM2_2026_catalogue'];
+const extraKey=k=>/^(cm2[-_]|roues-histoire-|biblio_CM2_)/.test(k);
+const backupStatus=m=>{document.getElementById('backupStatus').textContent=m};
+function collectBackup(){
+ const entries={};
+ for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(BACKUP_KEYS.includes(k)||extraKey(k))entries[k]=localStorage.getItem(k)}
+ return {format:'bibliotheque-cm2-backup',version:1,exportedAt:new Date().toISOString(),origin:location.origin,entries};
+}
+function downloadBackup(data,prefix='Sauvegarde_bibliotheque_CM2'){
+ const date=new Date().toISOString().replace(/[:.]/g,'-');
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});
+ const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=prefix+'_'+date+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+document.getElementById('backupAll').onclick=()=>{
+ try{const data=collectBackup();downloadBackup(data);backupStatus(Object.keys(data.entries).length+' élément(s) de stockage inclus dans la sauvegarde.')}catch(e){backupStatus("Impossible d'exporter les données sur ce navigateur.")}
+};
+document.getElementById('restoreAll').onclick=()=>document.getElementById('backupFile').click();
+document.getElementById('backupFile').onchange=async e=>{
+ const file=e.target.files?.[0];e.target.value='';if(!file)return;
+ try{
+  if(file.size>5*1024*1024)throw Error('Fichier trop volumineux (5 Mo maximum).');
+  const obj=JSON.parse(await file.text());
+  if(!obj||obj.format!=='bibliotheque-cm2-backup'||obj.version!==1||!obj.entries||typeof obj.entries!=='object'||Array.isArray(obj.entries))throw Error('Ce fichier ne correspond pas à une sauvegarde globale de la bibliothèque.');
+  const entries=Object.entries(obj.entries);
+  if(!entries.length)throw Error('Cette sauvegarde ne contient aucune donnée.');
+  if(entries.some(([key,value])=>!(BACKUP_KEYS.includes(key)||extraKey(key))||typeof value!=='string'))throw Error('La sauvegarde contient des données non reconnues.');
+  if(obj.entries['cm2-eleves-v1']!==undefined&&!Array.isArray(JSON.parse(obj.entries['cm2-eleves-v1'])))throw Error('La liste des élèves est invalide.');
+  const present=new Set(Array.from({length:localStorage.length},(_,i)=>localStorage.key(i)).filter(extraKey));
+  const summary='Sauvegarde du '+(obj.exportedAt||'date inconnue')+'\n'+entries.length+' ensemble(s) de données à restaurer.\n'+(present.size||0)+' ensemble(s) actuellement présents sur cet appareil.\n\nLes données locales de la bibliothèque seront remplacées. Continuer ?';
+  if(!confirm(summary))return;
+  // Do not touch storage if the safety download cannot be initiated.
+  downloadBackup(collectBackup(),'Secours_avant_import_CM2');
+  const old=collectBackup().entries;
+  try{
+   for(const k of present)localStorage.removeItem(k);
+   for(const [k,v] of entries)localStorage.setItem(k,v);
+  }catch(error){
+   for(const k of Object.keys(obj.entries))localStorage.removeItem(k);
+   for(const [k,v] of Object.entries(old))localStorage.setItem(k,v);
+   throw error;
+  }
+  try{$('names').value=JSON.parse(localStorage.getItem(KEY)||'[]').join('\n')}catch(e){$('names').value=''}
+  backupStatus('Restauration terminée : '+entries.length+' ensemble(s) importé(s). Recharge les activités déjà ouvertes pour voir les données.');
+ }catch(err){backupStatus('Importation annulée : '+err.message)}
+};
 </script></body></html>
