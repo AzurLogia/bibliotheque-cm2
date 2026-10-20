@@ -15,6 +15,11 @@ h1{text-align:center;margin:0 0 6px;font-size:clamp(30px,4vw,48px)}
 .team{background:white;border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
 .team.a{border:3px solid #93c5fd}.team.b{border:3px solid #fca5a5}
 .team h2{margin:0 0 8px}.team.a h2{color:var(--a)}.team.b h2{color:var(--b)}
+select{font:inherit;padding:10px;border:1px solid #d1d5db;border-radius:10px;max-width:100%;background:white}
+.import-panel{background:#fff;border:1px solid #dbeafe;border-radius:16px;padding:17px;margin-bottom:18px;box-shadow:0 5px 18px #0000000b}
+.import-panel h2{margin:0 0 9px;font-size:20px}.import-controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.import-controls label{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.import-note{color:var(--muted);font-size:13px;margin-top:9px}
 textarea{width:100%;min-height:220px;border:1px solid #d1d5db;border-radius:12px;padding:12px 14px;font-size:16px;line-height:1.45;resize:vertical}
 .hint{margin-top:6px;color:var(--muted);font-size:13px}
 .controls{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:16px 0}
@@ -40,7 +45,20 @@ button:disabled{opacity:.45;cursor:not-allowed}
   <div class="subtitle">Deux équipes déjà constituées, un duel aléatoire à chaque tour.</div>
 
   <section id="setupSection">
-    <div class="setup">
+    <div class="import-panel">
+<h2>📥 Récupérer des groupes du répartiteur CM2</h2>
+<div class="import-controls">
+<label>Groupes enregistrés <select id="savedSet"><option value="">— Choisir un enregistrement —</option></select></label>
+<button class="ghost" id="refreshSaves" type="button">↻ Actualiser</button>
+</div>
+<div class="import-controls" id="savedSelectors" style="margin-top:10px;display:none">
+<label>Équipe A <select id="savedTeamA"></select></label>
+<label>Équipe B <select id="savedTeamB"></select></label>
+<button class="secondary" id="applySaved" type="button">Importer ces deux équipes</button>
+</div>
+<div class="import-note" id="savedInfo">Tu peux également saisir les équipes manuellement ci-dessous.</div>
+</div>
+<div class="setup">
       <div class="team a">
         <h2>Équipe A</h2>
         <textarea id="teamA" placeholder="Un prénom par ligne"></textarea>
@@ -82,6 +100,52 @@ let originalA=[], originalB=[], remainingA=[], remainingB=[], round=0, sideSwapp
 const $=id=>document.getElementById(id);
 function parseNames(text){return text.split(/\n+/).map(s=>s.trim()).filter(Boolean)}
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const SAVES_KEY="cm2_team_saves";
+let availableSaves={};
+function validSavedTeams(save){
+ if(!save||!Array.isArray(save.teams))return [];
+ return save.teams.map((members,i)=>({
+  label:typeof save.names?.[i]==="string"&&save.names[i].trim()?save.names[i]:("Équipe "+(i+1)),
+  members:Array.isArray(members)?members.filter(x=>typeof x==="string"&&x.trim()).map(x=>x.trim()):[]
+ }));
+}
+function refreshSavedSets(){
+ let data={};try{data=JSON.parse(localStorage.getItem(SAVES_KEY)||"{}")}catch(e){}
+ availableSaves=data&&typeof data==="object"&&!Array.isArray(data)?data:{};
+ const list=$("savedSet"),previous=list.value;
+ list.replaceChildren(new Option("— Choisir un enregistrement —",""));
+ Object.keys(availableSaves).sort((a,b)=>a.localeCompare(b,"fr")).forEach(name=>list.add(new Option(name,name)));
+ if(Object.hasOwn(availableSaves,previous))list.value=previous;
+ updateSavedChoices();
+}
+function updateSavedChoices(){
+ const name=$("savedSet").value,group=validSavedTeams(availableSaves[name]);
+ const selectors=$("savedSelectors");
+ selectors.style.display=name&&group.length>=2?"flex":"none";
+ if(!name){$("savedInfo").textContent=Object.keys(availableSaves).length?"Choisis une composition enregistrée dans le répartiteur.":"Aucune composition enregistrée sur cet appareil. Enregistre d'abord les équipes dans le répartiteur, ou saisis-les manuellement.";return}
+ if(group.length<2){$("savedInfo").textContent="Cet enregistrement ne contient pas deux équipes.";return}
+ for(const [id,idx] of [["savedTeamA",0],["savedTeamB",1]]){
+  const sel=$(id);sel.replaceChildren();
+  group.forEach((g,i)=>sel.add(new Option(g.label+" ("+g.members.length+" élèves)",String(i))));
+  sel.value=String(idx);
+ }
+ $("savedInfo").textContent="Sélectionne deux équipes distinctes. Elles doivent avoir le même effectif pour permettre un duel par élève.";
+}
+function applySavedTeams(){
+ const group=validSavedTeams(availableSaves[$("savedSet").value]);
+ const a=Number($("savedTeamA").value),b=Number($("savedTeamB").value);
+ if(!group[a]||!group[b]||a===b){alert("Choisis deux équipes différentes.");return}
+ if(!group[a].members.length||group[a].members.length!==group[b].members.length){
+  alert("Les deux équipes enregistrées doivent contenir le même nombre d'élèves, avec au moins un élève chacune.");return
+ }
+ $("teamA").value=group[a].members.join("\n");
+ $("teamB").value=group[b].members.join("\n");
+ $("savedInfo").textContent="Équipes importées ! Tu peux les vérifier ou les modifier avant de commencer.";
+}
+$("refreshSaves").onclick=refreshSavedSets;
+$("savedSet").onchange=updateSavedChoices;
+$("applySaved").onclick=applySavedTeams;
+refreshSavedSets();
 function startGame(){
   const a=parseNames($("teamA").value), b=parseNames($("teamB").value);
   if(!a.length||!b.length){alert("Ajoute des prénoms dans les deux équipes.");return}
