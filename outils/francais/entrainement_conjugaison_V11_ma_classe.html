@@ -131,7 +131,7 @@ button:disabled{opacity:.42;cursor:not-allowed}
 }
 </style>
 </head>
-<body><aside id="cm2roster" style="padding:10px 18px;background:#e9f2fc;color:#173954;font:14px system-ui"><span id="cm2rosterstatus"></span> <a href="../../ma-classe.html" style="font-weight:bold">Gérer ma classe</a></aside><script>document.addEventListener("DOMContentLoaded",()=>{const n=(()=>{try{return JSON.parse(localStorage.getItem("cm2-eleves-v1")||"[]").length}catch(e){return 0}})();document.getElementById("cm2rosterstatus").textContent=n?n+" élève(s) chargé(s) depuis Ma classe.":"Aucun élève enregistré : renseigne Ma classe avant de lancer une séance.";});</script>
+<body><aside id="cm2roster" style="padding:10px 18px;background:#e9f2fc;color:#173954;font:14px system-ui"><span id="cm2rosterstatus"></span> <a href="../../ma-classe.html" style="font-weight:bold">Gérer ma classe</a></aside><script>document.getElementById("cm2rosterstatus").textContent="Liste de classe enregistrée sur cet appareil";</script>
 <div class="wrap">
   <h1>Entraînement conjugaison</h1>
   <div class="subtitle">Un outil évolutif pour réviser les temps et les groupes travaillés en classe.</div>
@@ -315,7 +315,7 @@ button:disabled{opacity:.42;cursor:not-allowed}
 </div>
 
 <script>
-const studentNames=(()=>{try{const data=JSON.parse(localStorage.getItem("cm2-eleves-v1")||"[]");return Array.isArray(data)?data.filter(x=>typeof x==="string"&&x.trim()):[]}catch(e){return []}})();
+const studentNames=(()=>{try{const n=JSON.parse(localStorage.getItem("cm2-eleves-v1")||"[]");return Array.isArray(n)?n.filter(x=>typeof x==="string"&&x.trim()).map(x=>x.trim()):[]}catch(_){return []}})();
 
 const subjects=["Je","Tu","Il","Nous","Vous","Ils"];
 const tenseLabels={
@@ -994,3 +994,218 @@ function showCorrectChoice(expected){
   document.querySelectorAll(".choice").forEach(b=>{
     if(normalize(b.textContent)===normalize(expected))b.classList.add("correct");
   });
+}
+function handleClassResult(ok,expected){
+  if(answered)return;answered=true;$("skipBtn").disabled=true;$("nextBtn").disabled=false;
+  if(ok){totalCorrect++;classResults.push({student:currentStudent,ok:true});setFeedback(`✅ Bravo&nbsp;<strong>${currentStudent}</strong> !`,"good")}
+  else {classResults.push({student:currentStudent,ok:false});setFeedback(`❌ La bonne réponse était <strong>${expected}</strong>.`,"bad");}
+  updateTopline();
+}
+function handleRemedResult(ok,expected){
+  if(!selectedResponder)return;
+  if(ok){
+    remedScores[selectedResponder]=(remedScores[selectedResponder]||0)+1;updateScoreboard();renderRemedPlayers();
+    document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+    const input=$("textAnswer"),val=$("validateText");if(input)input.disabled=true;if(val)val.disabled=true;
+    const saved=(remedScores[selectedResponder]||0)>=targetPoints;
+    setFeedback(saved
+      ?`✅ <strong>${selectedResponder}</strong>&nbsp;marque un point et est <strong>sauvé</strong> !`
+      :`✅ <strong>${selectedResponder}</strong>&nbsp;marque un point.`,"good");
+    answered=true;$("skipBtn").disabled=true;$("nextBtn").disabled=false;
+  }else{
+    const failed=selectedResponder;remedBlocked.add(failed);selectedResponder=null;renderRemedPlayers();
+    const left=activeRemedStudents().filter(n=>!remedBlocked.has(n));
+    if(left.length===0){
+      if(currentQ.type!=="error")showCorrectChoice(expected);
+      setFeedback(`Personne ne peut plus répondre. La bonne réponse était <strong>${expected}</strong>.`,"bad");
+      answered=true;$("skipBtn").disabled=true;$("nextBtn").disabled=false;
+    }else{
+      setFeedback(`❌ <strong>${failed}</strong>&nbsp;ne peut plus répondre à cette question. La parole passe à un autre élève.`,"warn");
+      enableInteractionForResponder();
+    }
+  }
+  updateTopline();
+}
+
+function checkChoice(btn,opt){
+  if(answered)return;if(mode==="remed"&&!selectedResponder)return;
+  const ok=normalize(opt)===normalize(currentQ.answer);
+  if(ok)btn.classList.add("correct");else{btn.classList.add("wrong");setTimeout(()=>btn.classList.remove("wrong"),450)}
+  if(mode==="class"){if(!ok)showCorrectChoice(currentQ.answer);handleClassResult(ok,currentQ.answer)}
+  else handleRemedResult(ok,currentQ.answer);
+}
+function checkText(){
+  if(answered)return;if(mode==="remed"&&!selectedResponder)return;
+  const inp=$("textAnswer"),value=inp.value,ok=normalize(value)===normalize(currentQ.answer);
+
+  if(mode==="class"){
+    if(ok){inp.style.borderColor="#86efac";handleClassResult(true,currentQ.answer)}
+    else{
+      textAttempts++;const left=maxTextAttempts-textAttempts;
+      if(left>0){
+        inp.style.borderColor="#fca5a5";$("attemptsInfo").textContent=`Encore ${left} essai${left>1?"s":""}`;
+        setFeedback(`Ce n’est pas encore ça. Il reste <strong>${left} essai${left>1?"s":""}</strong>.`,"warn");inp.select();
+      }else{
+        $("attemptsInfo").textContent=`${maxTextAttempts} essai${maxTextAttempts>1?"s":""} utilisé${maxTextAttempts>1?"s":""}`;inp.style.borderColor="#fca5a5";handleClassResult(false,currentQ.answer);
+      }
+    }
+  }else{
+    if(ok){inp.style.borderColor="#86efac";handleRemedResult(true,currentQ.answer)}
+    else{inp.value="";inp.style.borderColor="#fca5a5";handleRemedResult(false,currentQ.answer)}
+  }
+}
+
+function updateTopline(){
+  if(mode==="class"){
+    const total=activeStudents.length;
+    $("qCounter").textContent=`Question ${Math.min(qIndex+1,total)} / ${total}`;
+    $("scoreCounter").textContent=`${totalCorrect} bonne${totalCorrect>1?"s":""} réponse${totalCorrect>1?"s":""}`;
+    $("progressBar").style.width=`${total ? qIndex/total*100 : 0}%`;
+  }else if(mode==="remed"){
+    const saved=activeStudents.filter(n=>(remedScores[n]||0)>=targetPoints).length;
+    $("qCounter").textContent=`Question ${remedQuestionCount}`;
+    $("scoreCounter").textContent=`${saved} sauvé${saved>1?"s":""} / ${activeStudents.length-1} à sauver`;
+    $("progressBar").style.width=`${Math.min(100,saved/Math.max(1,activeStudents.length-1)*100)}%`;
+  }else{
+    $("qCounter").textContent=`Question ${Math.min(qIndex+1,slateQuestionCount)} / ${slateQuestionCount}`;
+    $("scoreCounter").textContent="Toute la classe";
+    $("progressBar").style.width=`${slateQuestionCount ? qIndex/slateQuestionCount*100 : 0}%`;
+  }
+}
+
+$("nextBtn").onclick=()=>{if(mode==="class"||mode==="slate")qIndex++;renderQuestion()};
+$("skipBtn").onclick=()=>{if(mode==="class")qIndex++;renderQuestion()};
+
+
+$("showCorrectionBtn").onclick=()=>{
+  if(mode!=="slate" || !currentQ) return;
+
+  if(currentQ.type==="completion" || currentQ.type==="subject" || currentQ.type==="group"){
+    document.querySelectorAll(".choice").forEach(b=>{
+      if(normalize(b.textContent)===normalize(currentQ.answer)){
+        b.classList.add("correct");
+      }
+    });
+    setFeedback(`✅ Bonne réponse : <strong>${currentQ.answer}</strong>.`,"good");
+  }else{
+    setFeedback(`✅ Correction : <strong>${currentQ.answer}</strong>.`,"good");
+  }
+
+  $("showCorrectionBtn").disabled=true;
+  $("nextBtn").disabled=false;
+};
+
+$("nobodyKnowsBtn").onclick=()=>{
+  if(mode!=="remed" || answered) return;
+  if(currentQ.type!=="error") showCorrectChoice(currentQ.answer);
+  setFeedback(`Personne ne marque de point. La bonne réponse était <strong>${currentQ.answer}</strong>.`,"bad");
+  answered=true;
+  $("skipBtn").disabled=true;
+  $("nextBtn").disabled=false;
+  document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+  const input=$("textAnswer"),val=$("validateText");
+  if(input) input.disabled=true;
+  if(val) val.disabled=true;
+};
+
+function startGame(){
+  readSelections();
+  activeStudents=getSelectedStudents();
+  slateQuestionCount=Math.max(1,Math.min(50,parseInt($("slateQuestionCount").value)||10));
+
+  if(selectedTenses.length===0){alert("Sélectionne au moins un temps.");return}
+  if(selectedGroups.length===0){alert("Sélectionne au moins un groupe de verbes.");return}
+  if(selectedExercises.length===0){alert("Sélectionne au moins un type d’exercice.");return}
+  if(mode!=="slate" && activeStudents.length===0){alert("Sélectionne au moins un élève.");return}
+  if(mode==="remed"&&activeStudents.length<2){alert("Le mode remédiation nécessite au moins deux élèves.");return}
+  if(availableCombos().length===0 && selectedExercises.some(x=>x!=="group")){alert("Aucune combinaison disponible avec ces réglages.");return}
+
+  targetPoints=Math.max(1,Math.min(10,parseInt($("targetPoints").value)||3));
+  maxTextAttempts=Math.max(1,Math.min(5,parseInt($("maxTextAttempts").value)||3));
+  totalCorrect=0;qIndex=0;lastStudent=null;remedQuestionCount=0;remedScores={};classResults=[];
+  activeStudents.forEach(n=>remedScores[n]=0);
+
+  classStudentDeck=shuffle(activeStudents);
+  questionDeck=buildClassDeck(mode==="slate" ? slateQuestionCount : activeStudents.length);
+  buildScoreboard();updateScoreboard();
+  $("summary").classList.remove("show");
+  $("statsPanel").classList.remove("show");$("statsPanel").classList.remove("show");$("gameArea").style.display="block";document.body.classList.add("projection");renderQuestion();
+}
+$("startBtn").onclick=startGame;$("restartBtn").onclick=startGame;
+
+
+function renderClassStats(){
+  const total=classResults.length;
+  const good=classResults.filter(r=>r.ok).length;
+  const bad=total-good;
+  const rate=total?Math.round(good/total*100):0;
+
+  $("successRate").textContent=`${rate} %`;
+  $("goodCount").textContent=good;
+  $("badCount").textContent=bad;
+
+  const errorStudents=classResults.filter(r=>!r.ok).map(r=>r.student);
+  const list=$("errorList");
+  list.innerHTML="";
+
+  if(errorStudents.length){
+    $("errorSection").style.display="block";
+    $("perfectNote").style.display="none";
+    errorStudents.forEach(name=>{
+      const div=document.createElement("div");
+      div.className="error-chip";
+      div.textContent=name;
+      list.appendChild(div);
+    });
+  }else{
+    $("errorSection").style.display="none";
+    $("perfectNote").style.display="block";
+  }
+
+  $("statsPanel").classList.add("show");
+}
+
+function finishGame(){
+  $("gameArea").style.display="none";$("summary").classList.add("show");$("progressBar").style.width="100%";
+  if(mode==="class"){
+    const total=activeStudents.length;
+    $("summaryTitle").textContent="Entraînement terminé !";$("finalScore").textContent=`${totalCorrect} / ${total}`;
+    $("finalText").textContent="Chaque élève sélectionné a répondu une fois.";
+    renderClassStats();
+  }else if(mode==="remed"){
+    const remaining=activeRemedStudents();$("summaryTitle").textContent="Remédiation terminée";$("finalScore").textContent="Tous sauf un";
+    $("finalText").innerHTML=remaining.length===1
+      ?`Tous les élèves ont atteint l’objectif sauf <strong>${remaining[0]}</strong>. Le jeu s’arrête ici, comme prévu.`
+      :"La partie est terminée.";
+  }else{
+    $("summaryTitle").textContent="Session ardoise terminée !";
+    $("finalScore").textContent=`${slateQuestionCount} question${slateQuestionCount>1?"s":""}`;
+    $("finalText").textContent="Toute la classe a répondu simultanément, sans score individuel.";
+    $("statsPanel").classList.remove("show");
+  }
+}
+
+
+$("settingsBtn").onclick=()=>{
+  document.body.classList.remove("projection");
+  $("gameArea").style.display="block";
+  $("summary").classList.remove("show");
+  $("qCounter").textContent="Prêt";
+  $("scoreCounter").textContent="0 bonne réponse";
+  $("progressBar").style.width="0%";
+  $("studentDraw").style.display="block";
+  $("remedPlayers").classList.remove("show");
+  $("currentStudent").textContent="—";
+  $("exerciseTag").textContent="Choisis les paramètres puis commence";
+  $("questionText").textContent="La première question apparaîtra ici.";
+  $("interaction").innerHTML="";
+  setFeedback("");
+  $("skipBtn").disabled=true;
+  $("nextBtn").disabled=true;
+  $("nobodyKnowsBtn").style.display="none";
+};
+
+renderStudents();readSelections();
+</script>
+</body>
+</html>
