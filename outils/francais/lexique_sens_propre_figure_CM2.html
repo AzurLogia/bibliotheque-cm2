@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Défis de lexique – Sens propre et sens figuré (CM2)</title>
+<style>
+:root{color-scheme:dark;--bg:#101827;--panel:#1c2a40;--panel2:#243650;--text:#f7f9fc;--muted:#bac9dc;--gold:#ffcf67;--blue:#7bc6ff;--green:#80e4b0;--red:#ff9c9c;--line:#435976}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0%,#253d60 0%,transparent 38%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',Arial,sans-serif;font-size:20px}
+button{font:inherit;cursor:pointer}button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}button:disabled{opacity:.35;cursor:not-allowed}
+.shell{max-width:1170px;margin:auto;padding:25px 30px 36px}.top{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:var(--gold);font-size:.75rem;font-weight:800}.brand{font-size:1.23rem;font-weight:800}.head-actions{display:flex;gap:10px;flex-wrap:wrap}.btn{border:1px solid var(--line);border-radius:14px;padding:12px 19px;background:#304462;color:white;font-weight:700;transition:.14s}.btn:hover:not(:disabled){filter:brightness(1.18)}.btn.primary{background:#f8c85e;border-color:#f8c85e;color:#142034}.btn.secondary{background:transparent}.btn.tiny{font-size:.78rem;padding:8px 13px}.btn.answer{background:#305a51;border-color:#539484}.btn.next{background:#477bb4;border-color:#6da2d8}
+.tabs{display:flex;gap:12px;margin-bottom:22px}.tab{flex:1;text-align:left;padding:15px 20px;border-radius:17px;border:2px solid #3d5271;background:#1b2940;color:white;font-weight:750}.tab.active{border-color:var(--gold);background:#3c3b45}.tab small{display:block;color:var(--muted);margin-top:3px;font-size:.74rem;font-weight:500}
+.main{border:1px solid #405473;border-radius:25px;background:linear-gradient(140deg,#1c2b44,#19253a);padding:31px;box-shadow:0 16px 50px #070c1940;min-height:520px}.status{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;color:var(--muted);font-size:.84rem;font-weight:650}.bar{height:8px;border-radius:10px;background:#344962;overflow:hidden;margin:15px 0 28px}.fill{height:100%;background:var(--gold);transition:width .2s}.question-label{text-align:center;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);font-size:.84rem}.question{font-weight:790;text-align:center;font-size:clamp(1.65rem,3.3vw,2.75rem);line-height:1.32;min-height:145px;display:flex;align-items:center;justify-content:center;padding:18px 10px}.instruction{text-align:center;color:var(--muted);font-size:.88rem;margin:-8px 0 20px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:750px;margin:0 auto}.choice{border:2px solid #62718b;background:#253850;color:white;padding:18px 22px;border-radius:16px;font-weight:800;min-height:76px;text-align:center}.choice:hover:not(:disabled){background:#334f73}.choice.sp{border-color:#72b9ff}.choice.sf{border-color:#ffd074}.choice.correct{background:#1b694e;border-color:#7af3b2;color:white}.choice.wrong{background:#713b49;border-color:#ff9797}.choice.dim{opacity:.58}.choice:disabled{cursor:default}.choice .letter{background:#ffffff24;padding:4px 10px;border-radius:8px;margin-right:12px}.choices.multi{grid-template-columns:1fr;max-width:1010px;gap:12px}.choices.multi .choice{text-align:left;font-size:clamp(.96rem,1.7vw,1.18rem);min-height:62px;padding:14px 20px;font-weight:650}
+.feedback{margin:25px auto 0;padding:18px 24px;max-width:1010px;background:#13243a;border-left:5px solid var(--green);border-radius:12px;line-height:1.5}.feedback strong{color:var(--green)}.feedback .explain{font-size:.95rem;margin-top:5px}.feedback .note{font-size:.8rem;color:var(--muted);margin-top:6px}.spacer{height:105px}.footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:28px}.control-group{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.meta{color:var(--muted);font-size:.76rem}.hint{color:var(--muted);font-size:.77rem;text-align:center;margin-top:16px}.help{font-size:.8rem;color:var(--muted);margin-top:12px}.hide{display:none!important}
+@media (max-width:650px){.shell{padding:15px}.main{padding:17px;min-height:500px}.top{margin-bottom:15px}.tabs{gap:7px}.tab{padding:12px;font-size:.84rem}.tab small{font-size:.65rem}.question{min-height:125px}.choices{gap:9px}.choice{padding:13px 8px;font-size:.88rem}.footer{justify-content:center}.footer>div{justify-content:center}.btn{padding:10px 12px;font-size:.85rem}}
+@media print{body{background:white;color:black}.top,.tabs,.footer,.hint{display:none}.main{border:0;box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+ <header class="top"><div><div class="eyebrow">Lexique · CM2</div><div class="brand">Sens propre &amp; sens figuré</div></div><div class="head-actions"><button class="btn secondary tiny" id="shuffleBtn" title="Mélanger les questions de la manche en cours">⤨ Mélanger</button><button class="btn secondary tiny" id="resetBtn">↺ Recommencer</button><button class="btn secondary tiny" id="fullBtn">⛶ Plein écran</button></div></header>
+ <nav class="tabs" aria-label="Choix de l'activité"><button class="tab active" id="tab1">1 · Propre ou figuré ?<small>20 phrases · justifier le classement</small></button><button class="tab" id="tab2">2 · Expressions mystères<small>12 expressions · retrouver le sens</small></button></nav>
+ <main class="main">
+  <div class="status"><span id="activityName">ACTIVITÉ 1 · PROPRE OU FIGURÉ ?</span><span id="counter">Phrase 1 / 20</span></div><div class="bar"><div class="fill" id="progress"></div></div>
+  <div class="question-label" id="qLabel">Sens propre ou sens figuré ?</div><div class="question" id="question" aria-live="polite"></div><div class="instruction" id="instruction">Les élèves choisissent une réponse puis expliquent leur raisonnement.</div>
+  <div class="choices" id="choices"></div><div id="feedback" class="feedback hide" aria-live="polite"></div>
+  <div class="footer"><div class="control-group"><button class="btn secondary" id="previous">← Précédente</button><button class="btn next" id="next">Suivante →</button></div><div class="control-group"><button class="btn answer" id="reveal">Afficher la correction</button></div></div>
+  <div class="hint">Clavier : ← / → pour naviguer · Entrée pour afficher la correction · 1, 2 ou 3 pour répondre.</div>
+ </main><p class="help">Pour une utilisation collective au vidéoprojecteur : solliciter une justification orale avant d'afficher la correction. Aucune connexion nécessaire.</p>
+</div>
+<script>
+'use strict';
+const items1=[
+ {q:'L’annonce de la victoire a enflammé les tribunes.',a:'SF',why:'La nouvelle a déclenché un immense enthousiasme.'},
+ {q:'La lampe de poche a éclairé le fond de la grotte.',a:'SP',why:'La lampe produit réellement de la lumière.'},
+ {q:'La nuit a jeté un voile d’obscurité sur la vallée.',a:'SF',why:'Il s’agit d’une image : l’obscurité recouvre progressivement la vallée comme un voile.'},
+ {q:'Cette explication a éclairé toute la classe sur le problème.',a:'SF',why:'Elle a permis aux élèves de mieux comprendre le problème.'},
+ {q:'Les ouvriers ont creusé un fossé le long de la route.',a:'SP',why:'Ils ont réellement creusé un trou allongé dans le sol.'},
+ {q:'Au musée, la statue est taillée dans un bloc de marbre.',a:'SP',why:'Le marbre désigne ici la pierre réelle.'},
+ {q:'Son argument a jeté un froid sur toute l’assemblée.',a:'SF',why:'Il a provoqué un malaise et interrompu l’enthousiasme.'},
+ {q:'À la moindre critique, ce candidat monte sur ses grands chevaux.',a:'SF',why:'Il se met rapidement en colère et réagit avec indignation.'},
+ {q:'Le pêcheur a jeté son filet dans la rivière.',a:'SP',why:'Il a réellement lancé un objet dans l’eau.'},
+ {q:'Après des semaines de débats, le projet a enfin vu le jour.',a:'SF',why:'Le projet a finalement été réalisé ou lancé.'},
+ {q:'Cette décision risque de creuser un fossé entre les deux amis.',a:'SF',why:'Elle risque de les éloigner et d’aggraver leur désaccord.'},
+ {q:'Une étincelle a enflammé les rideaux du théâtre.',a:'SP',why:'Les rideaux ont réellement pris feu.'},
+ {q:'Le cavalier monte sur son cheval avant la course.',a:'SP',why:'Il grimpe réellement sur l’animal.'},
+ {q:'En découvrant le résultat, elle est restée de marbre.',a:'SF',why:'Elle n’a montré aucune émotion ou réaction.'},
+ {q:'Le randonneur a arraché son pied de la boue.',a:'SP',why:'Le pied du randonneur était réellement coincé dans la boue.'},
+ {q:'Pour terminer à temps, l’équipe a travaillé d’arrache-pied.',a:'SF',why:'L’équipe a fourni des efforts soutenus et intenses.'},
+ {q:'Depuis son erreur, ce joueur marche sur des œufs devant son entraîneur.',a:'SF',why:'Il agit avec beaucoup de prudence pour éviter une nouvelle maladresse.'},
+ {q:'Le pâtissier marche sur des œufs tombés de leur boîte.',a:'SP',why:'Il pose réellement les pieds sur des œufs.'},
+ {q:'Le scientifique a mis le doigt sur l’origine de l’erreur.',a:'SF',why:'Il a identifié précisément la cause de l’erreur.'},
+ {q:'L’enfant a mis le doigt sur la tache d’encre.',a:'SP',why:'Il a réellement posé son doigt sur une tache.'}
+];
+const items2=[
+ {q:'Prêcher dans le désert',options:['Parler longuement d’un sujet que l’on connaît mal.','Défendre une opinion sans en être vraiment convaincu.','Donner de bons conseils que personne n’écoute.'],answer:2,why:'On s’exprime sans être écouté, comme si personne ne pouvait entendre.'},
+ {q:'Mettre de l’eau dans son vin',options:['Modérer ses exigences ou accepter un compromis.','Chercher à cacher une erreur embarrassante.','Éviter de prendre une décision importante.'],answer:0,why:'On devient moins intransigeant, plus conciliant.'},
+ {q:'Jeter de l’huile sur le feu',options:['Aggraver une dispute ou une situation déjà tendue.','Faire diversion pour apaiser une dispute.','Agir rapidement lorsqu’un danger survient.'],answer:0,why:'Comme l’huile peut attiser le feu, certaines paroles renforcent un conflit.'},
+ {q:'Couper l’herbe sous le pied de quelqu’un',options:['Prendre une décision sans demander l’avis des autres.','Devancer quelqu’un et l’empêcher de réaliser ce qu’il prévoyait.','Faire perdre confiance à quelqu’un en le critiquant.'],answer:1,why:'On prend l’autre de vitesse, ce qui compromet son projet.'},
+ {q:'Avoir plusieurs cordes à son arc',options:['Changer souvent d’avis selon les circonstances.','Essayer plusieurs fois sans réussir.','Posséder plusieurs compétences ou moyens d’agir.'],answer:2,why:'On dispose de différentes ressources ou aptitudes.'},
+ {q:'Noyer le poisson',options:['Oublier volontairement une information importante.','Brouiller les explications afin d’éviter une question gênante.','Multiplier les arguments pour convaincre à tout prix.'],answer:1,why:'On complique ou détourne la discussion pour esquiver une réponse claire.'},
+ {q:'Faire la sourde oreille',options:['Refuser volontairement d’écouter une demande ou un conseil.','Ignorer une conversation à cause du bruit ambiant.','Ne pas comprendre une consigne trop compliquée.'],answer:0,why:'On fait semblant de ne pas entendre ce qu’on ne veut pas écouter.'},
+ {q:'Chercher midi à quatorze heures',options:['S’obstiner à résoudre un problème impossible.','Perdre la notion du temps lorsqu’on réfléchit.','Compliquer inutilement quelque chose de simple.'],answer:2,why:'On cherche des complications là où il n’y en a pas.'},
+ {q:'Tirer son épingle du jeu',options:['Refuser de participer à une situation risquée.','Se sortir habilement d’une situation difficile.','Réussir grâce à l’aide des autres, sans faire d’effort.'],answer:1,why:'On parvient à s’en sortir avantageusement malgré les difficultés.'},
+ {q:'Prendre des vessies pour des lanternes',options:['Trouver une solution originale à un problème.','Se laisser tromper et confondre des choses très différentes.','S’inquiéter inutilement d’un danger imaginaire.'],answer:1,why:'On se méprend sur la réalité et on croit quelque chose d’absurde ou de trompeur.'},
+ {q:'Mettre la charrue avant les bœufs',options:['Faire les choses dans le mauvais ordre, trop précipitamment.','Tenter une tâche trop difficile pour son niveau.','Confier une responsabilité à une personne inexpérimentée.'],answer:0,why:'On commence par ce qui devrait normalement venir plus tard.'},
+ {q:'Avoir du pain sur la planche',options:['Se retrouver dans une situation sans issue.','Disposer de nombreuses possibilités pour réussir.','Avoir beaucoup de travail à accomplir.'],answer:2,why:'L’expression indique une quantité importante de travail qui reste à faire.'}
+];
+let mode=0;let lists=[items1.map((_,i)=>i),items2.map((_,i)=>i)];let positions=[0,0];let selections=[{},{}];let reveals=[{},{}];
+const $=id=>document.getElementById(id);
+const active=()=>mode===0?items1:items2;
+function currentIndex(){return positions[mode]}function current(){return active()[lists[mode][currentIndex()]]}
+function choose(i){selections[mode][lists[mode][currentIndex()]]=i;render()}
+function reveal(){reveals[mode][lists[mode][currentIndex()]]=true;render()}
+function render(){const list=lists[mode],pos=currentIndex(),data=current(),key=list[pos],shown=!!reveals[mode][key],selected=selections[mode][key];
+ $('tab1').classList.toggle('active',mode===0);$('tab2').classList.toggle('active',mode===1);$('activityName').textContent=mode===0?'ACTIVITÉ 1 · PROPRE OU FIGURÉ ?':'ACTIVITÉ 2 · EXPRESSIONS MYSTÈRES';$('counter').textContent=(mode===0?'Phrase ':'Expression ')+(pos+1)+' / '+list.length;$('progress').style.width=((pos+1)/list.length*100)+'%';$('qLabel').textContent=mode===0?'Sens propre ou sens figuré ?':'Que signifie cette expression ?';$('question').textContent=mode===0?data.q:'« '+data.q+' »';$('instruction').textContent=mode===0?'Analysez le sens de la phrase, puis justifiez votre choix.':'Choisissez l’explication la plus précise.';
+ const arr=mode===0?['Sens propre','Sens figuré']:data.options;const correct=mode===0?(data.a==='SP'?0:1):data.answer;const zone=$('choices');zone.innerHTML='';zone.classList.toggle('multi',mode===1);arr.forEach((label,i)=>{const b=document.createElement('button');b.className='choice';if(mode===0)b.classList.add(i===0?'sp':'sf');if(shown){b.classList.add(i===correct?'correct':(selected===i?'wrong':'dim'));}else if(selected===i){b.style.outline='3px solid #fff';b.style.outlineOffset='2px';}const marker=document.createElement('span');marker.className='letter';marker.textContent=(i+1).toString();b.append(marker,document.createTextNode(label));b.onclick=()=>choose(i);zone.append(b)});
+ const f=$('feedback');f.classList.toggle('hide',!shown);if(shown){const good=selected===undefined?null:selected===correct;f.innerHTML='<strong>'+(good===null?'Correction':good?'Bonne réponse !':'Correction')+' — '+(mode===0?arr[correct]:String.fromCharCode(65+correct)+' · '+arr[correct])+'</strong><div class="explain"></div><div class="note">'+(mode===0?'Repérez ce qui est réellement décrit et ce qui relève d’une image.':'Expliquez l’expression avec vos propres mots, puis employez-la dans une phrase.')+'</div>';f.querySelector('.explain').textContent=data.why;}
+ $('previous').disabled=pos===0;$('next').disabled=pos===list.length-1;$('reveal').textContent=shown?'✓ Correction affichée':'Afficher la correction';$('reveal').disabled=shown;
+}
+function move(dx){positions[mode]=Math.max(0,Math.min(lists[mode].length-1,positions[mode]+dx));render()}
+$('tab1').onclick=()=>{mode=0;render()};$('tab2').onclick=()=>{mode=1;render()};$('previous').onclick=()=>move(-1);$('next').onclick=()=>move(1);$('reveal').onclick=reveal;
+$('shuffleBtn').onclick=()=>{for(let i=lists[mode].length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[lists[mode][i],lists[mode][j]]=[lists[mode][j],lists[mode][i]]}positions[mode]=0;render()};
+$('resetBtn').onclick=()=>{if(confirm('Recommencer les deux activités et effacer les réponses ?')){lists=[items1.map((_,i)=>i),items2.map((_,i)=>i)];positions=[0,0];selections=[{},{}];reveals=[{},{}];mode=0;render()}};
+$('fullBtn').onclick=()=>{if(document.fullscreenElement){document.exitFullscreen?.()}else{document.documentElement.requestFullscreen?.()}};
+document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey)return;if(e.key==='ArrowRight'){move(1);e.preventDefault()}else if(e.key==='ArrowLeft'){move(-1);e.preventDefault()}else if(e.key==='Enter'){reveal();e.preventDefault()}else if(/^[123]$/.test(e.key)){let choice=Number(e.key)-1;if(choice<(mode===0?2:3))choose(choice)}});
+render();
+</script>
+</body></html>
