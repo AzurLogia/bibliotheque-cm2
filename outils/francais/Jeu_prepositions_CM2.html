@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Le puzzle des prépositions – CM2</title>
+<style>
+  :root{
+    --bg:#f5f1e8;
+    --paper:#fffdf8;
+    --ink:#23313d;
+    --muted:#66727c;
+    --blue:#386fb6;
+    --blue2:#eaf2fd;
+    --gold:#d2922e;
+    --gold2:#fff3dc;
+    --green:#3e9163;
+    --green2:#eaf7ef;
+    --red:#bf4d43;
+    --red2:#fff0ee;
+    --line:#d9d3c8;
+    --shadow:0 12px 34px rgba(35,49,61,.12);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  body{padding:18px 22px 24px}
+  .page{max-width:1500px;margin:0 auto}
+  header{display:flex;gap:22px;align-items:flex-end;justify-content:space-between;margin-bottom:12px}
+  h1{font-size:clamp(28px,3vw,46px);line-height:1;margin:0;font-weight:850;letter-spacing:-.7px}
+  .subtitle{font-size:clamp(14px,1.25vw,19px);color:var(--muted);margin-top:8px}
+  .badge{white-space:nowrap;background:#e9e4da;border:1px solid #d2cbc0;border-radius:999px;padding:8px 13px;font-weight:700;color:#59636b}
+
+  .instructions{background:var(--paper);border:1px solid var(--line);border-left:7px solid var(--blue);border-radius:15px;padding:13px 17px;margin:8px 0 14px;box-shadow:0 4px 14px rgba(35,49,61,.06);font-size:clamp(15px,1.25vw,18px);line-height:1.42}
+  .instructions strong{color:var(--blue)}
+
+  .bank-wrap{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:12px 14px 14px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .bank-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;font-size:15px;color:var(--muted);font-weight:750}
+  #bank{min-height:70px;border:2px dashed #c8c1b6;border-radius:13px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:9px;background:#faf8f3;transition:.18s}
+  #bank.active{border-color:var(--blue);background:var(--blue2)}
+  .chip{user-select:none;cursor:grab;touch-action:none;background:#fff;border:2px solid var(--blue);color:#284f82;border-radius:12px;padding:10px 17px;font-size:clamp(18px,1.75vw,26px);font-weight:850;box-shadow:0 3px 8px rgba(56,111,182,.12);transition:transform .12s, box-shadow .12s, background .12s}
+  .chip:hover{transform:translateY(-1px);box-shadow:0 6px 13px rgba(56,111,182,.18)}
+  .chip:active{cursor:grabbing}
+  .chip.selected{background:var(--gold2);border-color:var(--gold);color:#815512;box-shadow:0 0 0 4px rgba(210,146,46,.18)}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:11px 14px}
+  .sentence{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:12px 15px;display:flex;align-items:center;gap:8px;min-height:78px;box-shadow:0 5px 16px rgba(35,49,61,.06);font-size:clamp(18px,1.55vw,24px);font-weight:650;line-height:1.25}
+  .num{width:32px;height:32px;flex:0 0 32px;border-radius:50%;display:grid;place-items:center;background:#e8e3d9;color:#59636b;font-weight:900;font-size:15px}
+  .text{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .slot{display:inline-flex;vertical-align:middle;align-items:center;justify-content:center;min-width:126px;min-height:49px;padding:3px 6px;border:2.5px dashed #a9b3bc;border-radius:11px;background:#f9fbfc;transition:.15s}
+  .slot:empty::before{content:"préposition";color:#9aa4ad;font-size:14px;font-weight:700}
+  .slot.over{border-color:var(--gold);background:var(--gold2);transform:scale(1.03)}
+  .slot.correct{border-style:solid;border-color:var(--green);background:var(--green2)}
+  .slot.wrong{border-style:solid;border-color:var(--red);background:var(--red2);animation:shake .25s linear 2}
+  .slot .chip{font-size:clamp(17px,1.4vw,22px);padding:7px 12px;border-radius:9px}
+  @keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+  button{border:0;border-radius:12px;padding:11px 18px;font-size:16px;font-weight:800;cursor:pointer;transition:.15s;font-family:inherit}
+  #validate{background:var(--blue);color:#fff;box-shadow:0 5px 12px rgba(56,111,182,.22)}
+  #validate:hover{filter:brightness(.96);transform:translateY(-1px)}
+  #validate:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+  #reset{background:#ece7de;color:#53606a}
+  #hint{background:var(--gold2);color:#805512;border:1px solid #e4bf82}
+  #status{flex:1;min-width:260px;border-radius:12px;padding:10px 14px;font-size:16px;font-weight:750;display:none}
+  #status.info{display:block;background:var(--blue2);color:#2d609f;border:1px solid #b9d2f0}
+  #status.success{display:block;background:var(--green2);color:#2f7650;border:1px solid #add7bd}
+  #status.error{display:block;background:var(--red2);color:#963e37;border:1px solid #e2b7b3}
+  .hintbox{display:none;margin-top:10px;padding:10px 14px;background:var(--gold2);border:1px solid #e5c184;border-radius:12px;color:#725019;font-weight:650}
+  .hintbox.show{display:block}
+  .teacher-note{margin-top:10px;color:#7a817f;font-size:12px;text-align:right}
+
+  @media(max-width:900px){
+    body{padding:12px}
+    .grid{grid-template-columns:1fr}
+    header{align-items:flex-start}
+    .badge{display:none}
+  }
+  @media print{
+    body{background:white}
+    .controls,.teacher-note,.hintbox{display:none!important}
+    .bank-wrap,.sentence,.instructions{box-shadow:none}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div>
+      <h1>Le puzzle des prépositions</h1>
+      <div class="subtitle">Place chaque étiquette une seule fois. Plusieurs choix semblent possibles… mais tous ne permettent pas de terminer le puzzle.</div>
+    </div>
+    <div class="badge">CM2 • activité collective</div>
+  </header>
+
+  <div class="instructions">
+    <strong>Mission :</strong> complète les 8 phrases avec les 8 prépositions proposées. Une étiquette ne peut être utilisée qu’une seule fois.
+    <br>Tu peux <strong>glisser-déposer</strong> une étiquette, ou <strong>cliquer dessus puis cliquer sur un trou</strong>.
+  </div>
+
+  <section class="bank-wrap">
+    <div class="bank-title"><span>Étiquettes disponibles</span><span id="counter">8 restantes</span></div>
+    <div id="bank" class="drop-target" aria-label="Étiquettes disponibles"></div>
+  </section>
+
+  <main class="grid" id="sentences">
+    <div class="sentence"><span class="num">1</span><div class="text">Le chat se cache <span class="slot drop-target" data-index="0"></span> la table.</div></div>
+    <div class="sentence"><span class="num">2</span><div class="text">Le livre est posé <span class="slot drop-target" data-index="1"></span> la table.</div></div>
+    <div class="sentence"><span class="num">3</span><div class="text">Nous allons <span class="slot drop-target" data-index="2"></span> le médecin après l’école.</div></div>
+    <div class="sentence"><span class="num">4</span><div class="text">Lina part au gymnase <span class="slot drop-target" data-index="3"></span> sa sœur.</div></div>
+    <div class="sentence"><span class="num">5</span><div class="text">Hugo boit son chocolat <span class="slot drop-target" data-index="4"></span> sucre.</div></div>
+    <div class="sentence"><span class="num">6</span><div class="text">Ce cadeau est <span class="slot drop-target" data-index="5"></span> toi.</div></div>
+    <div class="sentence"><span class="num">7</span><div class="text">Il revient <span class="slot drop-target" data-index="6"></span> Paris après les vacances.</div></div>
+    <div class="sentence"><span class="num">8</span><div class="text">La maîtresse parle <span class="slot drop-target" data-index="7"></span> ses élèves.</div></div>
+  </main>
+
+  <div class="controls">
+    <button id="validate" disabled>✓ Valider</button>
+    <button id="reset">↻ Recommencer</button>
+    <button id="hint">💡 Indice</button>
+    <div id="status" role="status" aria-live="polite"></div>
+  </div>
+  <div class="hintbox" id="hintbox">Commence par repérer les phrases pour lesquelles très peu de prépositions semblent possibles. Garde les prépositions les plus polyvalentes pour la fin.</div>
+  <div class="teacher-note">Le jeu accepte plusieurs répartitions finales lorsque les phrases restent grammaticalement correctes et cohérentes.</div>
+</div>
+
+<script>
+(() => {
+  const words = ['avec','sous','à','pour','chez','de','sur','sans'];
+  // Compatibilités voulues : plusieurs choix locaux sont possibles,
+  // mais la contrainte "une seule fois" oblige à raisonner globalement.
+  const accepted = [
+    new Set(['sous']),
+    new Set(['sur','sous']),
+    new Set(['chez']),
+    new Set(['avec','sans']),
+    new Set(['avec','sans']),
+    new Set(['pour','à']),
+    new Set(['de','à']),
+    new Set(['à','avec'])
+  ];
+
+  const bank = document.getElementById('bank');
+  const slots = [...document.querySelectorAll('.slot')];
+  const validateBtn = document.getElementById('validate');
+  const resetBtn = document.getElementById('reset');
+  const hintBtn = document.getElementById('hint');
+  const hintBox = document.getElementById('hintbox');
+  const status = document.getElementById('status');
+  const counter = document.getElementById('counter');
+  let selected = null;
+  let dragged = null;
+
+  function makeChip(word){
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = word;
+    chip.draggable = true;
+    chip.dataset.word = word;
+    chip.setAttribute('role','button');
+    chip.setAttribute('tabindex','0');
+    chip.setAttribute('aria-label','Préposition ' + word);
+
+    chip.addEventListener('dragstart', e => {
+      dragged = chip;
+      e.dataTransfer.setData('text/plain', word);
+      e.dataTransfer.effectAllowed = 'move';
+      setSelected(chip);
+    });
+    chip.addEventListener('dragend', () => { dragged = null; clearOvers(); });
+    chip.addEventListener('click', e => { e.stopPropagation(); setSelected(selected === chip ? null : chip); });
+    chip.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); setSelected(selected === chip ? null : chip); }
+    });
+    return chip;
+  }
+
+  function setSelected(chip){
+    document.querySelectorAll('.chip.selected').forEach(c => c.classList.remove('selected'));
+    selected = chip;
+    if(chip) chip.classList.add('selected');
+  }
+
+  function clearFeedback(){
+    slots.forEach(s => s.classList.remove('correct','wrong'));
+    status.className = '';
+    status.textContent = '';
+  }
+
+  function clearOvers(){ document.querySelectorAll('.over').forEach(x => x.classList.remove('over')); }
+
+  function moveChip(chip, target){
+    if(!chip || !target) return;
+    clearFeedback();
+    if(target.classList.contains('slot')){
+      const existing = target.querySelector('.chip');
+      if(existing && existing !== chip) bank.appendChild(existing);
+      target.appendChild(chip);
+    } else if(target === bank){
+      bank.appendChild(chip);
+    }
+    setSelected(null);
+    updateState();
+  }
+
+  function setupDropTarget(target){
+    target.addEventListener('dragover', e => { e.preventDefault(); target.classList.add('over'); e.dataTransfer.dropEffect='move'; });
+    target.addEventListener('dragleave', () => target.classList.remove('over'));
+    target.addEventListener('drop', e => {
+      e.preventDefault(); target.classList.remove('over');
+      moveChip(dragged || selected, target);
+    });
+    target.addEventListener('click', e => {
+      if(e.target.classList.contains('chip')) return;
+      if(selected) moveChip(selected, target);
+    });
+  }
+
+  function updateState(){
+    const remaining = bank.querySelectorAll('.chip').length;
+    counter.textContent = remaining + (remaining > 1 ? ' restantes' : remaining === 1 ? ' restante' : ' restante');
+    validateBtn.disabled = slots.some(s => !s.querySelector('.chip'));
+  }
+
+  function validate(){
+    clearFeedback();
+    let wrong = 0;
+    slots.forEach((slot,i) => {
+      const chip = slot.querySelector('.chip');
+      const word = chip ? chip.dataset.word : '';
+      if(accepted[i].has(word)) slot.classList.add('correct');
+      else { slot.classList.add('wrong'); wrong++; }
+    });
+    if(wrong === 0){
+      status.className = 'success';
+      status.innerHTML = 'Bravo ! Toutes les phrases fonctionnent. <strong>Remarque :</strong> certaines étiquettes auraient pu sembler possibles ailleurs, mais il fallait raisonner sur l’ensemble du puzzle.';
+    } else {
+      status.className = 'error';
+      status.innerHTML = wrong === 1
+        ? 'Une phrase ne fonctionne pas avec la préposition choisie. Regarde aussi si un choix fait plus tôt t’a bloqué.'
+        : `${wrong} phrases ne fonctionnent pas avec les prépositions choisies. Reprends d’abord les placements les plus contraints.`;
+    }
+  }
+
+  function reset(){
+    clearFeedback(); setSelected(null); hintBox.classList.remove('show');
+    words.forEach(w => {
+      const chip = [...document.querySelectorAll('.chip')].find(c => c.dataset.word === w);
+      if(chip) bank.appendChild(chip);
+    });
+    updateState();
+  }
+
+  words.forEach(w => bank.appendChild(makeChip(w)));
+  document.querySelectorAll('.drop-target').forEach(setupDropTarget);
+  validateBtn.addEventListener('click', validate);
+  resetBtn.addEventListener('click', reset);
+  hintBtn.addEventListener('click', () => hintBox.classList.toggle('show'));
+  updateState();
+})();
+</script>
+</body>
+</html>
