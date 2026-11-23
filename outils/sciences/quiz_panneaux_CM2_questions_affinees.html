@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Défi panneaux routiers • Sciences CM2 • vrais panneaux</title>
+<style>
+  :root{--navy:#0e2343;--navy2:#152f51;--accent:#ffbf46;--accent2:#f7a900;--ink:#17314e;--muted:#64748b;--soft:#eaf1f8;--green:#14765a;--greenBg:#ddf8e9;--red:#a83242;--redBg:#fce8eb;--white:#fff}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);background:radial-gradient(circle at 85% 7%,#244a77,#132e53 50%,#091c35 100%)}
+  body{min-height:100vh;display:flex;justify-content:center;align-items:stretch;padding:clamp(10px,2vh,22px)}
+  button{font:inherit;cursor:pointer;transition:background .15s,border-color .15s,transform .12s}
+  button:focus-visible{outline:4px solid #e99f00;outline-offset:3px}
+  button:disabled{cursor:not-allowed;opacity:.55}
+  .app{width:min(1200px,100%);min-height:calc(100vh - 44px);border-radius:24px;overflow:hidden;display:flex;flex-direction:column;background:#f8fafc;box-shadow:0 18px 60px #00122a80}
+  header{background:var(--navy);color:white;padding:15px clamp(18px,3vw,36px);display:flex;gap:16px;align-items:center;justify-content:space-between}
+  .brand{display:flex;gap:12px;align-items:center;font-weight:850;letter-spacing:.02em;font-size:clamp(16px,2vw,22px)}
+  .brand-mark{width:43px;height:43px;background:var(--accent);color:var(--navy);display:grid;place-items:center;border-radius:12px;font-size:26px;line-height:1}
+  .header-note{font-size:13px;color:#cfdbec;text-align:right}
+  .main{flex:1;display:flex;flex-direction:column;padding:clamp(18px,2.2vw,30px) clamp(18px,3.4vw,45px)}
+  .screen{display:none;flex:1;flex-direction:column}.screen.active{display:flex}
+  .eyebrow{color:#1b68a2;text-transform:uppercase;font-size:14px;font-weight:850;letter-spacing:.13em}
+  .hero{display:grid;grid-template-columns:1.2fr .8fr;align-items:center;gap:28px;flex:1}
+  h1{font-size:clamp(38px,5vw,68px);line-height:1.07;letter-spacing:-.04em;margin:14px 0}
+  h2{font-size:clamp(23px,3vw,35px);line-height:1.18;margin:8px 0 14px}
+  .lead{font-size:clamp(18px,2vw,23px);line-height:1.5;color:#475d73;max-width:580px}
+  .heroArt{display:grid;place-items:center;position:relative;min-height:205px}
+  .heroCircle{background:#e8f2fb;width:clamp(145px,17vw,182px);height:clamp(145px,17vw,182px);border-radius:100%;display:grid;place-items:center;overflow:hidden}
+  .heroCircle svg,.heroCircle img{width:72%;height:72%;max-width:132px;max-height:132px;object-fit:contain;display:block;filter:drop-shadow(0 7px 5px #4d65784a)}
+  .pill-row{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0 30px}
+  .pill{display:inline-flex;align-items:center;background:#e8eff7;border-radius:100px;padding:9px 14px;color:#2b567d;font-size:14px;font-weight:750}
+  .btn{background:var(--navy);color:white;padding:15px 23px;border:none;border-radius:12px;font-weight:780;display:inline-flex;align-items:center;gap:10px;justify-content:center;min-height:53px}
+  .btn:hover{background:#244e7b}.btn.primary{background:var(--accent);color:#252019;font-size:19px;padding:17px 28px}.btn.primary:hover{background:#f1ac28}
+  .btn.secondary{background:white;color:var(--navy);border:2px solid #bdcad9}.btn.secondary:hover{background:#eef4fa}
+  .btn.ghost{background:transparent;color:#40566e;border:1px solid #cfdae7}
+  .question-top{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .progressBox{display:flex;align-items:center;gap:12px;min-width:245px}
+  .progress{height:12px;background:#dfe7ef;border-radius:30px;overflow:hidden;flex:1}.progressFill{height:100%;width:0;background:#f3b63d;border-radius:30px;transition:width .25s}
+  .qnum{font-size:15px;font-weight:800;color:#365877;white-space:nowrap}
+  .question-area{display:grid;grid-template-columns:minmax(240px,41%) minmax(310px,59%);align-items:stretch;gap:clamp(16px,3vw,36px);flex:1;margin-top:17px;min-height:0}
+  .signPane{background:#eff4f9;border:2px solid #dfe8f0;border-radius:20px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:18px;gap:15px;min-height:300px}
+  .signPane svg,.signPane img{width:min(100%,340px);max-height:min(39vh,330px);height:auto;filter:drop-shadow(0 9px 5px #9bb0be70);object-fit:contain}
+  .load-warning{color:#9c2c2c;font-size:14px;font-weight:700;text-align:center}.signHint{font-size:13px;letter-spacing:.07em;text-transform:uppercase;font-weight:800;color:#68839e}
+  .rightPane{display:flex;flex-direction:column;justify-content:center;min-width:0}
+  .choices{display:flex;flex-direction:column;gap:11px;margin:12px 0 18px}
+  .choice{width:100%;min-height:67px;border-radius:14px;background:white;border:2px solid #d5e0eb;color:#263f59;display:flex;align-items:center;text-align:left;padding:11px 17px;gap:16px;font-weight:650;font-size:clamp(16px,1.8vw,21px)}
+  .choice:hover:not(:disabled){background:#f0f6fc;border-color:#6996be}
+  .choice .letter{flex:none;display:grid;place-items:center;font-size:17px;font-weight:900;width:40px;height:40px;background:#eaf0f6;border-radius:10px;color:#3f5f83}
+  .choice.chosen{border-color:#1765a7;background:#e8f3ff}.choice.chosen .letter{background:#1765a7;color:white}
+  .choice.correct{border-color:#1b9169;background:var(--greenBg)}.choice.correct .letter{background:#1b9169;color:white}
+  .choice.wrong{border-color:#c94455;background:var(--redBg)}.choice.wrong .letter{background:#c94455;color:white}
+  .feedback{display:none;background:#edf5fc;border-left:5px solid #367bb5;border-radius:11px;padding:13px 16px;margin-bottom:12px;line-height:1.35;font-size:clamp(14px,1.5vw,17px)}
+  .feedback.show{display:block}.feedback strong{display:block;font-size:18px;margin-bottom:3px}
+  .quizButtons{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:4px}
+  .bottom{border-top:1px solid #e0e8f0;padding:14px clamp(18px,3.4vw,45px);display:flex;gap:18px;align-items:center;justify-content:space-between;color:#72849b;font-size:13px}
+  .kbd{padding:3px 6px;border:1px solid #aebccb;border-radius:5px;font-weight:700;color:#48637e;background:#fff}
+  .finish{text-align:center;justify-content:center;align-items:center;gap:16px}.finish .big{font-size:73px;line-height:1}
+  .finish h1{font-size:clamp(30px,4.2vw,53px);margin:6px 0}.finish p{max-width:720px;font-size:clamp(17px,2vw,22px);line-height:1.5;color:#4f6174;margin:0}
+  .takeaway{background:#eaf2fa;padding:20px 25px;border-radius:16px;max-width:730px;text-align:left;margin-top:12px;font-size:18px;line-height:1.5}
+  .takeaway strong{color:#173f62}
+  .result{color:#1c5c86;font-size:18px;font-weight:800}
+  @media (max-width:840px){.question-area{grid-template-columns:38% 62%;gap:12px}.main{padding:16px}.signPane{min-height:250px}.choice{min-height:58px;font-size:16px}.choice .letter{height:32px;width:32px}.hero{grid-template-columns:1fr}.heroArt{min-height:180px}.heroCircle{width:142px;height:142px;min-width:0;min-height:0}.heroArt{order:-1}header{padding:10px 18px}.header-note{display:none}.bottom{padding:10px 18px}}
+  @media (max-width:650px){.question-area{grid-template-columns:1fr}.signPane{min-height:0;padding:10px}.signPane svg,.signPane img{height:180px;max-height:180px}.signHint{display:none}h2{font-size:22px}.choices{margin:5px 0 10px}.choice{min-height:50px}.bottom span:last-child{display:none} .pill-row{margin:10px 0 20px}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app" role="application" aria-label="Quiz collectif sur les panneaux de signalisation routière">
+<header><div class="brand"><span class="brand-mark">🚦</span><span>SCIENCES • CM2 <span style="color:#ffbf46">/</span> Signal et information</span></div><div class="header-note">Défi collectif • Vrais panneaux français</div></header>
+<main class="main">
+<section id="intro" class="screen active" aria-labelledby="introTitle"><div class="hero"><div><div class="eyebrow">Mini-défi interactif</div><h1 id="introTitle">Que disent les<br>panneaux routiers ?</h1><p class="lead">Pas besoin de paroles pour transmettre une information ! Observe de vrais panneaux français, compare des réponses proches et explique ton choix. Attention : plusieurs propositions peuvent sembler crédibles !</p><div class="pill-row"><span class="pill">10 panneaux</span><span class="pill">CM2</span><span class="pill">10 à 15 minutes</span><span class="pill">Connexion Internet nécessaire</span></div><button class="btn primary" id="startBtn">Commencer le défi <span aria-hidden="true">→</span></button></div><div class="heroArt"><div class="heroCircle" id="heroSign" aria-label="Panneau STOP"></div></div></div></section>
+<section id="quiz" class="screen" aria-labelledby="questionTitle"><div class="question-top"><span class="eyebrow">J’observe • je choisis • je justifie</span><div class="progressBox"><span class="qnum" id="qnum">1 / 10</span><div class="progress" aria-hidden="true"><div id="progressFill" class="progressFill"></div></div></div></div><div class="question-area"><div class="signPane"><div class="signHint">Observe ce panneau</div><div id="signArt" role="img"></div><div class="load-warning" id="loadWarning" style="display:none">Image indisponible. Vérifie la connexion Internet.</div></div><div class="rightPane"><h2 id="questionTitle">Quel message transmet ce panneau ?</h2><div id="choices" class="choices"></div><div id="feedback" class="feedback" aria-live="polite"></div><div class="quizButtons"><button class="btn primary" id="revealBtn">Voir la réponse ✓</button><button class="btn" id="nextBtn" style="display:none">Panneau suivant →</button><button class="btn ghost" id="backBtn" title="Revenir au panneau précédent">← Précédent</button></div></div></div></section>
+<section id="finish" class="screen finish" aria-labelledby="finishTitle"><div class="big">🏁</div><div class="eyebrow">Défi terminé</div><h1 id="finishTitle">Bravo, experts en panneaux !</h1><div class="result" id="resultText"></div><p>Une forme, une couleur et un pictogramme suffisent parfois à transmettre une information importante.</p><div class="takeaway"><strong>À retenir :</strong> un panneau routier est un <strong>signal visuel</strong>. Pour comprendre ce qu’il signifie et savoir comment réagir, il faut connaître le <strong>code</strong> utilisé.<br><br><strong>Question pour la classe :</strong> que risquerait-il de se passer si chacun inventait une signification différente pour le même panneau ?</div><button class="btn primary" id="restartBtn">Recommencer ↻</button></section>
+</main>
+<footer class="bottom"><span>À projeter dans Firefox • <span class="kbd">F11</span> plein écran • <span class="kbd">A</span> <span class="kbd">B</span> <span class="kbd">C</span> pour choisir • <span class="kbd">Entrée</span> pour avancer</span><span>Réponses à révéler après discussion collective</span></footer>
+</div>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const svgStart='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-hidden="true">';
+const end='</svg>';
+const bicycle=(color='#132536')=>`<g fill="none" stroke="${color}" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"><circle cx="112" cy="244" r="49"/><circle cx="285" cy="244" r="49"/><path d="M112 244 L171 153 L218 244 Z M171 153 L285 244 L225 142 M156 141 H186 M215 139 H250"/></g>`;
+const tri=(inner)=>svgStart+`<polygon points="200,35 360,334 40,334" fill="white" stroke="#adb6bf" stroke-width="10" stroke-linejoin="round"/><polygon points="200,45 351,327 49,327" fill="white" stroke="#e32433" stroke-width="25" stroke-linejoin="round"/>${inner}`+end;
+const children=()=>`<g fill="#111d2b" stroke="#111d2b" stroke-linecap="round" stroke-linejoin="round"><circle cx="175" cy="156" r="17"/><path d="M168 179 L154 227 L182 232 L192 185 Z"/><path d="M170 199 L132 214 M183 202 L212 216" stroke-width="12" fill="none"/><path d="M159 228 L146 264 M181 230 L211 263" stroke-width="13" fill="none"/><circle cx="243" cy="179" r="13"/><path d="M241 193 L222 233 L252 231 L251 200 Z"/><path d="M233 211 L211 218 M248 209 L267 220" stroke-width="9" fill="none"/><path d="M229 228 L213 255 M248 231 L265 255" stroke-width="10" fill="none"/></g>`;
+const pedestrian=()=>svgStart+`<rect x="37" y="37" width="326" height="326" rx="13" fill="#a6b2bf"/><rect x="43" y="43" width="314" height="314" rx="9" fill="#136ac1" stroke="white" stroke-width="10"/><polygon points="200,74 79,304 321,304" fill="white"/><g fill="#1e2732"><circle cx="215" cy="143" r="14"/><path d="M212 161 L187 217 L226 232 L232 183 Z"/><path d="M206 183 L178 197 M219 185 L242 204" stroke="#1e2732" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M196 215 L178 248 M220 225 L250 245" stroke="#1e2732" stroke-width="13" fill="none" stroke-linecap="round"/></g><g fill="#172638"><polygon points="94,270 139,263 136,285 93,293"/><polygon points="155,259 193,256 194,279 150,284"/><polygon points="210,256 251,259 270,284 208,279"/><polygon points="270,263 307,271 313,294 281,287"/></g>`+end;
+const signs={
+ stop:'https://commons.wikimedia.org/wiki/Special:Redirect/file/France%20road%20sign%20AB4.svg',
+ interdit:'https://commons.wikimedia.org/wiki/Special:Redirect/file/France%20road%20sign%20B1.svg',
+ enfants:'https://commons.wikimedia.org/wiki/Special:Redirect/file/France%20road%20sign%20A13a.svg',
+ passage:'https://commons.wikimedia.org/wiki/Special:Redirect/file/France%20road%20sign%20C20a.svg',
+ vitesse:'https://commons.wikimedia.org/wiki/Special:Redirect/file/France%20road%20sign%20B14%20%2830%29.svg',
+ cede:'https://commons.wikimedia.org/wiki/Special:Redirect/file/France%20road%20sign%20AB3a.svg',
+ velo:'https://commons.wikimedia.org/wiki/Special:Redirect/file/France%20road%20sign%20B22a.svg',
+ parking:'https://commons.wikimedia.org/wiki/Special:Redirect/file/France%20road%20sign%20C1a.svg',
+ veloInterdit:'https://commons.wikimedia.org/wiki/Special:Redirect/file/France%20road%20sign%20B9b.svg',
+ droite:'https://commons.wikimedia.org/wiki/Special:Redirect/file/France%20road%20sign%20B21a1.svg'
+};
+const questions=[
+  {
+    "s": "stop",
+    "q": "À quelle condition peux-tu repartir après ce panneau ?",
+    "a": [
+      "Dès que j'ai suffisamment ralenti et vérifié la route.",
+      "Après m'être arrêté complètement et avoir vérifié que je peux repartir.",
+      "Sans m'arrêter si aucun véhicule n'est visible."
+    ],
+    "c": 1,
+    "e": "Le STOP impose un arrêt complet, même quand la route paraît libre. Il faut ensuite céder le passage aux usagers prioritaires."
+  },
+  {
+    "s": "interdit",
+    "q": "Que signifie exactement ce panneau placé à l'entrée d'une rue ?",
+    "a": [
+      "Il est interdit de circuler dans cette rue, dans les deux sens.",
+      "Il est interdit d'entrer dans cette rue depuis ce côté.",
+      "Il est interdit d'y stationner, mais on peut y circuler."
+    ],
+    "c": 1,
+    "e": "Le panneau « Sens interdit » empêche d'entrer dans la rue depuis cette direction. Ce n'est pas la même chose qu'une interdiction de circuler dans les deux sens."
+  },
+  {
+    "s": "enfants",
+    "q": "Quel danger ce panneau annonce-t-il précisément ?",
+    "a": [
+      "Un passage piéton est obligatoirement tracé juste après le panneau.",
+      "Des enfants peuvent circuler ou traverser à proximité.",
+      "La vitesse maximale autorisée devient automatiquement 30 km/h."
+    ],
+    "c": 1,
+    "e": "Le triangle rouge annonce un danger : un endroit fréquenté par des enfants. Ce panneau ne fixe pas, à lui seul, une limitation à 30 km/h."
+  },
+  {
+    "s": "passage",
+    "q": "Le panneau carré bleu te donne une information. Laquelle ?",
+    "a": [
+      "Un passage piéton se trouve à cet endroit.",
+      "Un passage piéton se trouve plus loin : c'est un avertissement de danger.",
+      "La rue devient une zone entièrement réservée aux piétons."
+    ],
+    "c": 0,
+    "e": "Le carré bleu indique ici un passage piéton à son emplacement. Un triangle rouge annonçant un passage piéton avertit plutôt de sa proximité."
+  },
+  {
+    "s": "vitesse",
+    "q": "Que représente précisément le nombre inscrit dans ce cercle ?",
+    "a": [
+      "La vitesse recommandée, que l'on peut dépasser si la route est libre.",
+      "La vitesse minimale à maintenir pour ne pas gêner la circulation.",
+      "La vitesse maximale autorisée : il ne faut pas la dépasser."
+    ],
+    "c": 2,
+    "e": "Le cercle blanc bordé de rouge indique une limitation de vitesse : 30 km/h maximum, et non une vitesse conseillée ou minimale."
+  },
+  {
+    "s": "cede",
+    "q": "Que distingue ce panneau d'un panneau STOP ?",
+    "a": [
+      "Il faut s'arrêter systématiquement à la ligne, même si la voie est libre.",
+      "Il faut laisser la priorité et s'arrêter seulement si la situation l'exige.",
+      "Il suffit de ralentir ; les véhicules de l'autre route doivent nous laisser passer."
+    ],
+    "c": 1,
+    "e": "Avec « Cédez le passage », on laisse passer les usagers prioritaires. L'arrêt n'est pas automatique, contrairement au STOP."
+  },
+  {
+    "s": "velo",
+    "q": "Que t'indique ce panneau rond bleu avec un vélo ?",
+    "a": [
+      "Un aménagement cyclable conseillé, mais que les cyclistes peuvent ignorer.",
+      "Un aménagement que les cyclistes doivent emprunter.",
+      "Une voie où les vélos sont admis seulement s'ils circulent au pas."
+    ],
+    "c": 1,
+    "e": "Ce panneau B22a rend l'utilisation de la piste ou de la bande cyclable obligatoire pour les cycles concernés. Un panneau carré bleu aurait un autre sens."
+  },
+  {
+    "s": "parking",
+    "q": "Quelle information donne ce panneau, sans autre précision ?",
+    "a": [
+      "Une zone où l'on peut stationner.",
+      "Un endroit où l'on peut s'arrêter brièvement, mais pas stationner.",
+      "Un stationnement réservé exclusivement aux habitants du quartier."
+    ],
+    "c": 0,
+    "e": "Le P blanc sur fond bleu indique un lieu de stationnement. Une réservation ou une restriction particulière nécessite une indication complémentaire."
+  },
+  {
+    "s": "veloInterdit",
+    "q": "Qu'est-ce qui est interdit par ce panneau ?",
+    "a": [
+      "L'accès à tous les véhicules, même les voitures.",
+      "L'accès aux cycles, notamment aux vélos.",
+      "L'accès aux seuls deux-roues motorisés."
+    ],
+    "c": 1,
+    "e": "Le symbole du vélo dans un cercle bordé de rouge interdit l'accès aux cycles. Il ne faut pas le confondre avec un panneau interdisant tous les véhicules."
+  },
+  {
+    "s": "droite",
+    "q": "Un îlot se trouve au milieu de la chaussée. Comment faut-il le franchir ?",
+    "a": [
+      "Passer obligatoirement à droite de l'îlot.",
+      "Tourner obligatoirement à droite à la prochaine intersection.",
+      "Passer de préférence à droite, mais la gauche reste autorisée."
+    ],
+    "c": 0,
+    "e": "Ce panneau B21a1 impose de contourner l'obstacle par la droite. Il n'ordonne pas de tourner à droite à une intersection."
+  }
+];
+let idx=0;let selections=Array(questions.length).fill(null);let revealed=Array(questions.length).fill(false);
+const $=id=>document.getElementById(id);
+function show(screen){document.querySelectorAll('.screen').forEach(el=>el.classList.toggle('active',el.id===screen));window.scrollTo(0,0)}
+function render(){const q=questions[idx];show('quiz');$('qnum').textContent=`${idx+1} / ${questions.length}`;$('progressFill').style.width=`${(idx+1)/questions.length*100}%`;$('loadWarning').style.display='none';$('signArt').innerHTML = `<img src="${signs[q.s]}" alt="Panneau routier numéro ${idx+1}" onerror="document.getElementById('loadWarning').style.display='block'">`; $('signArt').setAttribute('aria-label',`Panneau routier numéro ${idx+1}`);$('questionTitle').textContent=q.q;$('choices').innerHTML='';q.a.forEach((answer,i)=>{const btn=document.createElement('button');btn.className='choice';btn.type='button';btn.innerHTML=`<span class="letter">${String.fromCharCode(65+i)}</span><span>${answer}</span>`;btn.addEventListener('click',()=>choose(i));btn.dataset.choice=i;$('choices').appendChild(btn)});
+ const isRevealed=revealed[idx];$('revealBtn').style.display=isRevealed?'none':'inline-flex';$('nextBtn').style.display=isRevealed?'inline-flex':'none';$('nextBtn').textContent=idx===questions.length-1?'Voir la conclusion →':'Panneau suivant →';$('backBtn').disabled=idx===0;
+ if(isRevealed){const got=selections[idx]===q.c;const has=selections[idx]!==null;$('feedback').innerHTML=`<strong>${!has?'La bonne réponse : '+String.fromCharCode(65+q.c):got?'Bonne réponse !':'La bonne réponse était '+String.fromCharCode(65+q.c)+'.'}</strong>${q.e}`;$('feedback').classList.add('show')}else{$('feedback').classList.remove('show');$('feedback').textContent=''}
+ [...$('choices').children].forEach((b,i)=>{if(!isRevealed&&selections[idx]===i)b.classList.add('chosen');if(isRevealed&&i===q.c)b.classList.add('correct');if(isRevealed&&i===selections[idx]&&i!==q.c)b.classList.add('wrong');b.setAttribute('aria-pressed',String(selections[idx]===i));b.disabled=isRevealed});
+}
+function choose(i){if(revealed[idx])return;selections[idx]=i;render()}
+function reveal(){if(revealed[idx])return;revealed[idx]=true;render()}
+function next(){if(idx===questions.length-1){const answered=selections.filter((x,i)=>revealed[i]&&x!==null).length;const right=selections.filter((x,i)=>revealed[i]&&x===questions[i].c).length;$('resultText').textContent=answered?`${right} bonne${right>1?'s':''} réponse${right>1?'s':''} sur ${answered} question${answered>1?'s':''} jouée${answered>1?'s':''}`:'Toutes les réponses ont été découvertes ensemble.';show('finish')}else{idx++;render()}}
+$('startBtn').onclick=()=>{idx=0;selections=Array(questions.length).fill(null);revealed=Array(questions.length).fill(false);render()};$('restartBtn').onclick=()=>$('startBtn').click();$('revealBtn').onclick=reveal;$('nextBtn').onclick=next;$('backBtn').onclick=()=>{if(idx>0){idx--;render()}};
+document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;if($('quiz').classList.contains('active')){const k=e.key.toLowerCase();if(['a','b','c'].includes(k)){e.preventDefault();choose(k.charCodeAt(0)-97)}else if(e.key==='Enter'&&e.target.tagName!=='BUTTON'){e.preventDefault();revealed[idx]?next():reveal()}else if(e.key==='ArrowLeft'){e.preventDefault();if(idx>0){idx--;render()}}else if(e.key==='ArrowRight'&&revealed[idx]){e.preventDefault();next()}}});
+$('heroSign').innerHTML = `<img src="${signs.stop}" alt="Panneau STOP">`;
+</script>
+</body>
+</html>
